@@ -12,7 +12,7 @@ Reflection library
 
 ```php
 use lang\{Reflection};
-use org\example\{Author, Fixture};
+use org\example\{Author, Base, Fixture};
 
 $type= Reflection::of(Fixture::class);
 
@@ -22,7 +22,6 @@ $type->modifiers();           // Modifiers<public>
 $type->classLoader();         // lang.ClassLoader instance
 $type->parent();              // Type or NULL
 $type->kind();                // Kind::$INTERFACE, Kind::$TRAIT, Kind::$CLASS, Kind::$ENUM
-$type->constructor();         // Constructor or NULL
 $type->is(Base::class);       // true
 
 if ($type->instantiable()) {
@@ -49,33 +48,43 @@ $type->annotation(Author::class); // Annotation or NULL
 All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
 
 ```php
-$type->constant('POWER');                // Constant or NULL
-$type->property('value');                // Property or NULL
-$type->method('fixture');                // Method or NULL
+$type->constructor();                      // Constructor or NULL
+$type->constant('POWER');                  // Constant or NULL
+$type->property('value');                  // Property or NULL
+$type->method('fixture');                  // Method or NULL
+
+if ($constructor= $type->constructor()) {
+  $constructor->name();                    // 'POWER'
+  $constructor->modifiers();               // Modifiers<public>
+  $constructor->annotations();             // Annotations
+  $constructor->annotation(Author::class); // Annotation or NULL
+  $constructor->declaredIn();              // Type
+  $constructor->newInstance([]);           // (instance of the type)
+}
 
 foreach ($type->constants() as $constant) {
-  $constant->name();                     // 'POWER'
-  $constant->value();                    // 6100
-  $constant->modifiers();                // Modifiers<public>
-  $constant->annotations();              // Annotations
-  $constant->annotation(Author::class);  // Annotation or NULL
-  $constant->declaredIn();               // Type
+  $constant->name();                       // 'POWER'
+  $constant->value();                      // 6100
+  $constant->modifiers();                  // Modifiers<public>
+  $constant->annotations();                // Annotations
+  $constant->annotation(Author::class);    // Annotation or NULL
+  $constant->declaredIn();                 // Type
 }
 
 foreach ($type->properties() as $property) {
-  $property->name();                     // 'value'
-  $property->modifiers();                // Modifiers<public>
-  $property->annotations();              // Annotations
-  $property->annotation(Author::class);  // Annotation or NULL
-  $property->declaredIn();               // Type
+  $property->name();                       // 'value'
+  $property->modifiers();                  // Modifiers<public>
+  $property->annotations();                // Annotations
+  $property->annotation(Author::class);    // Annotation or NULL
+  $property->declaredIn();                 // Type
 }
 
 foreach ($type->methods() as $method) {
-  $method->name();                       // 'fixture'
-  $method->modifiers();                  // Modifiers<public>
-  $method->annotations();                // Annotations
-  $method->annotation(Author::class);    // Annotation or NULL
-  $method->declaredIn();                 // Type
-  $method->invoke($instance, []);        // (method return value)
+  $method->name();                         // 'fixture'
+  $method->modifiers();                    // Modifiers<public>
+  $method->annotations();                  // Annotations
+  $method->annotation(Author::class);      // Annotation or NULL
+  $method->declaredIn();                   // Type
+  $method->invoke($instance, []);          // (method return value)
 }
 ```
