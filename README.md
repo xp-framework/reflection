@@ -49,6 +49,10 @@ $type->annotation(Author::class); // Annotation or NULL
 All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
 
 ```php
+$type->constant('POWER');                // Constant or NULL
+$type->property('value');                // Property or NULL
+$type->method('fixture');                // Method or NULL
+
 foreach ($type->constants() as $constant) {
   $constant->name();                     // 'POWER'
   $constant->value();                    // 6100
@@ -72,9 +76,6 @@ foreach ($type->methods() as $method) {
   $method->annotations();                // Annotations
   $method->annotation(Author::class);    // Annotation or NULL
   $method->declaredIn();                 // Type
+  $method->invoke($instance, []);        // (method return value)
 }
-
-$type->constant('POWER');                // Constant or NULL
-$type->property('value');                // Property or NULL
-$type->method('fixture');                // Method or NULL
 ```
