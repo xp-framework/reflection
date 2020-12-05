@@ -45,13 +45,10 @@ foreach ($type->annotations() as $annotation) {
 $type->annotation(Author::class); // Annotation or NULL
 ```
 
-All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
+The constructor can be accessed via `constructor()`. Like members, it provides accessors for modifiers and annotations, as well as its declaring type.
 
 ```php
 $type->constructor();                      // Constructor or NULL
-$type->constant('POWER');                  // Constant or NULL
-$type->property('value');                  // Property or NULL
-$type->method('fixture');                  // Method or NULL
 
 if ($constructor= $type->constructor()) {
   $constructor->name();                    // 'POWER'
@@ -61,6 +58,14 @@ if ($constructor= $type->constructor()) {
   $constructor->declaredIn();              // Type
   $constructor->newInstance([]);           // (instance of the type)
 }
+```
+
+All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
+
+```php
+$type->constant('POWER');                  // Constant or NULL
+$type->property('value');                  // Property or NULL
+$type->method('fixture');                  // Method or NULL
 
 foreach ($type->constants() as $constant) {
   $constant->name();                       // 'POWER'
