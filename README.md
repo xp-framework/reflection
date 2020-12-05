@@ -11,27 +11,70 @@ XP Reflection
 Reflection library
 
 ```php
-use lang\{Reflection, IllegalStateException};
+use lang\{Reflection};
+use org\example\{Author, Fixture};
 
-$type= Reflection::of(IllegalStateException::class);
+$type= Reflection::of(Fixture::class);
 
-$type->name();      // lang.IllegalStateException
-$type->literal();   // lang\IllegalStateException
-$type->modifiers(); // Modifiers<public>
+$type->name();                // org.example.Fixture
+$type->literal();             // Fixture::class
+$type->modifiers();           // Modifiers<public>
+$type->classLoader();         // lang.ClassLoader instance
+$type->parent();              // Type or NULL
+$type->kind();                // Kind::$INTERFACE, Kind::$TRAIT, Kind::$CLASS, Kind::$ENUM
+$type->constructor();         // Constructor or NULL
+$type->is(Base::class);       // true
 
 if ($type->instantiable()) {
   $instance= $type->newInstance('Testing');
 }
 
-$type->annotations();
-$type->annotation(Author::class);
+$type->isInstance($instance); // true
+```
 
-$type->constants();
-$type->constant('CONST');
+Annotations can be accessed by iterating over `annotations()` or by the shorthand method `annotation()`.
 
-$type->properties();
-$type->property('value');
+```php
+foreach ($type->annotations() as $annotation) {
+  $annotation->type();            // Author::class
+  $annotation->name();            // 'author'
+  $annotation->arguments();       // ['Test', test => true]
+  $annotation->argument(0);       // 'Test'
+  $annotation->argument('test');  // true
+}
 
-$type->methods();
-$type->method('toString');
+$type->annotation(Author::class); // Annotation or NULL
+```
+
+All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
+
+```php
+foreach ($type->constants() as $constant) {
+  $constant->name();                     // 'POWER'
+  $constant->value();                    // 6100
+  $constant->modifiers();                // Modifiers<public>
+  $constant->annotations();              // Annotations
+  $constant->annotation(Author::class);  // Annotation or NULL
+  $constant->declaredIn();               // Type
+}
+
+foreach ($type->properties() as $property) {
+  $property->name();                     // 'value'
+  $property->modifiers();                // Modifiers<public>
+  $property->annotations();              // Annotations
+  $property->annotation(Author::class);  // Annotation or NULL
+  $property->declaredIn();               // Type
+}
+
+foreach ($type->methods() as $method) {
+  $method->name();                       // 'fixture'
+  $method->modifiers();                  // Modifiers<public>
+  $method->annotations();                // Annotations
+  $method->annotation(Author::class);    // Annotation or NULL
+  $method->declaredIn();                 // Type
+}
+
+$type->constant('POWER');                // Constant or NULL
+$type->property('value');                // Property or NULL
+$type->method('fixture');                // Method or NULL
 ```
