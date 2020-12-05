@@ -44,7 +44,7 @@ class Type {
 
   /**
    * Returns whether this type is either a subclass or equals the given type,
-   * much like the `instanceof` opertor.
+   * much like the `instanceof` operator.
    *
    * @param self|lang.XPClass|string $type
    */
@@ -61,10 +61,7 @@ class Type {
 
   /** @return ?self */
   public function parent() {
-    if ($parent= $this->reflect->getParentClass()) {
-      return new self($parent);
-    }
-    return null;
+    return ($parent= $this->reflect->getParentClass()) ? new self($parent) : null;
   }
 
   public function evaluate($expression) {
