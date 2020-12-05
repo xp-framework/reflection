@@ -1,0 +1,38 @@
+<?php namespace lang\ast;
+
+use lang\ClassLoader;
+
+module xp-framework/reflect {
+
+  /** @return void */
+  public function initialize() {
+
+    // Polyfill ReflectionClassConstant for PHP 7.0. Modifiers can always
+    // return public since class constant visibility was not introduced 
+    // until PHP 7.1, see https://wiki.php.net/rfc/class_const_visibility.
+    // For brevity, omit methods unused by our implementation.
+    if (!class_exists(\ReflectionClassConstant::class, false)) {
+      eval('class ReflectionClassConstant {
+        private $reflect;
+        public $name;
+
+        public function __construct($class, $name) {
+          $this->reflect= new \ReflectionClass($class);
+          $this->name= $name;
+        }
+
+        public function getModifiers() { return MODIFIER_PUBLIC; }
+
+        public function getValue() { return $this->reflect->getConstant($this->name); }
+
+        public function getDeclaringClass() { 
+          $reflect= $this->reflect;
+          do {
+            $parent= $reflect->getParentClass();
+          } while ($parent && $parent->hasConstant($name) && $reflect= $parent);
+          return $reflect;
+        }
+      }');
+    }
+  }
+}

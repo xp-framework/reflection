@@ -1,0 +1,20 @@
+{
+  "name" : "xp-framework/reflection",
+  "type" : "library",
+  "homepage" : "http://xp-framework.net/",
+  "license" : "BSD-3-Clause",
+  "description" : "Reflection",
+  "keywords": ["module", "xp"],
+  "require" : {
+    "xp-framework/core": "^10.0",
+    "xp-framework/ast": "^7.0",
+    "php" : ">=7.0.0"
+  },
+  "require-dev" : {
+    "xp-framework/unittest": "^11.0 | ^10.0"
+  },
+  "bin": ["bin/xp.xp-framework.reflection.reflect"],
+  "autoload" : {
+    "files" : ["src/main/php/autoload.php"]
+  }
+}
