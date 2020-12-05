@@ -10,9 +10,7 @@ class Constructor extends Member {
     $this->method= $reflect->getConstructor();
   }
 
-  public function annotations() {
-    return Reflection::parse()->methodAnnotations($this->method);
-  }
+  protected function getAnnotations() { return Reflection::parse()->ofMethod($this->reflect); }
 
   /** @return string */
   public function toString() {
@@ -48,10 +46,8 @@ class Constructor extends Member {
 
     try {
       return $this->reflect->newInstanceArgs($args);
-    } catch (\ReflectionException $e) {
-      throw new CannotInvoke($this->reflect->name, $e);
     } catch (\Throwable $e) {
-      throw new CannotInvoke($this->reflect->name, $e);
+      throw new CannotInstantiate($this->reflect->name, $e);
     }
   }
 }
