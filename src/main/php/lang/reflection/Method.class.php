@@ -5,39 +5,20 @@ use lang\{Reflection, Type};
 class Method extends Member {
   private $annotations= null;
 
+  protected function getAnnotations() { return Reflection::parse()->ofMethod($this->reflect); }
+
   public function invoke($instance, $args, $context= null) {
 
-    // Verify context is an instance of class this method is declared in
+    // TODO: Verify context is an instance of class this method is declared in
     if ($context) {
       $this->reflect->setAccessible(true);
     }
 
     try {
       return $this->reflect->invokeArgs($instance, $args);
-    } catch (\ReflectionException $e) {
-      throw new CannotInvoke(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
     } catch (\Throwable $e) {
       throw new CannotInvoke(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
     }
-  }
-
-  public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofMethod($this->reflect);
-    return new Annotations($this->annotations);
-  }
-
-  /** @return ?lang.reflection.Annotation */
-  public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofMethod($this->reflect);
-
-    $t= strtr($type, '.', '\\');
-    if (isset($this->annotations[$t])) {
-      return new Annotation($t, $this->annotations[$t]);
-    }
-
-    // Check lowercase version
-    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
-    return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
   }
 
   /** @return string */

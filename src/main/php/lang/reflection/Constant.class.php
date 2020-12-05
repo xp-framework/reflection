@@ -4,9 +4,7 @@ use lang\Reflection;
 
 class Constant extends Member {
 
-  public function annotations() {
-    return new Annotations(Reflection::parse()->ofConstant($this->reflect));
-  }
+  protected function getAnnotations() { return Reflection::parse()->ofConstant($this->reflect); }
 
   /** @return int */
   public function modifiers() { return $this->reflect->getModifiers(); }
