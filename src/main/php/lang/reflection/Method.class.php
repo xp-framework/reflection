@@ -3,10 +3,20 @@
 use lang\{Reflection, Type, TypeUnion, XPClass};
 
 class Method extends Member {
-  private $annotations= null;
 
+  /** @return [:var] */
   protected function getAnnotations() { return Reflection::parse()->ofMethod($this->reflect); }
 
+  /**
+   * Invokes this method
+   *
+   * @param  ?object $instance
+   * @param  var[] $args
+   * @param  ?string $context
+   * @return var
+   * @throws lang.reflection.CannotInvoke
+   * @throws lang.reflection.InvocationFailed if invocation raises an exception
+   */
   public function invoke($instance, $args, $context= null) {
 
     // TODO: Verify context is an instance of class this method is declared in
@@ -23,6 +33,7 @@ class Method extends Member {
     }
   }
 
+  /** @return lang.reflection.TypeHint */
   public function returns() {
     $t= $this->reflect->getReturnType();
     if (null === $t) {
