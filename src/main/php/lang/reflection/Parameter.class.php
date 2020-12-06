@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Type, TypeUnion, XPClass};
+use lang\{Reflection, Type, TypeUnion, XPClass, IllegalStateException};
 
 class Parameter {
   private $reflect, $method;
@@ -11,11 +11,29 @@ class Parameter {
     $this->method= $method ?? $reflect->getDeclaringFunction();
   }
 
-  /** @return string */
-  public function name() { return $this->reflect->name; }
+  /** Returns parameter name */
+  public function name(): string { return $this->reflect->name; }
 
-  /** @return int */
-  public function position() { return $this->reflect->getPosition(); }
+  /** Returns parameter position, starting at 0 */
+  public function position(): int { return $this->reflect->getPosition(); }
+
+  /** Returns whether this parameter accepts varargs */
+  public function variadic() { return $this->reflect->isVariadic(); }
+
+  /** Returns whether this parameter can be omitted */
+  public function optional() { return $this->reflect->isOptional(); }
+
+  /** 
+   * Returns an optional parameter's default value
+   * 
+   * @return var
+   * @throws lang.IllegalStateException if not default value is available
+   */
+  public function default() {
+    if ($this->reflect->isDefaultValueAvailable()) return $this->reflect->getDefaultValue();
+
+    throw new IllegalStateException('No default value avaible for parameter $'.$this->reflect->name);
+  }
 
   /** @return lang.reflection.Annotations */
   public function annotations() {

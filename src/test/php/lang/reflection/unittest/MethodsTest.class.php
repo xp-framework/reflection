@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
-use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive};
+use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException};
 use unittest\{Assert, Expect, Test, Values};
 
 class MethodsTest {
@@ -132,6 +132,30 @@ class MethodsTest {
       $actual[$name]= [$type->present(), $type->type()];
     }
     Assert::equals($expected, $actual);
+  }
+
+  #[Test]
+  public function variadic_parameter() {
+    $type= $this->type('{ function fixture(... $arg) { } }');
+    Assert::true($type->method('fixture')->parameter(0)->variadic());
+  }
+
+  #[Test]
+  public function optional_parameter() {
+    $type= $this->type('{ function fixture($arg= null) { } }');
+    Assert::true($type->method('fixture')->parameter(0)->optional());
+  }
+
+  #[Test]
+  public function default_value() {
+    $type= $this->type('{ function fixture($arg= "Test") { } }');
+    Assert::equals('Test', $type->method('fixture')->parameter(0)->default());
+  }
+
+  #[Test, Expect(IllegalStateException::class)]
+  public function default_value_for_required() {
+    $type= $this->type('{ function fixture($arg) { } }');
+    $type->method('fixture')->parameter(0)->default();
   }
 
   #[Test]

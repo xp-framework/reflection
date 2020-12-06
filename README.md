@@ -111,6 +111,9 @@ $method->parameter('arg');                 // Parameter or NULL
 foreach ($method->parameters() as $name => $parameter) {
   $parameter->position();                 // 0
   $parameter->name();                     // 'arg'
+  $parameter->variadic();                 // false
+  $parameter->optional();                 // true
+  $parameter->default();                  // (parameter default value)
   $parameter->constraint();               // TypeHint
   $parameter->annotations();              // Annotations
   $parameter->annotation(Inject::class)   // Annotation or NULL
