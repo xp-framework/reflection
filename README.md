@@ -110,7 +110,7 @@ foreach ($method->parameters() as $name => $parameter) {
   $parameter->position();                 // 0
   $parameter->name();                     // 'arg'
   $parameter->constraint();               // TypeHint
-  $method->annotations();                 // Annotations
-  $method->annotation(Inject::class);     // Annotation or NULL
+  $parameter->annotations();              // Annotations
+  $parameter->annotation(Inject::class)   // Annotation or NULL
 }
 ```
