@@ -5,9 +5,9 @@ use lang\{Reflection, Type, TypeUnion, XPClass};
 class Parameter {
   private $reflect, $method;
 
-  public function __construct($reflect) {
+  public function __construct($reflect, $method= null) {
     $this->reflect= $reflect;
-    $this->method= $reflect->getDeclaringFunction();
+    $this->method= $method ?? $reflect->getDeclaringFunction();
   }
 
   /** @return string */
@@ -15,6 +15,24 @@ class Parameter {
 
   /** @return int */
   public function position() { return $this->reflect->getPosition(); }
+
+  /** @return lang.reflection.Annotations */
+  public function annotations() {
+    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->reflect);
+    return new Annotations($this->annotations);
+  }
+
+  /** @return ?lang.reflection.Annotation */
+  public function annotation(string $type) {
+    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->reflect);
+
+    $t= strtr($type, '.', '\\');
+    if (isset($this->annotations[$t])) return new Annotation($t, $this->annotations[$t]);
+
+    // Check lowercase version
+    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
+    return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
+  }
 
   /**
    * Resolver handling `static`, `self` and `parent`.

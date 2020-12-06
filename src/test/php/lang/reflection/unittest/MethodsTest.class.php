@@ -103,10 +103,7 @@ class MethodsTest {
   #[Test, Values('returnTypes')]
   public function returns($decl, $present, $expected) {
     $returns= $this->type('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
-    Assert::equals(
-      ['present' => $present, 'type' => $expected],
-      ['present' => $returns->present(), 'type' => $returns->type()]
-    );
+    Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
   #[Test]

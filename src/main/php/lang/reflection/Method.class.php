@@ -50,7 +50,7 @@ class Method extends Member {
         break;
       }
     }
-    return null === $p ? null : new Parameter($p);
+    return null === $p ? null : new Parameter($p, $this->reflect);
   }
 
   /**
@@ -59,7 +59,7 @@ class Method extends Member {
    * @return lang.reflection.Parameters
    */
   public function parameters() {
-    return new Parameters($this->reflect->getParameters());
+    return new Parameters($this->reflect->getParameters(), $this->reflect);
   }
 
   /** @return lang.reflection.TypeHint */
