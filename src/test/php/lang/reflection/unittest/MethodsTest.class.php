@@ -141,9 +141,21 @@ class MethodsTest {
   }
 
   #[Test]
+  public function non_variadic_parameter() {
+    $type= $this->type('{ function fixture($arg) { } }');
+    Assert::false($type->method('fixture')->parameter(0)->variadic());
+  }
+
+  #[Test]
   public function optional_parameter() {
     $type= $this->type('{ function fixture($arg= null) { } }');
     Assert::true($type->method('fixture')->parameter(0)->optional());
+  }
+
+  #[Test]
+  public function required_parameter() {
+    $type= $this->type('{ function fixture($arg) { } }');
+    Assert::false($type->method('fixture')->parameter(0)->optional());
   }
 
   #[Test]
