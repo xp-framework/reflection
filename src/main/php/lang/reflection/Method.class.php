@@ -16,8 +16,10 @@ class Method extends Member {
 
     try {
       return $this->reflect->invokeArgs($instance, $args);
-    } catch (\Throwable $e) {
+    } catch (\ReflectionException $e) {
       throw new CannotInvoke(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
+    } catch (\Throwable $e) {
+      throw new InvocationFailed(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
     }
   }
 

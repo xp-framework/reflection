@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\CannotInvoke;
+use lang\reflection\{CannotInvoke, InvocationFailed};
 use unittest\{Assert, Expect, Test};
 
 class MethodsTest {
@@ -35,10 +35,26 @@ class MethodsTest {
     Assert::equals($type->method('fixture'), $type->methods()->named('fixture'));
   }
 
-  #[Test, Expect(CannotInvoke::class)]
+  #[Test, Expect(InvocationFailed::class)]
   public function exceptions_are_wrapped() {
     $type= $this->type('{
       public static function fixture() { throw new \lang\IllegalAccessException("test"); }
+    }');
+    $type->method('fixture')->invoke(null, []);
+  }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function cannot_invoke_private_method_by_default() {
+    $type= $this->type('{
+      private static function fixture() { }
+    }');
+    $type->method('fixture')->invoke(null, []);
+  }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function cannot_invoke_instance_method_without_instance() {
+    $type= $this->type('{
+      public function fixture() { }
     }');
     $type->method('fixture')->invoke(null, []);
   }
