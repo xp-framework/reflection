@@ -10,7 +10,7 @@ class InstantiationTest {
   #[Test]
   public function without_arguments() {
     $t= $this->type('{}');
-    Assert::instance($t->type(), $t->newInstance());
+    Assert::instance($t->class(), $t->newInstance());
   }
 
   #[Test]

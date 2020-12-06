@@ -45,8 +45,8 @@ class ReflectionTest {
   }
 
   #[Test]
-  public function type() {
-    Assert::equals(Type::forName(self::class), Reflection::of(self::class)->type());
+  public function class() {
+    Assert::equals(Type::forName(self::class), Reflection::of(self::class)->class());
   }
 
   #[Test]

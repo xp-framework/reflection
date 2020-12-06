@@ -46,7 +46,7 @@ class Method extends Member {
       } else if ('callable' === $name) {
         $t= Type::$CALLABLE;
       } else if ('self' === $name) {
-        $t= new XPClass($this->_reflect->getDeclaringClass());
+        $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
         return new TypeHint(Type::resolve($name, $this->resolver()));
       }

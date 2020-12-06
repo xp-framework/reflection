@@ -19,6 +19,7 @@ $type= Reflection::of(Fixture::class);
 $type->name();                // org.example.Fixture
 $type->literal();             // Fixture::class
 $type->modifiers();           // Modifiers<public>
+$type->class();               // lang.XPClass instance
 $type->classLoader();         // lang.ClassLoader instance
 $type->parent();              // Type or NULL
 $type->kind();                // Kind::$INTERFACE, Kind::$TRAIT, Kind::$CLASS, Kind::$ENUM

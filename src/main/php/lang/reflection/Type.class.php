@@ -17,7 +17,7 @@ class Type {
   public function literal(): string { return $this->reflect->name; }
 
   /** Returns corresponding lang.Type instance */
-  public function type() { return new XPClass($this->reflect); }
+  public function class() { return new XPClass($this->reflect); }
 
   /** @return lang.reflection.Modifiers */
   public function modifiers() { return new Modifiers($this->reflect->getModifiers()); }

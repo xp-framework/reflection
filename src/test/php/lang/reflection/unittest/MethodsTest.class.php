@@ -9,14 +9,14 @@ class MethodsTest {
 
   /** @return iterable */
   private function returnTypes() {
-    yield ['function fixture()', false, Type::$VAR];
-    yield ['function fixture(): array', true, Type::$ARRAY];
-    yield ['function fixture(): string', true, Primitive::$STRING];
-    yield ['function fixture(): string|int', true, new TypeUnion([Primitive::$STRING, Primitive::$INT])];
+    yield ['%s()', false, Type::$VAR];
+    yield ['%s(): array', true, Type::$ARRAY];
+    yield ['%s(): string', true, Primitive::$STRING];
 
-    yield ['/** @return string */ function fixture()', false, Primitive::$STRING];
-    yield ['/** @return function(): int */ function fixture()', false, new FunctionType([], Primitive::$INT)];
-    yield ['/** @return array<string> */ function fixture()', false, new ArrayType(Primitive::$STRING)];
+    yield ['/** @return string */ %s()', false, Primitive::$STRING];
+    yield ['/** @return function(): int */ %s()', false, new FunctionType([], Primitive::$INT)];
+    yield ['/** @return int|string */ %s()', false, new TypeUnion([Primitive::$STRING, Primitive::$INT])];
+    yield ['/** @return array<string> */ %s()', false, new ArrayType(Primitive::$STRING)];
   }
 
   #[Test]
@@ -93,11 +93,17 @@ class MethodsTest {
   }
 
   #[Test, Values('returnTypes')]
-  public function returns($declaration, $present, $expected) {
-    $returns= $this->type('{ '.$declaration.' { } }')->method('fixture')->returns();
+  public function returns($decl, $present, $expected) {
+    $returns= $this->type('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
     Assert::equals(
       ['present' => $present, 'type' => $expected],
       ['present' => $returns->present(), 'type' => $returns->type()]
     );
+  }
+
+  #[Test]
+  public function returns_self() {
+    $type= $this->type('{ function fixture(): self { } }');
+    Assert::equals($type->class(), $type->method('fixture')->returns()->type());
   }
 }

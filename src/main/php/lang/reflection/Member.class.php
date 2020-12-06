@@ -1,6 +1,5 @@
 <?php namespace lang\reflection;
 
-use lang\Type as XPType;
 use lang\{XPClass, Reflection};
 
 abstract class Member {
