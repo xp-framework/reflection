@@ -57,6 +57,8 @@ if ($constructor= $type->constructor()) {
   $constructor->annotations();             // Annotations
   $constructor->annotation(Inject::class); // Annotation or NULL
   $constructor->declaredIn();              // Type
+  $constructor->parameters();              // Parameters
+  $constructor->parameter(0);              // Parameter or NULL
   $constructor->newInstance([]);           // (instance of the type)
 }
 ```
@@ -100,7 +102,7 @@ foreach ($type->methods() as $name => $method) {
 }
 ```
 
-Method parameters can be retrieved by iterating via `parameters()`, by offset `parameter($position)` or by name `parameter($name)`.
+Method and constructor parameters can be retrieved by iterating via `parameters()`, by offset `parameter($position)` or by name `parameter($name)`.
 
 ```php
 $method->parameter(0);                     // Parameter or NULL
