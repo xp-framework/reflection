@@ -92,6 +92,7 @@ foreach ($type->methods() as $method) {
   $method->annotations();                  // Annotations
   $method->annotation(Author::class);      // Annotation or NULL
   $method->declaredIn();                   // Type
+  $method->returns();                      // TypeHint
   $method->invoke($instance, []);          // (method return value)
 }
 ```

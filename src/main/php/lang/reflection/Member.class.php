@@ -13,19 +13,16 @@ abstract class Member {
   }
 
   /**
-   * Resolves a type name
+   * Resolver handling `static`, `self` and `parent`.
    *
-   * @param  string $name
-   * @return lang.Type
+   * @return [:(function(string): lang.Type)]
    */
-  protected function resolve($name) {
-    if ('self' === $name) {
-      return new XPClass($this->reflect->getDeclaringClass());
-    } else if ('static' === $name) {
-      return new XPClass($this->reflect->class);
-    } else {
-      return XPType::forName($name);
-    }
+  protected function resolver() {
+    return [
+      'static' => function() { return new XPClass($this->reflect->class); },
+      'self'   => function() { return new XPClass($this->reflect->getDeclaringClass()); },
+      'parent' => function() { return new XPClass($this->reflect->getDeclaringClass()->getParentClass()); },
+    ];
   }
 
   /** @return [:var] */

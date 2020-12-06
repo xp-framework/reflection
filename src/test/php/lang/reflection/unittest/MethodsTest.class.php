@@ -1,10 +1,23 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
-use unittest\{Assert, Expect, Test};
+use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive};
+use unittest\{Assert, Expect, Test, Values};
 
 class MethodsTest {
   use TypeDefinition;
+
+  /** @return iterable */
+  private function returnTypes() {
+    yield ['function fixture()', false, Type::$VAR];
+    yield ['function fixture(): array', true, Type::$ARRAY];
+    yield ['function fixture(): string', true, Primitive::$STRING];
+    yield ['function fixture(): string|int', true, new TypeUnion([Primitive::$STRING, Primitive::$INT])];
+
+    yield ['/** @return string */ function fixture()', false, Primitive::$STRING];
+    yield ['/** @return function(): int */ function fixture()', false, new FunctionType([], Primitive::$INT)];
+    yield ['/** @return array<string> */ function fixture()', false, new ArrayType(Primitive::$STRING)];
+  }
 
   #[Test]
   public function name() {
@@ -76,6 +89,15 @@ class MethodsTest {
     Assert::equals(
       ['one' => $type->method('one'), 'two' => $type->method('two')],
       iterator_to_array($type->methods())
+    );
+  }
+
+  #[Test, Values('returnTypes')]
+  public function returns($declaration, $present, $expected) {
+    $returns= $this->type('{ '.$declaration.' { } }')->method('fixture')->returns();
+    Assert::equals(
+      ['present' => $present, 'type' => $expected],
+      ['present' => $returns->present(), 'type' => $returns->type()]
     );
   }
 }

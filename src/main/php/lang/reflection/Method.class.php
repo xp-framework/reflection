@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Type};
+use lang\{Reflection, Type, TypeUnion, XPClass};
 
 class Method extends Member {
   private $annotations= null;
@@ -21,6 +21,49 @@ class Method extends Member {
     } catch (\Throwable $e) {
       throw new InvocationFailed(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
     }
+  }
+
+  public function returns() {
+    $t= $this->reflect->getReturnType();
+    if (null === $t) {
+      $present= false;
+
+      // Check for type in api documentation, defaulting to `var`
+      $t= Type::$VAR;
+    } else if ($t instanceof \ReflectionUnionType) {
+      $union= [];
+      foreach ($t->getTypes() as $component) {
+        $union[]= Type::resolve($component->getName(), $this->resolver());
+      }
+      return new TypeHint(new TypeUnion($union));
+    } else {
+      $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
+
+      // Check array, self and callable for more specific types, e.g. `string[]`,
+      // `static` or `function(): string` in api documentation
+      if ('array' === $name) {
+        $t= Type::$ARRAY;
+      } else if ('callable' === $name) {
+        $t= Type::$CALLABLE;
+      } else if ('self' === $name) {
+        $t= new XPClass($this->_reflect->getDeclaringClass());
+      } else {
+        return new TypeHint(Type::resolve($name, $this->resolver()));
+      }
+      $present= true;
+    }
+
+    // Parse apidoc. FIXME!
+    preg_match_all('/@(return|param)\s+(.+)/', $this->reflect->getDocComment(), $matches, PREG_SET_ORDER);
+    $tags= [];
+    foreach ($matches as $match) {
+      $tags[$match[1]][]= rtrim($match[2], ' */');
+    }
+
+    return new TypeHint(
+      isset($tags['return'])? Type::resolve($tags['return'][0], $this->resolver()) : $t,
+      $present
+    );
   }
 
   /** @return string */
