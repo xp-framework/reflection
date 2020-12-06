@@ -6,7 +6,7 @@ abstract class Member {
   protected $reflect;
   private $annotations= null;
 
-  /** @param var $reflect */
+  /** @param ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect */
   public function __construct($reflect) {
     $this->reflect= $reflect;
   }
