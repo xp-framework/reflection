@@ -2,10 +2,7 @@
 
 use lang\{Reflection, Type, TypeUnion, XPClass};
 
-class Method extends Member {
-
-  /** @return [:var] */
-  protected function getAnnotations() { return Reflection::parse()->ofMethod($this->reflect); }
+class Method extends Routine {
 
   /**
    * Invokes this method
@@ -31,26 +28,6 @@ class Method extends Member {
     } catch (\Throwable $e) {
       throw new InvocationFailed(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
     }
-  }
-
-  /**
-   * Looks up a parameter
-   *
-   * @param  int|string $arg Either a position or a name
-   * @return ?lang.reflection.Parameter
-   */
-  public function parameter($arg) {
-    if (is_int($arg)) {
-      $p= $this->reflect->getParameters()[$arg] ?? null;
-    } else {
-      $p= null;
-      foreach ($this->reflect->getParameters() as $parameter) {
-        if ($arg !== $parameter->name) continue;
-        $p= $parameter;
-        break;
-      }
-    }
-    return null === $p ? null : new Parameter($p, $this->reflect);
   }
 
   /**
