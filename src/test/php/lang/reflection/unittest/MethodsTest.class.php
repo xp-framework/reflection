@@ -139,4 +139,44 @@ class MethodsTest {
     $type= $this->type('{ function fixture(self $arg) { } }');
     Assert::equals($type->class(), $type->method('fixture')->parameter(0)->constraint()->type());
   }
+
+  #[Test]
+  public function parameter_annotations() {
+    $t= $this->type('{
+      public function fixture(
+        #[Inject]
+        $arg
+      ) { }
+    }');
+    $parameter= $t->method('fixture')->parameter('arg');
+
+    Assert::equals(
+      [Inject::class => $parameter->annotation(Inject::class)],
+      iterator_to_array($parameter->annotations())
+    );
+  }
+
+  #[Test]
+  public function annotations() {
+    $t= $this->type('{
+      #[Author("Test")]
+      public function fixture() { }
+    }');
+    $method= $t->method('fixture');
+
+    Assert::equals(
+      [Author::class => $method->annotation(Author::class)],
+      iterator_to_array($method->annotations())
+    );
+  }
+
+  #[Test]
+  public function annotation() {
+    $t= $this->type('{
+      #[Author("Test")]
+      public function fixture() { }
+    }');
+
+    Assert::equals(['Test'], $t->method('fixture')->annotation(Author::class)->arguments());
+  }
 }

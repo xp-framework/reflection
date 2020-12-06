@@ -134,4 +134,14 @@ class FromSyntaxTree {
     $tree= $this->tree($reflect->getDeclaringClass()->name);
     return $this->annotations($tree, $tree->type()->method($reflect->name));
   }
+
+  /** @return iterable */
+  public function ofParameter($method, $reflect) {
+    $tree= $this->tree($method->getDeclaringClass()->name);
+    return $this->annotations($tree, $tree->type()
+      ->method($method->name)
+      ->signature
+      ->parameters[$reflect->getPosition()]
+    );
+  }
 }

@@ -12,7 +12,7 @@ Reflection library
 
 ```php
 use lang\{Reflection};
-use org\example\{Author, Base, Fixture};
+use org\example\{Base, Inject, Fixture};
 
 $type= Reflection::of(Fixture::class);
 
@@ -43,7 +43,7 @@ foreach ($type->annotations() as $annotation) {
   $annotation->argument('test');  // true
 }
 
-$type->annotation(Author::class); // Annotation or NULL
+$type->annotation(Inject::class); // Annotation or NULL
 ```
 
 The constructor can be accessed via `constructor()`. Like members, it provides accessors for modifiers and annotations, as well as its declaring type.
@@ -55,7 +55,7 @@ if ($constructor= $type->constructor()) {
   $constructor->name();                    // 'POWER'
   $constructor->modifiers();               // Modifiers<public>
   $constructor->annotations();             // Annotations
-  $constructor->annotation(Author::class); // Annotation or NULL
+  $constructor->annotation(Inject::class); // Annotation or NULL
   $constructor->declaredIn();              // Type
   $constructor->newInstance([]);           // (instance of the type)
 }
@@ -73,7 +73,7 @@ foreach ($type->constants() as $name => $constant) {
   $constant->value();                      // 6100
   $constant->modifiers();                  // Modifiers<public>
   $constant->annotations();                // Annotations
-  $constant->annotation(Author::class);    // Annotation or NULL
+  $constant->annotation(Inject::class);    // Annotation or NULL
   $constant->declaredIn();                 // Type
 }
 
@@ -81,7 +81,7 @@ foreach ($type->properties() as $name => $property) {
   $property->name();                       // 'value'
   $property->modifiers();                  // Modifiers<public>
   $property->annotations();                // Annotations
-  $property->annotation(Author::class);    // Annotation or NULL
+  $property->annotation(Inject::class);    // Annotation or NULL
   $property->declaredIn();                 // Type
   $property->get($instance);               // (property value)
   $property->set($instance, $value);       // (value)
@@ -91,7 +91,7 @@ foreach ($type->methods() as $name => $method) {
   $method->name();                         // 'fixture'
   $method->modifiers();                    // Modifiers<public>
   $method->annotations();                  // Annotations
-  $method->annotation(Author::class);      // Annotation or NULL
+  $method->annotation(Inject::class);      // Annotation or NULL
   $method->declaredIn();                   // Type
   $method->returns();                      // TypeHint
   $method->parameters();                   // Parameters
@@ -110,5 +110,7 @@ foreach ($method->parameters() as $name => $parameter) {
   $parameter->position();                 // 0
   $parameter->name();                     // 'arg'
   $parameter->constraint();               // TypeHint
+  $method->annotations();                 // Annotations
+  $method->annotation(Inject::class);     // Annotation or NULL
 }
 ```

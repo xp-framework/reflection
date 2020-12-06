@@ -37,19 +37,37 @@ class FromMeta {
 
   /** @return iterable */
   public function ofConstant($reflect) {
-    $meta= \xp::$meta[strtr($reflect->getDeclaringClass()->name, '\\', '.')]['class'][2][$reflect->name] ?? null;
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $meta= \xp::$meta[$c]['class'][2][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofConstant($reflect);
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
-    $meta= \xp::$meta[strtr($reflect->getDeclaringClass()->name, '\\', '.')]['class'][0][$reflect->name] ?? null;
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $meta= \xp::$meta[$c]['class'][0][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofProperty($reflect);
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
-    $meta= \xp::$meta[strtr($reflect->getDeclaringClass()->name, '\\', '.')]['class'][1][$reflect->name] ?? null;
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $meta= \xp::$meta[$c]['class'][1][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofMethod($reflect);
+  }
+
+  /** @return iterable */
+  public function ofParameter($method, $reflect) {
+    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
+    if ($target= \xp::$meta[$c][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
+      if ($meta= $target['$'.$reflect->name] ?? null) {
+        $r= [];
+        foreach ($meta as $name => $value) {
+          $r[$target[$name] ?? $name]= (array)$value;
+        }
+        return $r;
+      }
+    }
+    return $this->delegate->ofParameter($method, $reflect);
   }
 }

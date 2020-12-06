@@ -45,14 +45,14 @@ abstract class Member {
     return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
   }
 
-  /** @return string */
-  public function name() { return $this->reflect->name; }
+  /** Returns this member's name */
+  public function name(): string { return $this->reflect->name; }
 
   /** @return lang.reflection.Modifiers */
   public function modifiers() { return new Modifiers($this->reflect->getModifiers()); }
 
   /** @return lang.reflection.Type */
-  public function declaredIn() { return new Type($this->reflect->getDeclaringClass()); }
+  public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
 
   public function evaluate($expression) {
     return Reflection::parse()->evaluate($this->reflect->getDeclaringClass(), $expression);

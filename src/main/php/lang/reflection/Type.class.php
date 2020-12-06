@@ -81,10 +81,7 @@ class Type {
 
   /** @return ?lang.reflection.Constructor */
   public function constructor() {
-    if ($this->reflect->hasMethod('__construct')) {
-      return new Constructor($this->reflect);
-    }
-    return null;
+    return $this->reflect->hasMethod('__construct') ? new Constructor($this->reflect) : null;
   }
 
   /** Returns whether this type is instantiable via `new` */

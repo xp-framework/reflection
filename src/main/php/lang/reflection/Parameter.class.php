@@ -4,6 +4,7 @@ use lang\{Reflection, Type, TypeUnion, XPClass};
 
 class Parameter {
   private $reflect, $method;
+  private $annotations= null;
 
   public function __construct($reflect, $method= null) {
     $this->reflect= $reflect;
@@ -18,13 +19,13 @@ class Parameter {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->method, $this->reflect);
     return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->method, $this->reflect);
 
     $t= strtr($type, '.', '\\');
     if (isset($this->annotations[$t])) return new Annotation($t, $this->annotations[$t]);
