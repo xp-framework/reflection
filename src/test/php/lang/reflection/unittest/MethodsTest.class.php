@@ -12,11 +12,18 @@ class MethodsTest {
     yield ['%s()', false, Type::$VAR];
     yield ['%s(): array', true, Type::$ARRAY];
     yield ['%s(): string', true, Primitive::$STRING];
-
     yield ['/** @return string */ %s()', false, Primitive::$STRING];
     yield ['/** @return function(): int */ %s()', false, new FunctionType([], Primitive::$INT)];
     yield ['/** @return int|string */ %s()', false, new TypeUnion([Primitive::$STRING, Primitive::$INT])];
     yield ['/** @return array<string> */ %s()', false, new ArrayType(Primitive::$STRING)];
+  }
+
+  /** @return iterable */
+  private function parameterTypes() {
+    yield ['%s()', []];
+    yield ['%s($arg)', ['arg' => [false, Type::$VAR]]];
+    yield ['%s(string $arg)', ['arg' => [true, Primitive::$STRING]]];
+    yield ['/** @param string $arg */ %s($arg)', ['arg' => [false, Primitive::$STRING]]];
   }
 
   #[Test]
@@ -105,5 +112,28 @@ class MethodsTest {
   public function returns_self() {
     $type= $this->type('{ function fixture(): self { } }');
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
+  }
+
+  #[Test, Values([0, 'arg'])]
+  public function parameter_by($lookup) {
+    $method= $this->type('{ function fixture($arg) { } }')->method('fixture');
+    Assert::equals('arg', $method->parameter($lookup)->name());
+  }
+
+  #[Test, Values([0, 'arg'])]
+  public function non_existant_parameter_by($lookup) {
+    $method= $this->type('{ function fixture() { } }')->method('fixture');
+    Assert::null($method->parameter($lookup));
+  }
+
+  #[Test, Values('parameterTypes')]
+  public function parameters($decl, $expected) {
+    $method= $this->type('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture');
+    $actual= [];
+    foreach ($method->parameters() as $name => $parameter) {
+      $type= $parameter->type();
+      $actual[$name]= [$type->present(), $type->type()];
+    }
+    Assert::equals($expected, $actual);
   }
 }

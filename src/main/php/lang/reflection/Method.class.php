@@ -33,6 +33,24 @@ class Method extends Member {
     }
   }
 
+  public function parameter($arg) {
+    if (is_int($arg)) {
+      $p= $this->reflect->getParameters()[$arg] ?? null;
+    } else {
+      $p= null;
+      foreach ($this->reflect->getParameters() as $parameter) {
+        if ($arg !== $parameter->name) continue;
+        $p= $parameter;
+        break;
+      }
+    }
+    return null === $p ? null : new Parameter($p);
+  }
+
+  public function parameters() {
+    return new Parameters($this->reflect->getParameters());
+  }
+
   /** @return lang.reflection.TypeHint */
   public function returns() {
     $t= $this->reflect->getReturnType();
