@@ -38,15 +38,25 @@ class Constructor extends Routine {
     return Modifiers::namesOf($this->reflect->getModifiers()).' function __construct('.substr($sig, 2).')';
   }
 
+  /**
+   * Creates a new instance of the type this constructor belongs to
+   *
+   * @param  var[] $args
+   * @return object
+   * @throws lang.reflection.InvocationFailed
+   * @throws lang.reflection.CannotInstantiate
+   */
   public function newInstance($args) {
     if (!$this->class->isInstantiable()) {
-      throw new IllegalArgumentException('Cannot instantiate '.strtr($this->class->getName(), '\\', '.'));
+      throw new CannotInstantiate('Cannot instantiate '.strtr($this->class->getName(), '\\', '.'));
     }
 
     try {
       return $this->class->newInstanceArgs($args);
-    } catch (\Throwable $e) {
+    } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
+    } catch (\Throwable $e) {
+      throw new InvocationFailed($this->class->name, $e);
     }
   }
 }
