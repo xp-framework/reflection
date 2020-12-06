@@ -82,6 +82,8 @@ foreach ($type->properties() as $property) {
   $property->annotations();                // Annotations
   $property->annotation(Author::class);    // Annotation or NULL
   $property->declaredIn();                 // Type
+  $property->get($instance);               // (property value)
+  $property->set($instance, $value);       // (value)
 }
 
 foreach ($type->methods() as $method) {

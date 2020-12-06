@@ -56,10 +56,7 @@ class MethodsTest {
 
   #[Test]
   public function methods() {
-    $type= $this->type('{
-      public function one() { }
-      public function two() { }
-    }');
+    $type= $this->type('{ public function one() { } public function two() { } }');
     Assert::equals(
       ['one' => $type->method('one'), 'two' => $type->method('two')],
       iterator_to_array($type->methods())
