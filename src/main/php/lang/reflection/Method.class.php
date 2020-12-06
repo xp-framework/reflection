@@ -33,6 +33,12 @@ class Method extends Member {
     }
   }
 
+  /**
+   * Looks up a parameter
+   *
+   * @param  int|string $arg Either a position or a name
+   * @return ?lang.reflection.Parameter
+   */
   public function parameter($arg) {
     if (is_int($arg)) {
       $p= $this->reflect->getParameters()[$arg] ?? null;
@@ -47,6 +53,11 @@ class Method extends Member {
     return null === $p ? null : new Parameter($p);
   }
 
+  /**
+   * Returns all parameters
+   *
+   * @return lang.reflection.Parameters
+   */
   public function parameters() {
     return new Parameters($this->reflect->getParameters());
   }

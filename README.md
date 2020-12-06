@@ -68,7 +68,7 @@ $type->constant('POWER');                  // Constant or NULL
 $type->property('value');                  // Property or NULL
 $type->method('fixture');                  // Method or NULL
 
-foreach ($type->constants() as $constant) {
+foreach ($type->constants() as $name => $constant) {
   $constant->name();                       // 'POWER'
   $constant->value();                      // 6100
   $constant->modifiers();                  // Modifiers<public>
@@ -77,7 +77,7 @@ foreach ($type->constants() as $constant) {
   $constant->declaredIn();                 // Type
 }
 
-foreach ($type->properties() as $property) {
+foreach ($type->properties() as $name => $property) {
   $property->name();                       // 'value'
   $property->modifiers();                  // Modifiers<public>
   $property->annotations();                // Annotations
@@ -87,7 +87,7 @@ foreach ($type->properties() as $property) {
   $property->set($instance, $value);       // (value)
 }
 
-foreach ($type->methods() as $method) {
+foreach ($type->methods() as $name => $method) {
   $method->name();                         // 'fixture'
   $method->modifiers();                    // Modifiers<public>
   $method->annotations();                  // Annotations
@@ -97,5 +97,18 @@ foreach ($type->methods() as $method) {
   $method->parameters();                   // Parameters
   $method->parameter(0);                   // Parameter or NULL
   $method->invoke($instance, []);          // (method return value)
+}
+```
+
+Method parameters can be retrieved by iterating via `parameters()`, by offset `parameter($position)` or by name `parameter($name)`.
+
+```php
+$method->parameter(0);                     // Parameter or NULL
+$method->parameter('arg');                 // Parameter or NULL
+
+foreach ($method->parameters() as $name => $parameter) {
+  $parameter->position();                 // 0
+  $parameter->name();                     // 'arg'
+  $parameter->constraint();               // TypeHint
 }
 ```

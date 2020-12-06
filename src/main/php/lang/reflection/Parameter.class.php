@@ -3,14 +3,18 @@
 use lang\{Reflection, Type, TypeUnion, XPClass};
 
 class Parameter {
-  private $reflect;
+  private $reflect, $method;
 
   public function __construct($reflect) {
     $this->reflect= $reflect;
+    $this->method= $reflect->getDeclaringFunction();
   }
 
   /** @return string */
   public function name() { return $this->reflect->name; }
+
+  /** @return int */
+  public function position() { return $this->reflect->getPosition(); }
 
   /**
    * Resolver handling `static`, `self` and `parent`.
@@ -19,13 +23,14 @@ class Parameter {
    */
   protected function resolver() {
     return [
-      'static' => function() { return new XPClass($this->reflect->getDeclaringFunction()->class); },
-      'self'   => function() { return new XPClass($this->reflect->getDeclaringFunction()->getDeclaringClass()); },
-      'parent' => function() { return new XPClass($this->reflect->getDeclaringFunction()->getDeclaringClass()->getParentClass()); },
+      'static' => function() { return new XPClass($this->method->class); },
+      'self'   => function() { return new XPClass($this->method->getDeclaringClass()); },
+      'parent' => function() { return new XPClass($this->method->getDeclaringClass()->getParentClass()); },
     ];
   }
 
-  public function type() {
+  /** @return lang.reflection.TypeHint */
+  public function constraint() {
     $t= $this->reflect->getType();
     if (null === $t) {
       $present= false;
@@ -56,7 +61,7 @@ class Parameter {
     }
 
     // Parse apidoc. FIXME!
-    preg_match_all('/@(return|param)\s+(.+)/', $this->reflect->getDeclaringFunction()->getDocComment(), $matches, PREG_SET_ORDER);
+    preg_match_all('/@(return|param)\s+(.+)/', $this->method->getDocComment(), $matches, PREG_SET_ORDER);
     $tags= [];
     foreach ($matches as $match) {
       $tags[$match[1]][]= rtrim($match[2], ' */');
