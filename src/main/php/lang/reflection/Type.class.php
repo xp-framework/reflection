@@ -97,18 +97,16 @@ class Type {
    * @throws lang.reflect.CannotInstantiate if instantiation raised an exception
    */
   public function newInstance(... $args) {
-    if (!$this->reflect->isInstantiable()) {
-      throw new IllegalArgumentException('Cannot instantiate '.$this->name());
-    }
-
     try {
       if ($this->reflect->hasMethod('__construct')) {
         return $this->reflect->newInstanceArgs($args);
       } else {
         return $this->reflect->newInstance();
       }
+    } catch (\ReflectionException $e) {
+      throw new CannotInstantiate($this->reflect->name, $e);
     } catch (\Throwable $e) {
-      throw new CannotInstantiate($this->name(), $e);
+      throw new InvocationFailed($this->reflect->name, $e);
     }
   }
 
