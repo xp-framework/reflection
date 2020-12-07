@@ -165,4 +165,7 @@ class Type {
 
   /** @return lang.reflection.Methods */
   public function methods() { return new Methods($this->reflect); }
+
+  /** @return string */
+  public function __toString() { return $this->reflect->name; }
 }
