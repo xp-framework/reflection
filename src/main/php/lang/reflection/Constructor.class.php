@@ -47,10 +47,6 @@ class Constructor extends Routine {
    * @throws lang.reflection.CannotInstantiate
    */
   public function newInstance($args) {
-    if (!$this->class->isInstantiable()) {
-      throw new CannotInstantiate('Cannot instantiate '.strtr($this->class->getName(), '\\', '.'));
-    }
-
     try {
       return $this->class->newInstanceArgs($args);
     } catch (\ReflectionException $e) {

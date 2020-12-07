@@ -7,34 +7,46 @@ use unittest\{Assert, Test};
 class InstantiationTest {
   use TypeDefinition;
 
+  /** @return iterable */
+  private function invocations() {
+    yield [function($t, $args) { return $t->newInstance(...$args); }];
+    yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
+  }
+
   #[Test]
   public function without_arguments() {
     $t= $this->declare('{}');
     Assert::instance($t->class(), $t->newInstance());
   }
 
-  #[Test]
-  public function with_argument() {
+  #[Test, Values('invocations')]
+  public function with_empty_constructor($invocation) {
+    $t= $this->declare('{ public function __construct() { }}');
+    Assert::instance($t->class(), $invocation($t, []));
+  }
+
+  #[Test, Values('invocations')]
+  public function with_argument($invocation) {
     $t= $this->declare('{
       public $value= null;
       public function __construct($value) { $this->value= $value; }
     }');
-    Assert::equals($this, $t->newInstance($this)->value);
+    Assert::equals($this, $invocation($t, [$this])->value);
   }
 
-  #[Test, Expect(InvocationFailed::class)]
-  public function exceptions_are_wrapped() {
-    $type= $this->declare('{
+  #[Test, Expect(InvocationFailed::class), Values('invocations')]
+  public function exceptions_are_wrapped($invocation) {
+    $t= $this->declare('{
       public function __construct() { throw new \lang\IllegalAccessException("Test"); }
     }');
-    $type->newInstance();
+    $invocation($t, []);
   }
 
-  #[Test, Expect(CannotInstantiate::class)]
-  public function private_constructor() {
-    $type= $this->declare('{
+  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
+  public function private_constructor($invocation) {
+    $t= $this->declare('{
       private function __construct() { throw new \lang\IllegalAccessException("Unreachable"); }
     }');
-    $type->newInstance();
+    $invocation($t, []);
   }
 }
