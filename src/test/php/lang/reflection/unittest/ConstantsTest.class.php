@@ -17,6 +17,12 @@ class ConstantsTest {
   }
 
   #[Test]
+  public function declaredIn() {
+    $t= $this->declare('{ const FIXTURE = "test";}');
+    Assert::equals($t, $t->constant('FIXTURE')->declaredIn());
+  }
+
+  #[Test]
   public function constants() {
     $t= $this->declare('{ const one = 1, two = 2; }');
     Assert::equals(

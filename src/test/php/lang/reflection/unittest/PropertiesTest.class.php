@@ -20,6 +20,12 @@ class PropertiesTest {
   }
 
   #[Test]
+  public function declaredIn() {
+    $t= $this->declare('{ private $fixture; }');
+    Assert::equals($t, $t->property('fixture')->declaredIn());
+  }
+
+  #[Test]
   public function named() {
     $type= $this->declare('{ public $fixture; }');
     Assert::equals($type->property('fixture'), $type->properties()->named('fixture'));

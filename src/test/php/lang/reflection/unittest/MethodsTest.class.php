@@ -35,6 +35,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function declaredIn() {
+    $t= $this->declare('{ public function fixture() { } }');
+    Assert::equals($t, $t->method('fixture')->declaredIn());
+  }
+
+  #[Test]
   public function invoke_class_method() {
     $type= $this->declare('{ public static function fixture() { return "Test"; } }');
     Assert::equals('Test', $type->method('fixture')->invoke(null, []));
