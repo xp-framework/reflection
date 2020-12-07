@@ -1,12 +1,28 @@
 <?php namespace lang\reflection;
 
 class Constants extends Members {
+  private static $rc;
+
+  static function __static() {
+
+    // PHP 7.0 does not have getReflectionConstants(), enumerate constants
+    // using name and values instead and use ReflectionClassConstant polyfill
+    self::$rc= PHP_VERSION_ID >= 70100;
+  }
 
   /** @return iterable */
   public function getIterator() {
-    foreach ($this->reflect->getReflectionConstants() as $constant) {
-      if (0 !== strncmp($constant->name, '__', 2)) {
-        yield $constant->name => new Constant($constant);
+    if (self::$rc) {
+      foreach ($this->reflect->getReflectionConstants() as $constant) {
+        if (0 !== strncmp($constant->name, '__', 2)) {
+          yield $constant->name => new Constant($constant);
+        }
+      }
+    } else {
+      foreach ($this->reflect->getConstants() as $name => $_) {
+        if (0 !== strncmp($name, '__', 2)) {
+          yield $name => new Constant(new \ReflectionClassConstant($this->reflect->name, $name));
+        }
       }
     }
   }
