@@ -25,6 +25,8 @@ class MethodsTest {
     yield ['%s()', []];
     yield ['%s($arg)', ['arg' => [false, Type::$VAR]]];
     yield ['%s(string $arg)', ['arg' => [true, Primitive::$STRING]]];
+    yield ['%s(array $arg)', ['arg' => [true, Type::$ARRAY]]];
+    yield ['%s(callable $arg)', ['arg' => [true, Type::$CALLABLE]]];
     yield ['/** @param string $arg */ %s($arg)', ['arg' => [false, Primitive::$STRING]]];
     yield ['/** @param array<string> $arg */ %s($arg)', ['arg' => [false, new ArrayType(Primitive::$STRING)]]];
   }
@@ -149,6 +151,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function first_parameter() {
+    $method= $this->declare('{ function fixture($arg) { } }')->method('fixture');
+    Assert::equals($method->parameters()->first(), $method->parameter(0));
+  }
+
+  #[Test]
   public function variadic_parameter() {
     $type= $this->declare('{ function fixture(... $arg) { } }');
     Assert::true($type->method('fixture')->parameter(0)->variadic());
@@ -185,9 +193,15 @@ class MethodsTest {
   }
 
   #[Test]
-  public function self_parameter_type() {
+  public function self_parameter_constraint() {
     $type= $this->declare('{ function fixture(self $arg) { } }');
     Assert::equals($type->class(), $type->method('fixture')->parameter(0)->constraint()->type());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function type_union_parameter_constraint() {
+    $param= $this->declare('{ function fixture(string|int $arg) { } }')->method('fixture')->parameter(0);
+    Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $param->constraint()->type());
   }
 
   #[Test]
