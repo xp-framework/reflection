@@ -29,36 +29,36 @@ class MethodsTest {
 
   #[Test]
   public function name() {
-    Assert::equals('fixture', $this->type('{ public function fixture() { } }')->method('fixture')->name());
+    Assert::equals('fixture', $this->declare('{ public function fixture() { } }')->method('fixture')->name());
   }
 
   #[Test]
   public function invoke_class_method() {
-    $type= $this->type('{ public static function fixture() { return "Test"; } }');
+    $type= $this->declare('{ public static function fixture() { return "Test"; } }');
     Assert::equals('Test', $type->method('fixture')->invoke(null, []));
   }
 
   #[Test]
   public function invoke_instance_method() {
-    $type= $this->type('{ public function fixture() { return "Test"; } }');
+    $type= $this->declare('{ public function fixture() { return "Test"; } }');
     Assert::equals('Test', $type->method('fixture')->invoke($type->newInstance(), []));
   }
 
   #[Test]
   public function invoke_private_method_in_type_context() {
-    $type= $this->type('{ private function fixture() { return "Test"; } }');
+    $type= $this->declare('{ private function fixture() { return "Test"; } }');
     Assert::equals('Test', $type->method('fixture')->invoke($type->newInstance(), [], $type));
   }
 
   #[Test]
   public function named() {
-    $type= $this->type('{ public function fixture() { } }');
+    $type= $this->declare('{ public function fixture() { } }');
     Assert::equals($type->method('fixture'), $type->methods()->named('fixture'));
   }
 
   #[Test, Expect(InvocationFailed::class)]
   public function exceptions_are_wrapped() {
-    $type= $this->type('{
+    $type= $this->declare('{
       public static function fixture() { throw new \lang\IllegalAccessException("test"); }
     }');
     $type->method('fixture')->invoke(null, []);
@@ -66,7 +66,7 @@ class MethodsTest {
 
   #[Test, Expect(CannotInvoke::class)]
   public function cannot_invoke_private_method_by_default() {
-    $type= $this->type('{
+    $type= $this->declare('{
       private static function fixture() { }
     }');
     $type->method('fixture')->invoke(null, []);
@@ -74,7 +74,7 @@ class MethodsTest {
 
   #[Test, Expect(CannotInvoke::class)]
   public function cannot_invoke_instance_method_without_instance() {
-    $type= $this->type('{
+    $type= $this->declare('{
       public function fixture() { }
     }');
     $type->method('fixture')->invoke(null, []);
@@ -82,18 +82,18 @@ class MethodsTest {
 
   #[Test]
   public function non_existant() {
-    $type= $this->type('{ }');
+    $type= $this->declare('{ }');
     Assert::null($type->methods()->named('fixture'));
   }
 
   #[Test]
   public function without_methods() {
-    Assert::equals([], iterator_to_array($this->type('{ }')->methods()));
+    Assert::equals([], iterator_to_array($this->declare('{ }')->methods()));
   }
 
   #[Test]
   public function methods() {
-    $type= $this->type('{ public function one() { } public function two() { } }');
+    $type= $this->declare('{ public function one() { } public function two() { } }');
     Assert::equals(
       ['one' => $type->method('one'), 'two' => $type->method('two')],
       iterator_to_array($type->methods())
@@ -102,30 +102,30 @@ class MethodsTest {
 
   #[Test, Values('returnTypes')]
   public function returns($decl, $present, $expected) {
-    $returns= $this->type('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
+    $returns= $this->declare('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
   #[Test]
   public function returns_self() {
-    $type= $this->type('{ function fixture(): self { } }');
+    $type= $this->declare('{ function fixture(): self { } }');
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
   }
 
   #[Test, Values([0, 'arg'])]
   public function parameter_by($lookup) {
-    $parameter= $this->type('{ function fixture($arg) { } }')->method('fixture')->parameter($lookup);
+    $parameter= $this->declare('{ function fixture($arg) { } }')->method('fixture')->parameter($lookup);
     Assert::equals([0, 'arg'], [$parameter->position(), $parameter->name()]);
   }
 
   #[Test, Values([0, 'arg'])]
   public function non_existant_parameter_by($lookup) {
-    Assert::null($this->type('{ function fixture() { } }')->method('fixture')->parameter($lookup));
+    Assert::null($this->declare('{ function fixture() { } }')->method('fixture')->parameter($lookup));
   }
 
   #[Test, Values('parameterTypes')]
   public function parameters($decl, $expected) {
-    $method= $this->type('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture');
+    $method= $this->declare('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture');
     $actual= [];
     foreach ($method->parameters() as $name => $parameter) {
       $type= $parameter->constraint();
@@ -136,49 +136,49 @@ class MethodsTest {
 
   #[Test]
   public function variadic_parameter() {
-    $type= $this->type('{ function fixture(... $arg) { } }');
+    $type= $this->declare('{ function fixture(... $arg) { } }');
     Assert::true($type->method('fixture')->parameter(0)->variadic());
   }
 
   #[Test]
   public function non_variadic_parameter() {
-    $type= $this->type('{ function fixture($arg) { } }');
+    $type= $this->declare('{ function fixture($arg) { } }');
     Assert::false($type->method('fixture')->parameter(0)->variadic());
   }
 
   #[Test]
   public function optional_parameter() {
-    $type= $this->type('{ function fixture($arg= null) { } }');
+    $type= $this->declare('{ function fixture($arg= null) { } }');
     Assert::true($type->method('fixture')->parameter(0)->optional());
   }
 
   #[Test]
   public function required_parameter() {
-    $type= $this->type('{ function fixture($arg) { } }');
+    $type= $this->declare('{ function fixture($arg) { } }');
     Assert::false($type->method('fixture')->parameter(0)->optional());
   }
 
   #[Test]
   public function default_value() {
-    $type= $this->type('{ function fixture($arg= "Test") { } }');
+    $type= $this->declare('{ function fixture($arg= "Test") { } }');
     Assert::equals('Test', $type->method('fixture')->parameter(0)->default());
   }
 
   #[Test, Expect(IllegalStateException::class)]
   public function default_value_for_required() {
-    $type= $this->type('{ function fixture($arg) { } }');
+    $type= $this->declare('{ function fixture($arg) { } }');
     $type->method('fixture')->parameter(0)->default();
   }
 
   #[Test]
   public function self_parameter_type() {
-    $type= $this->type('{ function fixture(self $arg) { } }');
+    $type= $this->declare('{ function fixture(self $arg) { } }');
     Assert::equals($type->class(), $type->method('fixture')->parameter(0)->constraint()->type());
   }
 
   #[Test]
   public function parameter_annotations() {
-    $t= $this->type('{
+    $t= $this->declare('{
       public function fixture(
         #[Inject]
         $arg
@@ -194,7 +194,7 @@ class MethodsTest {
 
   #[Test]
   public function annotations() {
-    $t= $this->type('{
+    $t= $this->declare('{
       #[Author("Test")]
       public function fixture() { }
     }');
@@ -208,7 +208,7 @@ class MethodsTest {
 
   #[Test]
   public function annotation() {
-    $t= $this->type('{
+    $t= $this->declare('{
       #[Author("Test")]
       public function fixture() { }
     }');

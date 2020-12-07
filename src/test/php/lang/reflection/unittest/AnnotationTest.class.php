@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use lang\XPClass;
 use lang\reflection\Annotation;
 use unittest\{Assert, Test, Values};
 
@@ -74,49 +75,97 @@ class AnnotationTest {
 
   #[Test, Values('scalars')]
   public function with_scalar($annotation, $arguments) {
-    $t= $this->type('{}', $annotation);
+    $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
   #[Test, Values('arrays')]
   public function with_array($annotation, $arguments) {
-    $t= $this->type('{}', $annotation);
+    $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
   #[Test, Values('expressions')]
   public function with_expression($annotation, $arguments) {
-    $t= $this->type('{}', $annotation);
+    $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
   #[Test, Values('arguments')]
   public function with($annotation, $arguments) {
-    $t= $this->type('{}', $annotation);
+    $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
   #[Test]
   public function with_class_reference() {
-    $t= $this->type('{}', '#[Annotated(Fixture::class)]');
+    $t= $this->declare('{}', '#[Annotated(Fixture::class)]');
     $this->assertAnnotations([Annotated::class => [Fixture::class]], $t->annotations());
   }
 
   #[Test]
   public function with_constant_reference() {
-    $t= $this->type('{}', '#[Annotated(Fixture::TEST)]');
+    $t= $this->declare('{}', '#[Annotated(Fixture::TEST)]');
     $this->assertAnnotations([Annotated::class => ['test']], $t->annotations());
   }
 
   #[Test]
   public function multiple() {
-    $t= $this->type('{}', '#[Annotated, Enumeration([])]');
+    $t= $this->declare('{}', '#[Annotated, Enumeration([])]');
     $this->assertAnnotations([Annotated::class => [], Enumeration::class => [[]]], $t->annotations());
   }
 
   #[Test]
+  public function name() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals('annotated', $t->annotation(Annotated::class)->name());
+  }
+
+  #[Test]
+  public function literal() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals(Annotated::class, $t->annotation(Annotated::class)->type());
+  }
+
+  #[Test]
+  public function no_arguments() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals([], $t->annotation(Annotated::class)->arguments());
+  }
+
+  #[Test]
+  public function with_argument() {
+    $t= $this->declare('{}', '#[Annotated(Fixture::class)]');
+    Assert::equals([Fixture::class], $t->annotation(Annotated::class)->arguments());
+  }
+
+  #[Test]
+  public function mutiple_arguments() {
+    $t= $this->declare('{}', '#[Annotated(Fixture::class, true)]');
+    Assert::equals([Fixture::class, true], $t->annotation(Annotated::class)->arguments());
+  }
+
+  #[Test, Values([[0, 'test'], [1, true], ['version', 2]])]
+  public function select_argument($select, $expected) {
+    $t= $this->declare('{}', '#[Annotated("test", true, version: 2)]');
+    Assert::equals($expected, $t->annotation(Annotated::class)->argument($select));
+  }
+
+  #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]
+  public function is($type) {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::true($t->annotation(Annotated::class)->is($type));
+  }
+
+  #[Test, Values([[Annotated::class, true], [Fixture::class, false]])]
+  public function provides($type, $expected) {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals($expected, $t->annotations()->provides($type));
+  }
+
+  #[Test]
   public function on_constant() {
-    $t= $this->type('{
+    $t= $this->declare('{
       #[Annotated]
       const FIXTURE = "test";
     }');
@@ -125,7 +174,7 @@ class AnnotationTest {
 
   #[Test]
   public function on_property() {
-    $t= $this->type('{
+    $t= $this->declare('{
       #[Annotated]
       public $fixture;
     }');
@@ -134,7 +183,7 @@ class AnnotationTest {
 
   #[Test]
   public function on_method() {
-    $t= $this->type('{
+    $t= $this->declare('{
       #[Annotated]
       public function fixture() { }
     }');
@@ -143,22 +192,40 @@ class AnnotationTest {
 
   #[Test]
   public function by_type() {
-    $t= $this->type('{}', '#[Annotated]');
+    $t= $this->declare('{}', '#[Annotated]');
     Assert::equals(new Annotation(Annotated::class, []), $t->annotations()->type(Annotated::class));
   } 
 
   #[Test]
   public function non_existant() {
-    $t= $this->type('{}');
+    $t= $this->declare('{}');
     Assert::null($t->annotations()->type(Annotated::class));
   }
 
   #[Test]
   public function three() {
-    $t= $this->type('{}', '#[Annotated, Enumeration("byValue"), Error(Fixture::class)]');
+    $t= $this->declare('{}', '#[Annotated, Enumeration("byValue"), Error(Fixture::class)]');
     $this->assertAnnotations(
       [Annotated::class => [], Enumeration::class => ['byValue'], Error::class => [Fixture::class]],
       $t->annotations()
+    );
+  } 
+
+  #[Test]
+  public function string_representation() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals(
+      'lang.reflection.Annotation<lang\reflection\unittest\Annotated([])>',
+      $t->annotation(Annotated::class)->toString()
+    );
+  } 
+
+  #[Test]
+  public function hash_code() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::equals(
+      'A33d3567738fa0159cd21f46db6f5d219',
+      $t->annotation(Annotated::class)->hashCode()
     );
   } 
 }

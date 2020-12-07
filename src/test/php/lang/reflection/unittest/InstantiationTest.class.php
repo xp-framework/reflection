@@ -9,13 +9,13 @@ class InstantiationTest {
 
   #[Test]
   public function without_arguments() {
-    $t= $this->type('{}');
+    $t= $this->declare('{}');
     Assert::instance($t->class(), $t->newInstance());
   }
 
   #[Test]
   public function with_argument() {
-    $t= $this->type('{
+    $t= $this->declare('{
       public $value= null;
       public function __construct($value) { $this->value= $value; }
     }');
@@ -24,7 +24,7 @@ class InstantiationTest {
 
   #[Test, Expect(CannotInstantiate::class)]
   public function exceptions_are_wrapped() {
-    $type= $this->type('{
+    $type= $this->declare('{
       public function __construct() { throw new \lang\IllegalAccessException("test"); }
     }');
     $type->newInstance();

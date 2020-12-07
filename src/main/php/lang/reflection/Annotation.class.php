@@ -37,7 +37,7 @@ class Annotation implements Value {
   public function toString() { return nameof($this).'<'.$this->type.'('.Objects::stringOf($this->arguments).')>'; }
 
   /** @return string */
-  public function hashCode() { return 'A'.Objects::hashOf([$this->type, $this->arguments]); }
+  public function hashCode() { return 'A'.md5(Objects::hashOf([$this->type, $this->arguments])); }
 
   public function compareTo($value) {
     return $value instanceof self

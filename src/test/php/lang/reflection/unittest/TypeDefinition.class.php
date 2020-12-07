@@ -11,7 +11,7 @@ trait TypeDefinition {
    * @param  var $annotations
    * @return lang.reflection.Type
    */
-  private function type($declaration, $annotations= null) {
+  private function declare($declaration, $annotations= null) {
     static $i= 0;
 
     $type= ClassLoader::defineType(
