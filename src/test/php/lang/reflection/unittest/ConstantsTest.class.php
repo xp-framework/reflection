@@ -16,6 +16,21 @@ class ConstantsTest {
     Assert::equals('test', $this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->value());
   }
 
+  #[Test]
+  public function constants() {
+    $t= $this->declare('{ const one = 1, two = 2; }');
+    Assert::equals(
+      ['one' => $t->constant('one'), 'two' => $t->constant('two')],
+      iterator_to_array($t->constants())
+    );
+  }
+
+  #[Test]
+  public function named() {
+    $t= $this->declare('{ const FIXTURE = "test"; }');
+    Assert::equals($t->constant('FIXTURE'), $t->constants()->named('FIXTURE'));
+  }
+
   #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
   public function private_constant() {
     $const= $this->declare('{ private const FIXTURE = "test"; }')->constant('FIXTURE');
