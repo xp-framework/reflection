@@ -30,15 +30,6 @@ class Method extends Routine {
     }
   }
 
-  /**
-   * Returns all parameters
-   *
-   * @return lang.reflection.Parameters
-   */
-  public function parameters() {
-    return new Parameters($this->reflect->getParameters(), $this->reflect);
-  }
-
   /** @return lang.reflection.TypeHint */
   public function returns() {
     $t= $this->reflect->getReturnType();
