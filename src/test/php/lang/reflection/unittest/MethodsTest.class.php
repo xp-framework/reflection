@@ -2,6 +2,7 @@
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
 use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException};
+use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Expect, Test, Values};
 
 class MethodsTest {
@@ -11,6 +12,7 @@ class MethodsTest {
   private function returnTypes() {
     yield ['%s()', false, Type::$VAR];
     yield ['%s(): array', true, Type::$ARRAY];
+    yield ['%s(): callable', true, Type::$CALLABLE];
     yield ['%s(): string', true, Primitive::$STRING];
     yield ['/** @return string */ %s()', false, Primitive::$STRING];
     yield ['/** @return function(): int */ %s()', false, new FunctionType([], Primitive::$INT)];
@@ -104,6 +106,12 @@ class MethodsTest {
   public function returns($decl, $present, $expected) {
     $returns= $this->declare('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function returns_type_union() {
+    $returns= $this->declare('{ function fixture(): string|int { } }')->method('fixture')->returns();
+    Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $returns->type());
   }
 
   #[Test]
@@ -214,5 +222,65 @@ class MethodsTest {
     }');
 
     Assert::equals(['Test'], $t->method('fixture')->annotation(Author::class)->arguments());
+  }
+
+  #[Test]
+  public function string_representation_with_typed_parameter() {
+    $t= $this->declare('{ public function fixture(array $s): string { } }');
+    Assert::equals(
+      'public function fixture(array $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_with_apidoc_parameter() {
+    $t= $this->declare('{
+      /** @param array<string> $s */
+      public function fixture($s): string { }
+    }');
+    Assert::equals(
+      'public function fixture(array<string> $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_with_unconstrained_parameter() {
+    $t= $this->declare('{ public function fixture($s): string { } }');
+    Assert::equals(
+      'public function fixture(var $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_with_typed_return() {
+    $t= $this->declare('{ public function fixture(): string { } }');
+    Assert::equals(
+      'public function fixture(): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_with_apidoc_return() {
+    $t= $this->declare('{
+      /** @return array<string> */
+      public function fixture() { }
+    }');
+    Assert::equals(
+      'public function fixture(): array<string>',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_without_return() {
+    $t= $this->declare('{ public function fixture() { } }');
+    Assert::equals(
+      'public function fixture(): var',
+      $t->method('fixture')->toString()
+    );
   }
 }
