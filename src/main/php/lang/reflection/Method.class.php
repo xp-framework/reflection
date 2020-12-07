@@ -110,7 +110,7 @@ class Method extends Routine {
     }
 
     return 
-      Modifiers::namesOf($this->reflect->getModifiers()).
+      Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
       ' function '.$this->reflect->name.'('.substr($sig, 2).'): '.
       $returns
     ;

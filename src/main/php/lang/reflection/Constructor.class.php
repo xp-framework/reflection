@@ -36,7 +36,7 @@ class Constructor extends Routine {
       $sig.= ', '.$type.' $'.$parameter->name;
     }
 
-    return Modifiers::namesOf($this->reflect->getModifiers()).' function __construct('.substr($sig, 2).')';
+    return Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).' function __construct('.substr($sig, 2).')';
   }
 
   /**

@@ -20,7 +20,19 @@ class Type {
   public function class() { return new XPClass($this->reflect); }
 
   /** @return lang.reflection.Modifiers */
-  public function modifiers() { return new Modifiers($this->reflect->getModifiers()); }
+  public function modifiers() {
+    if (PHP_VERSION_ID >= 70400) return new Modifiers($this->reflect->getModifiers());
+
+    // PHP 7.4 made type and member modifiers consistent. For versions before that,
+    // map PHP reflection modifiers to generic form
+    $m= $this->reflect->getModifiers();
+    $r= 0;
+    $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r |= MODIFIER_ABSTRACT;
+    $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r |= MODIFIER_ABSTRACT;
+    $m & \ReflectionClass::IS_FINAL && $r |= MODIFIER_FINAL;
+
+    return new Modifiers($r);
+  }
 
   /** Returns type kind */
   public function kind(): Kind {
