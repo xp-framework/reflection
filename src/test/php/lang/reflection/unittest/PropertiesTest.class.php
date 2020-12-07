@@ -62,6 +62,16 @@ class PropertiesTest {
   }
 
   #[Test]
+  public function private_instance_roundtrip() {
+    $type= $this->declare('{ private $fixture = "Test"; }');
+    $instance= $type->newInstance();
+    $property= $type->properties()->named('fixture');
+    $property->set($instance, 'Modified', $type);
+
+    Assert::equals('Modified', $property->get($instance, $type));
+  }
+
+  #[Test]
   public function non_existant() {
     $type= $this->declare('{ }');
     Assert::null($type->properties()->named('fixture'));
@@ -78,6 +88,15 @@ class PropertiesTest {
     Assert::equals(
       ['one' => $type->property('one'), 'two' => $type->property('two')],
       iterator_to_array($type->properties())
+    );
+  }
+
+  #[Test]
+  public function string_representation() {
+    $t= $this->declare('{ public $fixture; }');
+    Assert::equals(
+      'public $fixture',
+      $t->property('fixture')->toString()
     );
   }
 }
