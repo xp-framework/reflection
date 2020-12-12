@@ -16,7 +16,7 @@ class FromAttributes {
       if ('eval' === key($args)) {
         $r[$attribute->getName()]= [$this->evaluate($context, $args['eval'])];
       } else {
-        $r[$attribute->getName()]= $attribute->getArguments();
+        $r[$attribute->getName()]= $args;
       }
     }
     return $r;
