@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.1.1 / 2020-12-12
+
 * Fixed `Type` class to consistently raise CannotInstantiate exceptions
   for interfaces and abstract classes
   (@thekid)
