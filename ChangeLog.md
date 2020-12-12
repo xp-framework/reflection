@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.2.0 / 2020-12-12
+
 * Changed code to attribute reflection instead of parsing the code in
   PHP 8 - @thekid
 
