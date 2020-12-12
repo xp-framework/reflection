@@ -7,12 +7,58 @@ use lang\reflection\Annotation;
  *
  * @see  https://wiki.php.net/rfc/shorter_attribute_syntax
  */
-trait FromAttributes {
+class FromAttributes {
+
+  private function annotations($reflect, $context) {
+    $r= [];
+    foreach ($reflect->getAttributes() as $attribute) {
+      $args= $attribute->getArguments();
+      if ('eval' === key($args)) {
+        $r[$attribute->getName()]= [$this->evaluate($context, $args['eval'])];
+      } else {
+        $r[$attribute->getName()]= $attribute->getArguments();
+      }
+    }
+    return $r;
+  }
 
   /** @return iterable */
-  public function annotations() {
-    foreach ($this->reflect->getAttributes() as $attribute) {
-      yield new Annotation($attribute->getName(), $attribute->getArguments());
+  public function ofType($reflect) {
+    return $this->annotations($reflect, $reflect);
+  }
+
+  /** @return iterable */
+  public function ofConstant($reflect) {
+    return $this->annotations($reflect, $reflect->getDeclaringClass());
+  }
+
+  /** @return iterable */
+  public function ofProperty($reflect) {
+    return $this->annotations($reflect, $reflect->getDeclaringClass());
+  }
+
+  /** @return iterable */
+  public function ofMethod($reflect) {
+    return $this->annotations($reflect, $reflect->getDeclaringClass());
+  }
+
+  /** @return iterable */
+  public function ofParameter($method, $reflect) {
+    return $this->annotations($reflect, $method->getDeclaringClass());
+  }
+
+  public function evaluate($reflect, $code) {
+    $ns= '';
+
+    // Parse namespace and imports from file
+    $tokens= \PhpToken::tokenize(file_get_contents($reflect->getFileName()));
+    foreach ($tokens as $t) {
+      if (T_DOC_COMMENT === $t->id || T_CLASS === $t->id || T_INTERFACE === $t->id || T_TRAIT === $t->id) break;
+      if (T_OPEN_TAG === $t->id) continue;
+      $ns.= $t->text;
     }
+
+    $func= eval($ns.' return static function() { return '.$code.'; };');
+    return $func->bindTo(null, $reflect->name)();
   }
 }

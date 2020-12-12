@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed code to attribute reflection instead of parsing the code in
+  PHP 8 - @thekid
+
 ## 0.1.1 / 2020-12-12
 
 * Fixed `Type` class to consistently raise CannotInstantiate exceptions

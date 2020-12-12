@@ -1,6 +1,6 @@
 <?php namespace lang;
 
-use lang\annotations\{FromMeta, FromSyntaxTree};
+use lang\annotations\{FromMeta, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
 
 abstract class Reflection {
@@ -8,7 +8,15 @@ abstract class Reflection {
 
   /** @return lang.annotations.FromMeta */
   public static function parse() {
-    return self::$parse ?? self::$parse= new FromMeta(new FromSyntaxTree());
+    if (self::$parse) {
+      // NOOP
+    } else if (PHP_VERSION_ID >= 80000) {
+      self::$parse= new FromMeta(new FromAttributes());
+    } else {
+      self::$parse= new FromMeta(new FromSyntaxTree());
+    }
+
+    return self::$parse;
   }
 
   /**
