@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\Reflect;
 use lang\reflection\{CannotInstantiate, InvocationFailed};
+use lang\{Reflection, Value, CommandLine};
 use unittest\{Assert, Test};
 
 class InstantiationTest {
@@ -48,5 +48,15 @@ class InstantiationTest {
       private function __construct() { throw new \lang\IllegalAccessException("Unreachable"); }
     }');
     $invocation($t, []);
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function interfaces_cannot_be_instantiated() {
+    Reflection::of(Value::class)->newInstance();
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function abstract_classes_cannot_be_instantiated() {
+    Reflection::of(CommandLine::class)->newInstance();
   }
 }

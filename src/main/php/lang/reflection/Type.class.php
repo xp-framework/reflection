@@ -118,7 +118,11 @@ class Type {
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->reflect->name, $e);
     } catch (\Throwable $e) {
-      throw new InvocationFailed($this->reflect->name, $e);
+      if ($this->reflect->isInstantiable()) {
+        throw new InvocationFailed($this->reflect->name, $e);
+      } else {
+        throw new CannotInstantiate($this->reflect->name);
+      }
     }
   }
 
