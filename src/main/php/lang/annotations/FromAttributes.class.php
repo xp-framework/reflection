@@ -58,7 +58,8 @@ class FromAttributes {
       $ns.= $t->text;
     }
 
-    $func= eval($ns.' return static function() { return '.$code.'; };');
-    return $func->bindTo(null, $reflect->name)();
+    // Create, then bind closure to reflected class
+    $f= eval($ns.' return static function() { return '.$code.'; };');
+    return $f->bindTo(null, $reflect->name)();
   }
 }
