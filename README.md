@@ -11,7 +11,7 @@ XP Reflection
 Reflection library
 
 ```php
-use lang\{Reflection};
+use lang\Reflection;
 use org\example\{Base, Inject, Fixture};
 
 $type= Reflection::of(Fixture::class);
