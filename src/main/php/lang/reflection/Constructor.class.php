@@ -47,7 +47,7 @@ class Constructor extends Routine {
    * @throws lang.reflection.InvocationFailed
    * @throws lang.reflection.CannotInstantiate
    */
-  public function newInstance($args) {
+  public function newInstance($args= []) {
     try {
       return $this->class->newInstanceArgs($args);
     } catch (\ReflectionException $e) {

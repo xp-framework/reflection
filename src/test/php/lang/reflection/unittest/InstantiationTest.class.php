@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Value, CommandLine};
-use unittest\{Assert, Test};
+use lang\{Reflection, Value, CommandLine, IllegalAccessException};
+use unittest\{Assert, Expect, Test, Values, AssertionFailedError};
 
 class InstantiationTest {
   use TypeDefinition;
@@ -14,9 +14,15 @@ class InstantiationTest {
   }
 
   #[Test]
-  public function without_arguments() {
+  public function instantiate_type() {
     $t= $this->declare('{}');
     Assert::instance($t->class(), $t->newInstance());
+  }
+
+  #[Test]
+  public function arguments_can_be_omitted() {
+    $t= $this->declare('{ public function __construct() { }}');
+    Assert::instance($t->class(), $t->constructor()->newInstance());
   }
 
   #[Test, Values('invocations')]
@@ -34,12 +40,15 @@ class InstantiationTest {
     Assert::equals($this, $invocation($t, [$this])->value);
   }
 
-  #[Test, Expect(InvocationFailed::class), Values('invocations')]
+  #[Test, Values('invocations')]
   public function exceptions_are_wrapped($invocation) {
-    $t= $this->declare('{
-      public function __construct() { throw new \lang\IllegalAccessException("Test"); }
-    }');
-    $invocation($t, []);
+    $t= $this->declare('{ public function __construct() { throw new \lang\IllegalAccessException("Test"); } }');
+    try {
+      $invocation($t, []);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (InvocationFailed $expected) {
+      Assert::instance(IllegalAccessException::class, $expected->getCause());
+    }
   }
 
   #[Test, Expect(CannotInstantiate::class), Values('invocations')]
