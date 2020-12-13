@@ -103,6 +103,14 @@ class ModifiersTest {
   }
 
   #[Test]
+  public function hash_code() {
+    Assert::equals(
+      'M['.(MODIFIER_PUBLIC | MODIFIER_STATIC),
+      (new Modifiers('public static'))->hashCode()
+    );
+  }
+
+  #[Test]
   public function string_representation() {
     Assert::equals(
       'lang.reflection.Modifiers<public static>',
