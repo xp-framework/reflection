@@ -2,7 +2,8 @@
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
 use lang\{Reflection, Runnable, CommandLine, IllegalAccessException};
-use unittest\{Assert, Expect, Test, Values, AssertionFailedError};
+use unittest\actions\RuntimeVersion;
+use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
 
 class InstantiationTest {
   use TypeDefinition;
@@ -70,6 +71,12 @@ class InstantiationTest {
       private function __construct($value) { $this->value= $value; }
     }');
     Assert::equals($this, $t->constructor()->newInstance([$this], $t)->value);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function instantiate_with_constructor_promotion() {
+    $t= $this->declare('{ private function __construct(public $value) { } }');
+    Assert::equals($this, $t->constructor()->newInstance([$this])->value);
   }
 
   #[Test, Expect(CannotInstantiate::class)]
