@@ -135,6 +135,18 @@ class AnnotationTest {
   }
 
   #[Test]
+  public function name_in_namespace() {
+    $t= $this->declare('{}', '#[\lang\reflection\unittest\Annotated]');
+    Assert::equals('annotated', $t->annotation(Annotated::class)->name());
+  }
+
+  #[Test]
+  public function name_in_global_namespace() {
+    $t= $this->declare('{}', '#[\Annotated]');
+    Assert::equals('annotated', $t->annotation(\Annotated::class)->name());
+  }
+
+  #[Test]
   public function literal() {
     $t= $this->declare('{}', '#[Annotated]');
     Assert::equals(Annotated::class, $t->annotation(Annotated::class)->type());
