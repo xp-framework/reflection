@@ -38,6 +38,8 @@ class Property extends Member {
       return $value;
     } catch (\ReflectionException $e) {
       throw new CannotAccess(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+    } catch (\Throwable $e) {
+      throw new AccessingFailed(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
     }
   }
 

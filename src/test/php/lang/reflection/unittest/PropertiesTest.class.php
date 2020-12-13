@@ -1,7 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Modifiers, CannotAccess};
-use unittest\{Assert, Test};
+use lang\reflection\{Modifiers, CannotAccess, AccessingFailed};
+use unittest\actions\RuntimeVersion;
+use unittest\{Assert, Action, Expect, Test};
 
 class PropertiesTest {
   use TypeDefinition;
@@ -83,6 +84,12 @@ class PropertiesTest {
   public function cannot_write_private_with_incorrect_context() {
     $type= $this->declare('{ private static $fixture = "Test"; }');
     $type->property('fixture')->set(null, 'Modified', typeof($this));
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")'), Expect(AccessingFailed::class)]
+  public function type_mismatch() {
+    $type= $this->declare('{ private static array $fixture; }');
+    $type->property('fixture')->set(null, 1, $type);
   }
 
   #[Test]
