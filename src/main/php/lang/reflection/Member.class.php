@@ -77,8 +77,4 @@ abstract class Member {
 
   /** @return lang.reflection.Type */
   public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
-
-  public function evaluate($expression) {
-    return Reflection::parse()->evaluate($this->reflect->getDeclaringClass(), $expression);
-  }
 }
