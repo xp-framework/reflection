@@ -25,6 +25,8 @@ class Type {
 
     // PHP 7.4 made type and member modifiers consistent. For versions before that,
     // map PHP reflection modifiers to generic form
+    //
+    // @codeCoverageIgnoreStart
     $m= $this->reflect->getModifiers();
     $r= 0;
     $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r |= MODIFIER_ABSTRACT;
@@ -32,6 +34,7 @@ class Type {
     $m & \ReflectionClass::IS_FINAL && $r |= MODIFIER_FINAL;
 
     return new Modifiers($r);
+    // @codeCoverageIgnoreEnd
   }
 
   /** Returns type kind */
