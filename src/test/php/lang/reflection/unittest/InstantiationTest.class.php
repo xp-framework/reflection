@@ -63,6 +63,21 @@ class InstantiationTest {
     $invocation($t, []);
   }
 
+  #[Test]
+  public function instantiate_with_private_constructor_in_context() {
+    $t= $this->declare('{
+      public $value= null;
+      private function __construct($value) { $this->value= $value; }
+    }');
+    Assert::equals($this, $t->constructor()->newInstance([$this], $t)->value);
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function cannot_instantiate_with_private_constructor_in_incorrect_context() {
+    $t= $this->declare('{ private function __construct() { } }');
+    $t->constructor()->newInstance([], typeof($this));
+  }
+
   #[Test, Expect(CannotInstantiate::class)]
   public function interfaces_cannot_be_instantiated() {
     Reflection::of(Runnable::class)->newInstance();

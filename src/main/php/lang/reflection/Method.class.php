@@ -17,7 +17,7 @@ class Method extends Routine {
   public function invoke($instance, $args= [], $context= null) {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
-    if ($context) {
+    if ($context && !$this->reflect->isPublic()) {
       $t= $context instanceof Type ? $context : Reflection::of($context);
       if ($t->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);

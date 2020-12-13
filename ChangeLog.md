@@ -3,7 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Implemented context type check when invoking methods - @thekid
+* Implemented context type check when invoking methods and constructors
+  (@thekid)
 
 ## 0.2.0 / 2020-12-12
 
