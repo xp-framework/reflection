@@ -8,23 +8,37 @@ class Property extends Member {
 
   public function get($instance, $context= null) {
 
-    // TODO: Verify context is an instance of class this method is declared in
-    if ($context) {
-      $this->reflect->setAccessible(true);
+    // Success oriented: Let PHP's reflection API raise the exceptions for us
+    if ($context && !$this->reflect->isPublic()) {
+      $t= $context instanceof Type ? $context : Reflection::of($context);
+      if ($t->is($this->reflect->class)) {
+        $this->reflect->setAccessible(true);
+      }
     }
 
-    return $this->reflect->getValue($instance);
+    try {
+      return $this->reflect->getValue($instance);
+    } catch (\ReflectionException $e) {
+      throw new CannotAccess(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+    }
   }
 
   public function set($instance, $value, $context= null) {
 
-    // TODO: Verify context is an instance of class this method is declared in
-    if ($context) {
-      $this->reflect->setAccessible(true);
+    // Success oriented: Let PHP's reflection API raise the exceptions for us
+    if ($context && !$this->reflect->isPublic()) {
+      $t= $context instanceof Type ? $context : Reflection::of($context);
+      if ($t->is($this->reflect->class)) {
+        $this->reflect->setAccessible(true);
+      }
     }
 
-    $this->reflect->setValue($instance, $value);
-    return $value;
+    try {
+      $this->reflect->setValue($instance, $value);
+      return $value;
+    } catch (\ReflectionException $e) {
+      throw new CannotAccess(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+    }
   }
 
   public function toString() {

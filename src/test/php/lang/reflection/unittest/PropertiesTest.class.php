@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\Modifiers;
+use lang\reflection\{Modifiers, CannotAccess};
 use unittest\{Assert, Test};
 
 class PropertiesTest {
@@ -59,6 +59,30 @@ class PropertiesTest {
     $type->properties()->named('fixture')->set(null, 'Modified');
 
     Assert::equals('Modified', $class::$fixture);
+  }
+
+  #[Test, Expect(CannotAccess::class)]
+  public function cannot_read_private_by_default() {
+    $type= $this->declare('{ private static $fixture = "Test"; }');
+    $type->property('fixture')->get(null);
+  }
+
+  #[Test, Expect(CannotAccess::class)]
+  public function cannot_write_private_by_default() {
+    $type= $this->declare('{ private static $fixture = "Test"; }');
+    $type->property('fixture')->set(null, 'Modified');
+  }
+
+  #[Test, Expect(CannotAccess::class)]
+  public function cannot_read_private_with_incorrect_context() {
+    $type= $this->declare('{ private static $fixture = "Test"; }');
+    $type->property('fixture')->get(null, typeof($this));
+  }
+
+  #[Test, Expect(CannotAccess::class)]
+  public function cannot_write_private_with_incorrect_context() {
+    $type= $this->declare('{ private static $fixture = "Test"; }');
+    $type->property('fixture')->set(null, 'Modified', typeof($this));
   }
 
   #[Test]
