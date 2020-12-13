@@ -75,7 +75,7 @@ class InstantiationTest {
 
   #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
   public function instantiate_with_constructor_promotion() {
-    $t= $this->declare('{ private function __construct(public $value) { } }');
+    $t= $this->declare('{ public function __construct(public $value) { } }');
     Assert::equals($this, $t->constructor()->newInstance([$this])->value);
   }
 
