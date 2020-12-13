@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.3.1 / 2020-12-13
+
+* Fixed syntax error when using type annotations with `eval` argument
+  (@thekid)
+
 ## 0.3.0 / 2020-12-12
 
 * Added `lang.reflection.Method::closure()` - @thekid

@@ -2,6 +2,8 @@
 
 class Fixture {
   const TEST = 'test';
+
+  public static $DEFAULT = null;
   private $value;
 
   /** @param var */

@@ -73,6 +73,12 @@ class AnnotationTest {
     yield ['#[Annotated(true, using: "values")]', [0 => true, 'using' => 'values']];
   }
 
+  /** @return iterable */
+  private function evaluation() {
+    yield ['#[Annotated(eval: "new Fixture()")]', [new Fixture()]];
+    yield ['#[Annotated(eval: "Fixture::\$DEFAULT")]', [Fixture::$DEFAULT]];
+  }
+
   #[Test, Values('scalars')]
   public function with_scalar($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
@@ -93,6 +99,12 @@ class AnnotationTest {
 
   #[Test, Values('arguments')]
   public function with($annotation, $arguments) {
+    $t= $this->declare('{}', $annotation);
+    $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
+  }
+
+  #[Test, Values('evaluation')]
+  public function with_eval($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }

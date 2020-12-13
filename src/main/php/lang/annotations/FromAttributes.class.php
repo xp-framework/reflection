@@ -48,12 +48,13 @@ class FromAttributes {
   }
 
   public function evaluate($reflect, $code) {
-    $ns= '';
+    static $break= [T_ATTRIBUTE => 1, T_DOC_COMMENT => 1, T_CLASS => 1, T_INTERFACE => 1, T_TRAIT => 1];
 
     // Parse namespace and imports from file
+    $ns= '';
     $tokens= \PhpToken::tokenize(file_get_contents($reflect->getFileName()));
     foreach ($tokens as $t) {
-      if (T_DOC_COMMENT === $t->id || T_CLASS === $t->id || T_INTERFACE === $t->id || T_TRAIT === $t->id) break;
+      if (isset($break[$t->id])) break;
       if (T_OPEN_TAG === $t->id) continue;
       $ns.= $t->text;
     }
