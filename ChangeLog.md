@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.4.0 / 2020-12-14
+
 * Removed lookup for lowercase XP annotations, the AST library does not
   support them any longer
   (@thekid)
