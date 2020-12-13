@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added `lang.reflection.Annotation::newInstance()` method - @thekid
+
 ## 0.3.1 / 2020-12-13
 
 * Fixed syntax error when using type annotations with `eval` argument

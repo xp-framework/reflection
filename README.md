@@ -41,6 +41,7 @@ foreach ($type->annotations() as $annotation) {
   $annotation->arguments();       // ['Test', test => true]
   $annotation->argument(0);       // 'Test'
   $annotation->argument('test');  // true
+  $annotation->newInstance();     // Author class instance
 }
 
 $type->annotation(Inject::class); // Annotation or NULL

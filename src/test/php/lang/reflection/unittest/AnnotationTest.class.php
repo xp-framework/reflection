@@ -164,6 +164,13 @@ class AnnotationTest {
     Assert::equals($expected, $t->annotation(Annotated::class)->argument($select));
   }
 
+  #[Test]
+  public function instantiation() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::instance(Annotated::class, $t->annotation(Annotated::class)->newInstance());
+  }
+
+
   #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]
   public function is($type) {
     $t= $this->declare('{}', '#[Annotated]');
