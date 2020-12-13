@@ -112,4 +112,16 @@ class InvocationTest {
   public function abstract_methods_cannot_be_instantiated() {
     Reflection::of(CommandLine::class)->method('parse')->invoke(null, ['...']);
   }
+
+  #[Test]
+  public function invoke_class_via_closure() {
+    $closure= $this->fixtures['parent']->method('creation')->closure();
+    Assert::equals('Creation', $closure());
+  }
+
+  #[Test, Values([['external', 'External'], ['friend', 'Friend'], ['internal', 'Internal']])]
+  public function invoke_instance_via_closure($method, $expected) {
+    $closure= $this->fixtures['parent']->method($method)->closure($this->fixtures['parent']->newInstance());
+    Assert::equals($expected, $closure());
+  }
 }

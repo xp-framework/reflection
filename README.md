@@ -98,6 +98,7 @@ foreach ($type->methods() as $name => $method) {
   $method->returns();                      // TypeHint
   $method->parameters();                   // Parameters
   $method->parameter(0);                   // Parameter or NULL
+  $method->closure($instance);             // Closure instance
   $method->invoke($instance, []);          // (method return value)
 }
 ```

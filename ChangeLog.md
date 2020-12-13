@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.3.0 / 2020-12-12
+
+* Added `lang.reflection.Method::closure()` - @thekid
 * Implemented context type check when reading and writing properties as
   well as when invoking methods and constructors
   (@thekid)

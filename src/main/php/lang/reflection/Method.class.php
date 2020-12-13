@@ -5,6 +5,16 @@ use lang\{Reflection, TypeUnion, Type as XPType, XPClass};
 class Method extends Routine {
 
   /**
+   * Returns a closure
+   *
+   * @param  ?object $instance
+   * @return \Closure
+   */
+  public function closure($instance= null) {
+    return $this->reflect->getClosure($instance);
+  }
+
+  /**
    * Invokes this method
    *
    * @param  ?object $instance
