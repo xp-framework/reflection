@@ -77,6 +77,7 @@ class AnnotationTest {
   private function evaluation() {
     yield ['#[Annotated(eval: "new Fixture()")]', [new Fixture()]];
     yield ['#[Annotated(eval: "Fixture::\$DEFAULT")]', [Fixture::$DEFAULT]];
+    yield ['#[Annotated(eval: "self::\$member")]', ['Test']];
   }
 
   #[Test, Values('scalars')]
@@ -105,7 +106,7 @@ class AnnotationTest {
 
   #[Test, Values('evaluation')]
   public function with_eval($annotation, $arguments) {
-    $t= $this->declare('{}', $annotation);
+    $t= $this->declare('{ private static $member= "Test"; }', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
