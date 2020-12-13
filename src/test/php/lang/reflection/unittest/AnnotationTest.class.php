@@ -211,6 +211,17 @@ class AnnotationTest {
   }
 
   #[Test]
+  public function on_parameter() {
+    $t= $this->declare('{
+      public function fixture(
+        #[Annotated]
+        $arg
+      ) { }
+    }');
+    $this->assertAnnotations([Annotated::class => []], $t->method('fixture')->parameter(0)->annotations());
+  }
+
+  #[Test]
   public function by_type() {
     $t= $this->declare('{}', '#[Annotated]');
     Assert::equals(new Annotation(Annotated::class, []), $t->annotations()->type(Annotated::class));
