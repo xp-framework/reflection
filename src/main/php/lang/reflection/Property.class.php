@@ -6,6 +6,14 @@ class Property extends Member {
 
   protected function getAnnotations() { return Reflection::parse()->ofProperty($this->reflect); }
 
+  /**
+   * Gets this property's value
+   *
+   * @param  ?object $instance
+   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
+   * @return var
+   * @throws lang.reflection.CannotAccess
+   */
   public function get($instance, $context= null) {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
@@ -23,6 +31,16 @@ class Property extends Member {
     }
   }
 
+  /**
+   * Sets this property's value
+   *
+   * @param  ?object $instance
+   * @param  var $value
+   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
+   * @return var The given value
+   * @throws lang.reflection.CannotAccess
+   * @throws lang.reflection.AccessFailed if setting raises an exception
+   */
   public function set($instance, $value, $context= null) {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
@@ -43,6 +61,7 @@ class Property extends Member {
     }
   }
 
+  /** @return string */
   public function toString() {
     return Modifiers::namesOf($this->reflect->getModifiers()).' $'.$this->reflect->name;
   }
