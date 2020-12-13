@@ -12,13 +12,30 @@ trait TypeDefinition {
    * @return lang.reflection.Type
    */
   private function declare($declaration, $annotations= null) {
-    static $i= 0;
+    static $u= 0;
 
-    $type= ClassLoader::defineType(
-      ($annotations ? $annotations.' ' : '').self::class.($i++),
+    return Reflection::of(ClassLoader::defineType(
+      ($annotations ? $annotations.' ' : '').self::class.'Parent'.($u++),
       ['kind' => 'class', 'extends' => null, 'implements' => [], 'use' => []],
       $declaration
-    );
-    return Reflection::of($type);
+    ));
+  }
+
+  /**
+   * Extends a type
+   *
+   * @param  lang.reflection.Type $base
+   * @param  var $declaration
+   * @param  var $annotations
+   * @return lang.reflection.Type
+   */
+  private function extend($base, $declaration= [], $annotations= null) {
+    static $u= 0;
+
+    return Reflection::of(ClassLoader::defineType(
+      ($annotations ? $annotations.' ' : '').self::class.'Child'.($u++),
+      ['kind' => 'class', 'extends' => [$base], 'implements' => [], 'use' => []],
+      $declaration
+    ));
   }
 }

@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Implemented context type check when invoking methods - @thekid
+
 ## 0.2.0 / 2020-12-12
 
 * Changed code to attribute reflection instead of parsing the code in

@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Type, TypeUnion, XPClass};
+use lang\{Reflection, TypeUnion, Type as XPType, XPClass};
 
 class Method extends Routine {
 
@@ -9,16 +9,19 @@ class Method extends Routine {
    *
    * @param  ?object $instance
    * @param  var[] $args
-   * @param  ?string $context
+   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return var
    * @throws lang.reflection.CannotInvoke
    * @throws lang.reflection.InvocationFailed if invocation raises an exception
    */
-  public function invoke($instance, $args, $context= null) {
+  public function invoke($instance, $args= [], $context= null) {
 
-    // TODO: Verify context is an instance of class this method is declared in
+    // Success oriented: Let PHP's reflection API raise the exceptions for us
     if ($context) {
-      $this->reflect->setAccessible(true);
+      $t= $context instanceof Type ? $context : Reflection::of($context);
+      if ($t->is($this->reflect->class)) {
+        $this->reflect->setAccessible(true);
+      }
     }
 
     try {
@@ -37,11 +40,11 @@ class Method extends Routine {
       $present= false;
 
       // Check for type in api documentation, defaulting to `var`
-      $t= Type::$VAR;
+      $t= XPType::$VAR;
     } else if ($t instanceof \ReflectionUnionType) {
       $union= [];
       foreach ($t->getTypes() as $component) {
-        $union[]= Type::resolve($component->getName(), $this->resolver());
+        $union[]= XPType::resolve($component->getName(), $this->resolver());
       }
       return new TypeHint(new TypeUnion($union));
     } else {
@@ -50,13 +53,13 @@ class Method extends Routine {
       // Check array, self and callable for more specific types, e.g. `string[]`,
       // `static` or `function(): string` in api documentation
       if ('array' === $name) {
-        $t= Type::$ARRAY;
+        $t= XPType::$ARRAY;
       } else if ('callable' === $name) {
-        $t= Type::$CALLABLE;
+        $t= XPType::$CALLABLE;
       } else if ('self' === $name) {
         $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
-        return new TypeHint(Type::resolve($name, $this->resolver()));
+        return new TypeHint(XPType::resolve($name, $this->resolver()));
       }
       $present= true;
     }
@@ -69,7 +72,7 @@ class Method extends Routine {
     }
 
     return new TypeHint(
-      isset($tags['return'])? Type::resolve($tags['return'][0], $this->resolver()) : $t,
+      isset($tags['return'])? XPType::resolve($tags['return'][0], $this->resolver()) : $t,
       $present
     );
   }

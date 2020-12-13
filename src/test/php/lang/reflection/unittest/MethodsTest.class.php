@@ -1,6 +1,5 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{CannotInvoke, InvocationFailed};
 use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Expect, Test, Values};
@@ -43,51 +42,9 @@ class MethodsTest {
   }
 
   #[Test]
-  public function invoke_class_method() {
-    $type= $this->declare('{ public static function fixture() { return "Test"; } }');
-    Assert::equals('Test', $type->method('fixture')->invoke(null, []));
-  }
-
-  #[Test]
-  public function invoke_instance_method() {
-    $type= $this->declare('{ public function fixture() { return "Test"; } }');
-    Assert::equals('Test', $type->method('fixture')->invoke($type->newInstance(), []));
-  }
-
-  #[Test]
-  public function invoke_private_method_in_type_context() {
-    $type= $this->declare('{ private function fixture() { return "Test"; } }');
-    Assert::equals('Test', $type->method('fixture')->invoke($type->newInstance(), [], $type));
-  }
-
-  #[Test]
   public function named() {
     $type= $this->declare('{ public function fixture() { } }');
     Assert::equals($type->method('fixture'), $type->methods()->named('fixture'));
-  }
-
-  #[Test, Expect(InvocationFailed::class)]
-  public function exceptions_are_wrapped() {
-    $type= $this->declare('{
-      public static function fixture() { throw new \lang\IllegalAccessException("test"); }
-    }');
-    $type->method('fixture')->invoke(null, []);
-  }
-
-  #[Test, Expect(CannotInvoke::class)]
-  public function cannot_invoke_private_method_by_default() {
-    $type= $this->declare('{
-      private static function fixture() { }
-    }');
-    $type->method('fixture')->invoke(null, []);
-  }
-
-  #[Test, Expect(CannotInvoke::class)]
-  public function cannot_invoke_instance_method_without_instance() {
-    $type= $this->declare('{
-      public function fixture() { }
-    }');
-    $type->method('fixture')->invoke(null, []);
   }
 
   #[Test]
