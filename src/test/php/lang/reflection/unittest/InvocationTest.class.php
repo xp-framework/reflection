@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\IllegalAccessException;
 use lang\reflection\{CannotInvoke, InvocationFailed};
+use lang\{Reflection, IllegalAccessException, Runnable, CommandLine};
 use unittest\{Assert, AssertionFailedError, Values, Expect, Test};
 
 class InvocationTest {
@@ -101,5 +101,15 @@ class InvocationTest {
   public function incorrectly_typed_argument() {
     $t= $this->declare('{ public function fixture(array $arg) { } }');
     $t->method('fixture')->invoke($t->newInstance(), [1]);
+  }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function interface_methods_cannot_be_instantiated() {
+    Reflection::of(Runnable::class)->method('run')->invoke(null);
+  }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function abstract_methods_cannot_be_instantiated() {
+    Reflection::of(CommandLine::class)->method('parse')->invoke(null, ['...']);
   }
 }

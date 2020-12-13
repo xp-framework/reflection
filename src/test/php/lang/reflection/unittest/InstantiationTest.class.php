@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Value, CommandLine, IllegalAccessException};
+use lang\{Reflection, Runnable, CommandLine, IllegalAccessException};
 use unittest\{Assert, Expect, Test, Values, AssertionFailedError};
 
 class InstantiationTest {
@@ -52,16 +52,20 @@ class InstantiationTest {
   }
 
   #[Test, Expect(CannotInstantiate::class), Values('invocations')]
-  public function private_constructor($invocation) {
-    $t= $this->declare('{
-      private function __construct() { throw new \lang\IllegalAccessException("Unreachable"); }
-    }');
+  public function cannot_instantiate_using_private_constructor($invocation) {
+    $t= $this->declare('{ private function __construct() { } }');
+    $invocation($t, []);
+  }
+
+  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
+  public function cannot_instantiate_using_protected_constructor($invocation) {
+    $t= $this->declare('{ protected function __construct() { } }');
     $invocation($t, []);
   }
 
   #[Test, Expect(CannotInstantiate::class)]
   public function interfaces_cannot_be_instantiated() {
-    Reflection::of(Value::class)->newInstance();
+    Reflection::of(Runnable::class)->newInstance();
   }
 
   #[Test, Expect(CannotInstantiate::class)]
