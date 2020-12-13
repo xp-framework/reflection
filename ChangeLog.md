@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Removed lookup for lowercase XP annotations, the AST library does not
+  support them any longer
+  (@thekid)
 * Added `lang.reflection.Annotation::newInstance()` method - @thekid
 
 ## 0.3.1 / 2020-12-13
