@@ -62,8 +62,8 @@ class InvocationTest {
     try {
       $t->method('fixture')->invoke(null, []);
       throw new AssertionFailedError('No exception was raised');
-    } catch (InvocationFailed $e) {
-      Assert::instance(IllegalAccessException::class, $e->getCause());
+    } catch (InvocationFailed $expected) {
+      Assert::instance(IllegalAccessException::class, $expected->getCause());
     }
   }
 
