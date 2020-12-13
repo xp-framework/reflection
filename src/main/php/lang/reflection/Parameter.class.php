@@ -46,11 +46,7 @@ class Parameter {
     $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->method, $this->reflect);
 
     $t= strtr($type, '.', '\\');
-    if (isset($this->annotations[$t])) return new Annotation($t, $this->annotations[$t]);
-
-    // Check lowercase version
-    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
-    return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 
   /**

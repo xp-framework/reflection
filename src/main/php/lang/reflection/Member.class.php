@@ -38,11 +38,7 @@ abstract class Member {
     $this->annotations ?? $this->annotations= $this->getAnnotations();
 
     $t= strtr($type, '.', '\\');
-    if (isset($this->annotations[$t])) return new Annotation($t, $this->annotations[$t]);
-
-    // Check lowercase version
-    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
-    return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 
   /** Returns this member's name */
