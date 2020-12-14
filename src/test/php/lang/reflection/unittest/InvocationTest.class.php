@@ -63,7 +63,6 @@ class InvocationTest {
       $t->method('fixture')->invoke(null, []);
       throw new AssertionFailedError('No exception was raised');
     } catch (InvocationFailed $expected) {
-      Assert::equals($t->method('fixture'), $expected->target());
       Assert::instance(IllegalAccessException::class, $expected->getCause());
     }
   }
@@ -124,5 +123,27 @@ class InvocationTest {
   public function invoke_instance_via_closure($method, $expected) {
     $closure= $this->fixtures['parent']->method($method)->closure($this->fixtures['parent']->newInstance());
     Assert::equals($expected, $closure());
+  }
+
+  #[Test]
+  public function invocation_failed_target() {
+    $t= $this->declare('{ public static function fixture() { throw new \lang\IllegalAccessException("test"); } }');
+    try {
+      $t->method('fixture')->invoke(null, []);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (InvocationFailed $expected) {
+      Assert::equals($t->method('fixture'), $expected->target());
+    }
+  }
+
+  #[Test]
+  public function cannot_invoke_target() {
+    $t= $this->declare('{ private static function fixture() { } }');
+    try {
+      $t->method('fixture')->invoke(null, []);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (CannotInvoke $expected) {
+      Assert::equals($t->method('fixture'), $expected->target());
+    }
   }
 }

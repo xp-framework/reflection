@@ -37,7 +37,7 @@ class Method extends Routine {
     try {
       return $this->reflect->invokeArgs($instance, $args);
     } catch (\ReflectionException $e) {
-      throw new CannotInvoke(strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name, $e);
+      throw new CannotInvoke($this, $e);
     } catch (\Throwable $e) {
       throw new InvocationFailed($this, $e);
     }

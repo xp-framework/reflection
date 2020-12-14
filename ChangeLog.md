@@ -5,8 +5,8 @@ XP Reflection ChangeLog
 
 * Added `compoundName()` accessor to constants, properties and methods.
   (@thekid)
-* Passed method or constructor to `InvocationFailed` exception, and make
-  it accessible via its `target()` method.
+* Passed method or constructor to `InvocationFailed` and `CannotInvoke`
+  exceptions, and make it accessible via their `target()` method.
   (@thekid)
 
 ## 0.4.0 / 2020-12-14
