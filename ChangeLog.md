@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Passed property to `AccessingFailed` and `CannotAccess` exceptions,
+  and make it accessible via their `target()` method
+  (@thekid)
 * Made `Reflection::of()` also accept `lang.reflection.Type` instances
   (@thekid)
 * Added `compoundName()` accessor to constants, properties and methods

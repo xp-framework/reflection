@@ -29,7 +29,7 @@ class Property extends Member {
     try {
       return $this->reflect->getValue($instance);
     } catch (\ReflectionException $e) {
-      throw new CannotAccess(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+      throw new CannotAccess($this, $e);
     }
   }
 
@@ -56,9 +56,9 @@ class Property extends Member {
       $this->reflect->setValue($instance, $value);
       return $value;
     } catch (\ReflectionException $e) {
-      throw new CannotAccess(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+      throw new CannotAccess($this, $e);
     } catch (\Throwable $e) {
-      throw new AccessingFailed(strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name, $e);
+      throw new AccessingFailed($this, $e);
     }
   }
 

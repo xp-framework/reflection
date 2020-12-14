@@ -1,7 +1,5 @@
 <?php namespace lang\reflection;
 
-use lang\XPException;
-
-class CannotAccess extends XPException {
-
+class CannotAccess extends TargetException {
+  const MESSAGE = 'Cannot invoke';
 }

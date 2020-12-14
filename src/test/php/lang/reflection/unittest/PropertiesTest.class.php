@@ -2,7 +2,7 @@
 
 use lang\reflection\{Modifiers, CannotAccess, AccessingFailed};
 use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Action, Expect, Test};
+use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
 
 class PropertiesTest {
   use TypeDefinition;
@@ -135,5 +135,27 @@ class PropertiesTest {
       'public $fixture',
       $t->property('fixture')->toString()
     );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  public function accessing_failed_target() {
+    $t= $this->declare('{ public static array $fixture; }');
+    try {
+      $t->property('fixture')->set(null, 1);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (AccessingFailed $expected) {
+      Assert::equals($t->property('fixture'), $expected->target());
+    }
+  }
+
+  #[Test]
+  public function cannot_access_target() {
+    $t= $this->declare('{ private static $fixture; }');
+    try {
+      $t->property('fixture')->get(null);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (CannotAccess $expected) {
+      Assert::equals($t->property('fixture'), $expected->target());
+    }
   }
 }
