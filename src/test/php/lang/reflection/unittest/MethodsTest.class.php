@@ -36,6 +36,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function compoundName() {
+    $t= $this->declare('{ public function fixture() { } }');
+    Assert::equals($t->name().'::fixture()', $t->method('fixture')->compoundName());
+  }
+
+  #[Test]
   public function declaredIn() {
     $t= $this->declare('{ public function fixture() { } }');
     Assert::equals($t, $t->method('fixture')->declaredIn());

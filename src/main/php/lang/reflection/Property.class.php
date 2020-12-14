@@ -6,6 +6,9 @@ class Property extends Member {
 
   protected function getAnnotations() { return Reflection::parse()->ofProperty($this->reflect); }
 
+  /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
+  public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }
+
   /**
    * Gets this property's value
    *

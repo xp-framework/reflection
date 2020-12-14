@@ -67,7 +67,7 @@ class Constructor extends Routine {
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
     } catch (\Throwable $e) {
-      throw new InvocationFailed($this->class->name, $e);
+      throw new InvocationFailed($this, $e);
     }
   }
 }

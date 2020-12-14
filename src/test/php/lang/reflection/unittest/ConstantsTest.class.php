@@ -12,6 +12,12 @@ class ConstantsTest {
   }
 
   #[Test]
+  public function compoundName() {
+    $t= $this->declare('{ const FIXTURE = "test"; }');
+    Assert::equals($t->name().'::FIXTURE', $t->constant('FIXTURE')->compoundName());
+  }
+
+  #[Test]
   public function value() {
     Assert::equals('test', $this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->value());
   }

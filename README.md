@@ -53,7 +53,8 @@ The constructor can be accessed via `constructor()`. Like members, it provides a
 $type->constructor();                      // Constructor or NULL
 
 if ($constructor= $type->constructor()) {
-  $constructor->name();                    // 'POWER'
+  $constructor->name();                    // '__construct'
+  $constructor->compoundName();            // 'org.example.Fixture::__construct()'
   $constructor->modifiers();               // Modifiers<public>
   $constructor->annotations();             // Annotations
   $constructor->annotation(Inject::class); // Annotation or NULL
@@ -73,6 +74,7 @@ $type->method('fixture');                  // Method or NULL
 
 foreach ($type->constants() as $name => $constant) {
   $constant->name();                       // 'POWER'
+  $constant->compoundName();               // 'org.example.Fixture::POWER'
   $constant->value();                      // 6100
   $constant->modifiers();                  // Modifiers<public>
   $constant->annotations();                // Annotations
@@ -82,6 +84,7 @@ foreach ($type->constants() as $name => $constant) {
 
 foreach ($type->properties() as $name => $property) {
   $property->name();                       // 'value'
+  $property->compoundName();               // 'org.example.Fixture::$value'
   $property->modifiers();                  // Modifiers<public>
   $property->annotations();                // Annotations
   $property->annotation(Inject::class);    // Annotation or NULL
@@ -92,6 +95,7 @@ foreach ($type->properties() as $name => $property) {
 
 foreach ($type->methods() as $name => $method) {
   $method->name();                         // 'fixture'
+  $method->compoundName();                 // 'org.example.Fixture::fixture()'
   $method->modifiers();                    // Modifiers<public>
   $method->annotations();                  // Annotations
   $method->annotation(Inject::class);      // Annotation or NULL

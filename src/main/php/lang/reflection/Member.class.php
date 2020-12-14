@@ -44,6 +44,9 @@ abstract class Member {
   /** Returns this member's name */
   public function name(): string { return $this->reflect->name; }
 
+  /** Returns a compound name   */
+  public abstract function compoundName(): string;
+
   /** @return lang.reflection.Modifiers */
   public function modifiers() {
 
@@ -75,6 +78,6 @@ abstract class Member {
     return new Modifiers($this->reflect->getModifiers() & ~0x1fb7f008);
   }
 
-  /** @return lang.reflection.Type */
+  /** Returns the type this member is declared in */
   public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
 }

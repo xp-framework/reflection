@@ -13,6 +13,12 @@ class PropertiesTest {
   }
 
   #[Test]
+  public function compoundName() {
+    $t= $this->declare('{ public $fixture; }');
+    Assert::equals($t->name().'::$fixture', $t->property('fixture')->compoundName());
+  }
+
+  #[Test]
   public function modifiers() {
     Assert::equals(
       new Modifiers('private'),

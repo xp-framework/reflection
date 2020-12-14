@@ -7,6 +7,9 @@ abstract class Routine extends Member {
   /** @return [:var] */
   protected function getAnnotations() { return Reflection::parse()->ofMethod($this->reflect); }
 
+  /** Returns a compound name consisting of `[CLASS]::[NAME]()`  */
+  public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name.'()'; }
+
   /**
    * Looks up a parameter
    *
