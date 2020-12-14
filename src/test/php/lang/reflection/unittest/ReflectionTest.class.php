@@ -33,6 +33,11 @@ class ReflectionTest {
   }
 
   #[Test]
+  public function of_reflection_object() {
+    Assert::equals(nameof($this), Reflection::of(new \ReflectionObject($this))->name());
+  }
+
+  #[Test]
   public function of_instance() {
     Assert::equals(nameof($this), Reflection::of($this)->name());
   }
