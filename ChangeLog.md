@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.5.0 / 2020-12-14
+
 * Passed property to `AccessingFailed` and `CannotAccess` exceptions,
   and make it accessible via their `target()` method
   (@thekid)
