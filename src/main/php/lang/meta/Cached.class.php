@@ -38,21 +38,21 @@ class Cached {
   /** @return iterable */
   public function ofConstant($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c]['class'][2][$reflect->name] ?? null;
+    $meta= \xp::$meta[$c][2][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofConstant($reflect);
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c]['class'][0][$reflect->name] ?? null;
+    $meta= \xp::$meta[$c][0][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofProperty($reflect);
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c]['class'][1][$reflect->name] ?? null;
+    $meta= \xp::$meta[$c][1][$reflect->name] ?? null;
     return $meta ? $this->annotations($meta) : $this->delegate->ofMethod($reflect);
   }
 

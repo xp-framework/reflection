@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed accessing meta data for type members via `xp::$meta` cache
+  (@thekid)
+
 ## 0.5.0 / 2020-12-14
 
 * Passed property to `AccessingFailed` and `CannotAccess` exceptions,
