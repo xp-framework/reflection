@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, TypeUnion, Type as XPType, XPClass};
+use lang\{Reflection, TypeUnion, Type, XPClass};
 
 class Method extends Routine {
 
@@ -28,8 +28,7 @@ class Method extends Routine {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
     if ($context && !$this->reflect->isPublic()) {
-      $t= $context instanceof Type ? $context : Reflection::of($context);
-      if ($t->is($this->reflect->class)) {
+      if (Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
       }
     }
@@ -50,11 +49,11 @@ class Method extends Routine {
       $present= false;
 
       // Check for type in api documentation, defaulting to `var`
-      $t= XPType::$VAR;
+      $t= Type::$VAR;
     } else if ($t instanceof \ReflectionUnionType) {
       $union= [];
       foreach ($t->getTypes() as $component) {
-        $union[]= XPType::resolve($component->getName(), $this->resolver());
+        $union[]= Type::resolve($component->getName(), $this->resolver());
       }
       return new TypeHint(new TypeUnion($union));
     } else {
@@ -63,13 +62,13 @@ class Method extends Routine {
       // Check array, self and callable for more specific types, e.g. `string[]`,
       // `static` or `function(): string` in api documentation
       if ('array' === $name) {
-        $t= XPType::$ARRAY;
+        $t= Type::$ARRAY;
       } else if ('callable' === $name) {
-        $t= XPType::$CALLABLE;
+        $t= Type::$CALLABLE;
       } else if ('self' === $name) {
         $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
-        return new TypeHint(XPType::resolve($name, $this->resolver()));
+        return new TypeHint(Type::resolve($name, $this->resolver()));
       }
       $present= true;
     }
@@ -82,7 +81,7 @@ class Method extends Routine {
     }
 
     return new TypeHint(
-      isset($tags['return'])? XPType::resolve($tags['return'][0], $this->resolver()) : $t,
+      isset($tags['return'])? Type::resolve($tags['return'][0], $this->resolver()) : $t,
       $present
     );
   }

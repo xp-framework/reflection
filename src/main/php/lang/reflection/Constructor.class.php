@@ -54,8 +54,7 @@ class Constructor extends Routine {
       // Workaround for non-public constructors: Set accessible, then manually
       // invoke after creating an instance without invoking the constructor.
       if ($context && !$this->reflect->isPublic()) {
-        $t= $context instanceof Type ? $context : Reflection::of($context);
-        if ($t->is($this->class->name)) {
+        if (Reflection::of($context)->is($this->class->name)) {
           $instance= $this->class->newInstanceWithoutConstructor();
           $this->reflect->setAccessible(true);
           $this->reflect->invokeArgs($instance, $args);

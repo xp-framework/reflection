@@ -3,10 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Added `compoundName()` accessor to constants, properties and methods.
+* Made `Reflection::of()` also accept `lang.reflection.Type` instances
+  (@thekid)
+* Added `compoundName()` accessor to constants, properties and methods
   (@thekid)
 * Passed method or constructor to `InvocationFailed` and `CannotInvoke`
-  exceptions, and make it accessible via their `target()` method.
+  exceptions, and make it accessible via their `target()` method
   (@thekid)
 
 ## 0.4.0 / 2020-12-14

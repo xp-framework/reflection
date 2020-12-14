@@ -22,7 +22,7 @@ abstract class Reflection {
   /**
    * Creates a new reflection instance
    *
-   * @param  string|lang.XPClass|ReflectionClass|object $arg
+   * @param  string|lang.XPClass|lang.reflection.Type|ReflectionClass|object $arg
    * @return lang.reflection.Type
    */
   public static function of($arg) {
@@ -30,6 +30,8 @@ abstract class Reflection {
       return new Type($arg->reflect());
     } else if ($arg instanceof \ReflectionClass) {
       return new Type($arg);
+    } else if ($arg instanceof Type) {
+      return $arg;
     } else if (is_object($arg)) {
       return new Type(new \ReflectionObject($arg));
     } else {

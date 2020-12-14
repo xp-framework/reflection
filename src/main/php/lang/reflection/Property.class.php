@@ -21,8 +21,7 @@ class Property extends Member {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
     if ($context && !$this->reflect->isPublic()) {
-      $t= $context instanceof Type ? $context : Reflection::of($context);
-      if ($t->is($this->reflect->class)) {
+      if (Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
       }
     }
@@ -48,8 +47,7 @@ class Property extends Member {
 
     // Success oriented: Let PHP's reflection API raise the exceptions for us
     if ($context && !$this->reflect->isPublic()) {
-      $t= $context instanceof Type ? $context : Reflection::of($context);
-      if ($t->is($this->reflect->class)) {
+      if (Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
       }
     }

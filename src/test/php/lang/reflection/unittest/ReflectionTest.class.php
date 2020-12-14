@@ -21,7 +21,13 @@ class ReflectionTest {
   }
 
   #[Test]
-  public function of_Reflection() {
+  public function of_reflection() {
+    $t= Reflection::of(self::class);
+    Assert::equals($t, Reflection::of($t));
+  }
+
+  #[Test]
+  public function of_reflection_class() {
     Assert::equals(nameof($this), Reflection::of(new \ReflectionClass(self::class))->name());
   }
 
