@@ -1,9 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\meta\Cached;
+use lang\meta\MetaInformation;
 use unittest\{Assert, Before, After, Test};
 
-class MetaTest {
+class MetaInformationTest {
   private $reflect;
 
   #[Before]
@@ -33,7 +33,7 @@ class MetaTest {
   public function type_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
-      (new Cached(null))->ofType($this->reflect)
+      (new MetaInformation(null))->ofType($this->reflect)
     );
   }
 
@@ -41,7 +41,7 @@ class MetaTest {
   public function constant_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
-      (new Cached(null))->ofConstant(new \ReflectionClassConstant($this->reflect->name, 'TEST'))
+      (new MetaInformation(null))->ofConstant(new \ReflectionClassConstant($this->reflect->name, 'TEST'))
     );
   }
 
@@ -49,7 +49,7 @@ class MetaTest {
   public function property_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
-      (new Cached(null))->ofProperty(new \ReflectionProperty($this->reflect->name, 'DEFAULT'))
+      (new MetaInformation(null))->ofProperty(new \ReflectionProperty($this->reflect->name, 'DEFAULT'))
     );
   }
 
@@ -57,7 +57,7 @@ class MetaTest {
   public function method_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
-      (new Cached(null))->ofMethod(new \ReflectionMethod($this->reflect->name, '__construct'))
+      (new MetaInformation(null))->ofMethod(new \ReflectionMethod($this->reflect->name, '__construct'))
     );
   }
 
@@ -66,7 +66,7 @@ class MetaTest {
     $method= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new Cached(null))->ofParameter($method, $method->getParameters()[0])
+      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])
     );
   }
 }

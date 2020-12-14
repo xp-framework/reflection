@@ -42,13 +42,13 @@ class ReflectionTest {
     Assert::equals(nameof($this), Reflection::of($this)->name());
   }
 
-  #[Test]
-  public function parser_for_php7() {
-    Assert::instance(FromSyntaxTree::class, Reflection::parse(70000));
+  #[Test, Values([70000, 70100, 70200, 70300, 70400])]
+  public function parser_for_php7($versionId) {
+    Assert::instance(FromSyntaxTree::class, Reflection::annotations($versionId));
   }
 
-  #[Test]
-  public function parser_for_php8() {
-    Assert::instance(FromAttributes::class, Reflection::parse(80000));
+  #[Test, Values([80000, 80100])]
+  public function parser_for_php8($versionId) {
+    Assert::instance(FromAttributes::class, Reflection::annotations($versionId));
   }
 }

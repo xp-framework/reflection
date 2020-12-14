@@ -1,18 +1,18 @@
 <?php namespace lang;
 
-use lang\meta\{Cached, FromSyntaxTree, FromAttributes};
+use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
 
 abstract class Reflection {
   private static $meta= null;
 
-  public static function parse($version) {
+  public static function annotations($version) {
     return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
   }
 
   /** @return lang.annotations.FromMeta */
   public static function meta() {
-    return self::$meta ?? self::$meta= new Cached(self::parse(PHP_VERSION_ID));
+    return self::$meta ?? self::$meta= new MetaInformation(self::annotations(PHP_VERSION_ID));
   }
 
   /**

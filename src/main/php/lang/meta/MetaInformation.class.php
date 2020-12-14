@@ -4,7 +4,7 @@
  * Returns annotations from `xp::$meta` if it present there, delegating
  * it to another source otherwise.
  */
-class Cached {
+class MetaInformation {
   public $delegate;
 
   public function __construct($delegate) {
