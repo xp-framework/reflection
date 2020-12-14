@@ -4,7 +4,7 @@ use lang\Reflection;
 
 class Property extends Member {
 
-  protected function getAnnotations() { return Reflection::parse()->ofProperty($this->reflect); }
+  protected function getAnnotations() { return Reflection::meta()->ofProperty($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }

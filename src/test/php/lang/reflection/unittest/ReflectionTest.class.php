@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use lang\annotations\{FromAttributes, FromSyntaxTree};
 use lang\{Reflection, Type};
 use unittest\{Assert, Test};
 
@@ -34,5 +35,15 @@ class ReflectionTest {
   #[Test]
   public function of_instance() {
     Assert::equals(nameof($this), Reflection::of($this)->name());
+  }
+
+  #[Test]
+  public function parser_for_php7() {
+    Assert::instance(FromSyntaxTree::class, Reflection::parse(70000));
+  }
+
+  #[Test]
+  public function parser_for_php8() {
+    Assert::instance(FromAttributes::class, Reflection::parse(80000));
   }
 }

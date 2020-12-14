@@ -5,7 +5,7 @@
  * it to another source otherwise.
  */
 class FromMeta {
-  private $delegate;
+  public $delegate;
 
   public function __construct($delegate) {
     $this->delegate= $delegate;

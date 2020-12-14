@@ -80,7 +80,7 @@ class Type {
   }
 
   public function evaluate($expression) {
-    return Reflection::parse()->evaluate($this->reflect, $expression);
+    return Reflection::meta()->evaluate($this->reflect, $expression);
   }
 
   /** @return ?lang.IClassLoader */
@@ -132,13 +132,13 @@ class Type {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofType($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->ofType($this->reflect);
     return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofType($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->ofType($this->reflect);
 
     $t= strtr($type, '.', '\\');
     return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;

@@ -4,19 +4,15 @@ use lang\annotations\{FromMeta, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
 
 abstract class Reflection {
-  private static $parse= null;
+  private static $meta= null;
+
+  public static function parse($version) {
+    return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
+  }
 
   /** @return lang.annotations.FromMeta */
-  public static function parse() {
-    if (self::$parse) {
-      // NOOP
-    } else if (PHP_VERSION_ID >= 80000) {
-      self::$parse= new FromMeta(new FromAttributes());
-    } else {
-      self::$parse= new FromMeta(new FromSyntaxTree());
-    }
-
-    return self::$parse;
+  public static function meta() {
+    return self::$meta ?? self::$meta= new FromMeta(self::parse(PHP_VERSION_ID));
   }
 
   /**

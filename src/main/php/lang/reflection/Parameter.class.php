@@ -37,13 +37,13 @@ class Parameter {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->method, $this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->ofParameter($this->method, $this->reflect);
     return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::parse()->ofParameter($this->method, $this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->ofParameter($this->method, $this->reflect);
 
     $t= strtr($type, '.', '\\');
     return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;

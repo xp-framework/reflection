@@ -4,7 +4,7 @@ use lang\Reflection;
 
 class Constant extends Member {
 
-  protected function getAnnotations() { return Reflection::parse()->ofConstant($this->reflect); }
+  protected function getAnnotations() { return Reflection::meta()->ofConstant($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name; }
