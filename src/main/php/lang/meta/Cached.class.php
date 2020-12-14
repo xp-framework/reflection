@@ -1,10 +1,10 @@
-<?php namespace lang\annotations;
+<?php namespace lang\meta;
 
 /**
  * Returns annotations from `xp::$meta` if it present there, delegating
  * it to another source otherwise.
  */
-class FromMeta {
+class Cached {
   public $delegate;
 
   public function __construct($delegate) {

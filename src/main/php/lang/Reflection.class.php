@@ -1,6 +1,6 @@
 <?php namespace lang;
 
-use lang\annotations\{FromMeta, FromSyntaxTree, FromAttributes};
+use lang\meta\{Cached, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
 
 abstract class Reflection {
@@ -12,7 +12,7 @@ abstract class Reflection {
 
   /** @return lang.annotations.FromMeta */
   public static function meta() {
-    return self::$meta ?? self::$meta= new FromMeta(self::parse(PHP_VERSION_ID));
+    return self::$meta ?? self::$meta= new Cached(self::parse(PHP_VERSION_ID));
   }
 
   /**

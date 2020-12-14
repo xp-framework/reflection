@@ -1,4 +1,4 @@
-<?php namespace lang\annotations;
+<?php namespace lang\meta;
 
 use lang\ast\{Language, Tokens, Visitor, Code};
 

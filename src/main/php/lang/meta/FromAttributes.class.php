@@ -1,4 +1,4 @@
-<?php namespace lang\annotations;
+<?php namespace lang\meta;
 
 use lang\reflection\Annotation;
 

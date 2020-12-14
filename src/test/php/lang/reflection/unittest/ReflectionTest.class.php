@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\annotations\{FromAttributes, FromSyntaxTree};
+use lang\meta\{FromAttributes, FromSyntaxTree};
 use lang\{Reflection, Type};
 use unittest\{Assert, Test};
 
