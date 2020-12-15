@@ -1,10 +1,9 @@
 <?php namespace lang\reflection;
 
-use lang\{XPClass, Reflection};
+use lang\{XPClass, Reflection, Value};
 
-abstract class Member {
-  protected $reflect;
-  private $annotations= null;
+abstract class Member implements Value {
+  protected $reflect, $annotations;
 
   /** @param ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect */
   public function __construct($reflect) {
@@ -80,4 +79,24 @@ abstract class Member {
 
   /** Returns the type this member is declared in */
   public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
+
+  /** @return string */
+  public function hashCode() { return $this->compoundName(); }
+
+  /** @return string */
+  public abstract function toString();
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    if ($value instanceof self) {
+      $r= $this->reflect->class <=> $value->reflect->class;
+      return 0 === $r ? $this->reflect->name <=> $value->reflect->name : $r;
+    }
+    return 1;
+  }
 }
