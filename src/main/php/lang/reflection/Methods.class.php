@@ -1,12 +1,28 @@
 <?php namespace lang\reflection;
 
+use lang\Reflection;
+
 class Methods extends Members {
 
   /** @return iterable */
   public function getIterator() {
     foreach ($this->reflect->getMethods() as $method) {
+      if (0 !== strncmp($method->name, '__', 2)) yield $method->name => new Method($method);
+    }
+  }
+
+  /**
+   * Return methods with a given annotation
+   *
+   * @param  string $annotation
+   * @return iterable
+   */
+  public function with($annotation) {
+    $t= strtr($annotation, '.', '\\');
+    foreach ($this->reflect->getMethods() as $method) {
       if (0 !== strncmp($method->name, '__', 2)) {
-        yield $method->name => new Method($method);
+        $annotations= Reflection::meta()->ofMethod($method);
+        if (isset($annotations[$t])) yield $method->name => new Method($method, $annotations);
       }
     }
   }

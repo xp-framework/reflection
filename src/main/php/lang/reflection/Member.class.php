@@ -6,8 +6,9 @@ abstract class Member implements Value {
   protected $reflect, $annotations;
 
   /** @param ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect */
-  public function __construct($reflect) {
+  public function __construct($reflect, $annotations= null) {
     $this->reflect= $reflect;
+    $this->annotations= $annotations;
   }
 
   /**

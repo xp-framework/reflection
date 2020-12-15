@@ -54,6 +54,24 @@ class MethodsTest {
   }
 
   #[Test]
+  public function with() {
+    $type= $this->declare('{
+      #[Annotated]
+      public function a() { }
+
+      #[Annotated]
+      public function b() { }
+
+      public function c() { }
+    }');
+
+    Assert::equals(
+      ['a' => $type->method('a'), 'b' => $type->method('b')],
+      iterator_to_array($type->methods()->with(Annotated::class))
+    );
+  }
+
+  #[Test]
   public function non_existant() {
     $type= $this->declare('{ }');
     Assert::null($type->methods()->named('fixture'));
