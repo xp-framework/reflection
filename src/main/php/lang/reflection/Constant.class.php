@@ -1,6 +1,7 @@
 <?php namespace lang\reflection;
 
 use lang\Reflection;
+use util\Objects;
 
 class Constant extends Member {
 
@@ -14,4 +15,13 @@ class Constant extends Member {
 
   /** @return var */
   public function value() { return $this->reflect->getValue(); }
+
+  /** @return string */
+  public function toString() {
+    return sprintf('%s const %s = %s',
+      Modifiers::namesOf($this->reflect->getModifiers()),
+      $this->reflect->name,
+      Objects::stringOf($this->reflect->getValue())
+    );
+  }
 }

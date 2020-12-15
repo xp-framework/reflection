@@ -60,4 +60,13 @@ class ConstantsTest {
     $const= $this->declare('{ public const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PUBLIC, 'test'], [$const->modifiers(), $const->value()]);
   }
+
+  #[Test]
+  public function string_representation() {
+    $t= $this->declare('{ const FIXTURE = "test"; }');
+    Assert::equals(
+      'public const FIXTURE = "test"',
+      $t->constant('FIXTURE')->toString()
+    );
+  }
 }
