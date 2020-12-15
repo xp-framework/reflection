@@ -208,6 +208,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function hash_code() {
+    $t= $this->declare('{ public function fixture() { } }');
+    Assert::equals($t->name().'::fixture()', $t->method('fixture')->hashCode());
+  }
+
+  #[Test]
   public function string_representation_with_typed_parameter() {
     $t= $this->declare('{ public function fixture(array $s): string { } }');
     Assert::equals(
@@ -265,5 +271,23 @@ class MethodsTest {
       'public function fixture(): var',
       $t->method('fixture')->toString()
     );
+  }
+
+  #[Test]
+  public function compare_to_self() {
+    $type= $this->declare('{ public function a() { } }');
+    Assert::equals(0, $type->method('a')->compareTo($type->method('a')));
+  }
+
+  #[Test]
+  public function compare_to_other_method() {
+    $type= $this->declare('{ public function a() { } public function b() { } }');
+    Assert::equals(-1, $type->method('a')->compareTo($type->method('b')));
+  }
+
+  #[Test]
+  public function compare_to_other_value() {
+    $type= $this->declare('{ public function a() { } }');
+    Assert::equals(1, $type->method('a')->compareTo(null));
   }
 }
