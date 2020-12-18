@@ -3,8 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Added `lang.reflect.Methods::with()` method to enumerate all methods
-  with a given annotation
+* Added `lang.reflect.Methods::annotated()` method to enumerate all
+  methods with a given annotation
   (@thekid)
 * Fixed accessing meta data for type members via `xp::$meta` cache
   (@thekid)

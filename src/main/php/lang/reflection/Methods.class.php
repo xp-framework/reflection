@@ -12,12 +12,12 @@ class Methods extends Members {
   }
 
   /**
-   * Return methods with a given annotation
+   * Return methods annotated with a given annotation
    *
    * @param  string $annotation
    * @return iterable
    */
-  public function with($annotation) {
+  public function annotated($annotation) {
     $t= strtr($annotation, '.', '\\');
     foreach ($this->reflect->getMethods() as $method) {
       if (0 !== strncmp($method->name, '__', 2)) {

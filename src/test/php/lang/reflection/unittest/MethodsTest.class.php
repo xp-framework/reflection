@@ -54,7 +54,7 @@ class MethodsTest {
   }
 
   #[Test]
-  public function with() {
+  public function annotated() {
     $type= $this->declare('{
       #[Annotated]
       public function a() { }
@@ -67,7 +67,7 @@ class MethodsTest {
 
     Assert::equals(
       ['a' => $type->method('a'), 'b' => $type->method('b')],
-      iterator_to_array($type->methods()->with(Annotated::class))
+      iterator_to_array($type->methods()->annotated(Annotated::class))
     );
   }
 
