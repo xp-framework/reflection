@@ -62,7 +62,7 @@ class MetaInformation {
   public function ofMethod($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
     }
 
     return [DETAIL_ANNOTATIONS => $this->delegate->ofMethod($reflect)];
@@ -71,15 +71,15 @@ class MetaInformation {
   /** @return iterable */
   public function ofParameter($method, $reflect) {
     $c= strtr($method->getDeclaringClass()->name, '\\', '.');
-    if ($target= \xp::$meta[$c][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
-      if ($meta= $target['$'.$reflect->name] ?? null) {
+    if ($meta= \xp::$meta[$c][1][$method->name] ?? null) {
+      if ($param= $meta[DETAIL_TARGET_ANNO]['$'.$reflect->name] ?? null) {
         $r= [];
-        foreach ($meta as $name => $value) {
-          $r[$target[$name] ?? $name]= (array)$value;
+        foreach ($param as $name => $value) {
+          $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
         }
-        return $r;
+        return [DETAIL_ANNOTATIONS => $r, DETAIL_RETURNS => $meta[DETAIL_ARGUMENTS][$reflect->getPosition()]];
       }
     }
-    return $this->delegate->ofParameter($method, $reflect);
+    return [DETAIL_ANNOTATIONS => $this->delegate->ofParameter($method, $reflect)];
   }
 }

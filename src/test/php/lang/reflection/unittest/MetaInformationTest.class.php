@@ -19,7 +19,14 @@ class MetaInformationTest {
       1 => [
         '__construct' => [
           DETAIL_ANNOTATIONS => ['annotated' => 'test'],
-          DETAIL_TARGET_ANNO => ['annotated' => Annotated::class, '$value' => ['annotated' => 'test']]
+          DETAIL_TARGET_ANNO => ['annotated' => Annotated::class, '$value' => ['annotated' => 'test']],
+          DETAIL_ARGUMENTS   => ['var'],
+          DETAIL_RETURNS     => null
+        ],
+        'value' => [
+          DETAIL_ANNOTATIONS => [],
+          DETAIL_ARGUMENTS   => [],
+          DETAIL_RETURNS     => 'function(): var'
         ]
       ]
     ];
@@ -67,11 +74,29 @@ class MetaInformationTest {
   }
 
   #[Test]
+  public function method_return_type() {
+    $m= new \ReflectionMethod($this->reflect->name, 'value');
+    Assert::equals(
+      'function(): var',
+      (new MetaInformation(null))->ofMethod($m)[DETAIL_RETURNS]
+    );
+  }
+
+  #[Test]
   public function parameter_annotations() {
     $method= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])
+      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])[DETAIL_ANNOTATIONS]
+    );
+  }
+
+  #[Test]
+  public function parameter_type() {
+    $method= new \ReflectionMethod($this->reflect->name, '__construct');
+    Assert::equals(
+      'var',
+      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])[DETAIL_RETURNS]
     );
   }
 }
