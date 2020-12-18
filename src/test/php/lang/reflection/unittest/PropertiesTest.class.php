@@ -135,6 +135,12 @@ class PropertiesTest {
     Assert::equals(new TypeHint(Primitive::$STRING, false), $type->property('fixture')->constraint());
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  public function type_from_declaration() {
+    $type= $this->declare('{ public string $fixture; }');
+    Assert::equals(new TypeHint(Primitive::$STRING, true), $type->property('fixture')->constraint());
+  }
+
   #[Test]
   public function string_representation() {
     $t= $this->declare('{ public $fixture; }');
