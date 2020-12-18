@@ -42,7 +42,7 @@ class Method extends Routine {
     }
   }
 
-  /** @return lang.reflection.TypeHint */
+  /** @return lang.reflection.Constraint */
   public function returns() {
     $t= $this->reflect->getReturnType();
     if (null === $t) {
@@ -55,7 +55,7 @@ class Method extends Routine {
       foreach ($t->getTypes() as $component) {
         $union[]= Type::resolve($component->getName(), $this->resolver());
       }
-      return new TypeHint(new TypeUnion($union));
+      return new Constraint(new TypeUnion($union));
     } else {
       $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
 
@@ -68,14 +68,14 @@ class Method extends Routine {
       } else if ('self' === $name) {
         $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
-        return new TypeHint(Type::resolve($name, $this->resolver()));
+        return new Constraint(Type::resolve($name, $this->resolver()));
       }
       $present= true;
     }
 
     // Use meta information
     $this->meta ?? $this->meta= $this->meta();
-    return new TypeHint(
+    return new Constraint(
       isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
       $present
     );

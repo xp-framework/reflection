@@ -22,7 +22,7 @@ class Property extends Member {
     ];
   }
 
-  /** @return lang.reflection.TypeHint */
+  /** @return lang.reflection.Constraint */
   public function constraint() {
     $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
     if (null === $t) {
@@ -35,7 +35,7 @@ class Property extends Member {
       foreach ($t->getTypes() as $component) {
         $union[]= Type::resolve($component->getName(), $this->resolver());
       }
-      return new TypeHint(new TypeUnion($union));
+      return new Constraint(new TypeUnion($union));
     } else {
       $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
 
@@ -46,13 +46,13 @@ class Property extends Member {
       } else if ('self' === $name) {
         $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
-        return new TypeHint(Type::resolve($name, $this->resolver()));
+        return new Constraint(Type::resolve($name, $this->resolver()));
       }
       $present= true;
     }
 
     $this->meta ?? $this->meta= Reflection::meta()->ofProperty($this->reflect);
-    return new TypeHint(
+    return new Constraint(
       isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
       $present
     );
