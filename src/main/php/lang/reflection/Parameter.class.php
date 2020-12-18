@@ -96,19 +96,10 @@ class Parameter {
       $present= true;
     }
 
-    // Parse apidoc. FIXME!
-    preg_match_all('/@(return|param)\s+(.+)/', $this->method->getDocComment(), $matches, PREG_SET_ORDER);
-    $tags= [];
-    foreach ($matches as $match) {
-      $tags[$match[1]][]= rtrim($match[2], ' */');
-    }
-
-    $p= $this->reflect->getPosition();
-    if (isset($tags['param'][$p])) {
-      preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tags['param'][$p], $matches);
-      return new TypeHint(Type::resolve($matches[1], $this->resolver()), $present);
-    }
-
-    return new TypeHint($t, $present);
+    $this->meta ?? $this->meta= Reflection::meta()->ofParameter($this->method, $this->reflect);
+    return new TypeHint(
+      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
+      $present
+    );
   }
 }

@@ -48,7 +48,7 @@ class Method extends Routine {
     if (null === $t) {
       $present= false;
 
-      // Check for type in api documentation, defaulting to `var`
+      // Check for type in meta information, defaulting to `var`
       $t= Type::$VAR;
     } else if ($t instanceof \ReflectionUnionType) {
       $union= [];
@@ -60,7 +60,7 @@ class Method extends Routine {
       $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
 
       // Check array, self and callable for more specific types, e.g. `string[]`,
-      // `static` or `function(): string` in api documentation
+      // `static` or `function(): string` in meta information
       if ('array' === $name) {
         $t= Type::$ARRAY;
       } else if ('callable' === $name) {
@@ -73,15 +73,10 @@ class Method extends Routine {
       $present= true;
     }
 
-    // Parse apidoc. FIXME!
-    preg_match_all('/@(return|param)\s+(.+)/', $this->reflect->getDocComment(), $matches, PREG_SET_ORDER);
-    $tags= [];
-    foreach ($matches as $match) {
-      $tags[$match[1]][]= rtrim($match[2], ' */');
-    }
-
+    // Use meta information
+    $this->meta ?? $this->meta= $this->meta();
     return new TypeHint(
-      isset($tags['return'])? Type::resolve($tags['return'][0], $this->resolver()) : $t,
+      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
       $present
     );
   }
