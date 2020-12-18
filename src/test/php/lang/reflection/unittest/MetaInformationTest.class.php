@@ -14,8 +14,13 @@ class MetaInformationTest {
     ];
     \xp::$meta['lang.reflection.unittest.Fixture']= [
       'class' => $annotations,
-      2 => ['TEST' => $annotations],
-      0 => ['DEFAULT' => $annotations],
+      2 => [
+        'TEST' => $annotations
+      ],
+      0 => [
+        'DEFAULT' => $annotations + [DETAIL_RETURNS => 'self'],
+        'value'   => [DETAIL_ANNOTATIONS => [], DETAIL_RETURNS => 'function(): var']
+      ],
       1 => [
         '__construct' => [
           DETAIL_ANNOTATIONS => ['annotated' => 'test'],
@@ -61,6 +66,15 @@ class MetaInformationTest {
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->ofProperty($p)[DETAIL_ANNOTATIONS]
+    );
+  }
+
+  #[Test]
+  public function property_type() {
+    $p= new \ReflectionProperty($this->reflect->name, 'value');
+    Assert::equals(
+      'function(): var',
+      (new MetaInformation(null))->ofProperty($p)[DETAIL_RETURNS]
     );
   }
 

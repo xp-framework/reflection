@@ -52,7 +52,7 @@ class MetaInformation {
   public function ofProperty($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
     }
 
     return [DETAIL_ANNOTATIONS => $this->delegate->ofProperty($reflect)];
