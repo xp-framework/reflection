@@ -83,13 +83,7 @@ class Method extends Routine {
 
   /** @return string */
   public function toString() {
-
-    // Parse apidoc. FIXME!
-    preg_match_all('/@(return|param)\s+(.+)/', $this->reflect->getDocComment(), $matches, PREG_SET_ORDER);
-    $tags= [];
-    foreach ($matches as $match) {
-      $tags[$match[1]][]= $match[2];
-    }
+    $tags= Reflection::meta()->tags($this->reflect);
 
     // Compile signature
     $sig= '';

@@ -15,15 +15,6 @@ class MetaInformation {
     return $this->annotations->evaluate($reflect, $code);
   }
 
-  private function tags($reflect) {
-    preg_match_all('/@(return|param)\s+(.+)/', $reflect->getDocComment(), $matches, PREG_SET_ORDER);
-    $tags= [];
-    foreach ($matches as $match) {
-      $tags[$match[1]][]= rtrim($match[2], ' */');
-    }
-    return $tags;
-  }
-
   /**
    * Constructs annotations from meta information
    *
@@ -36,6 +27,15 @@ class MetaInformation {
       $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
     }
     return $r;
+  }
+
+  public function tags($reflect) {
+    preg_match_all('/@(return|param)\s+(.+)/', $reflect->getDocComment(), $matches, PREG_SET_ORDER);
+    $tags= [];
+    foreach ($matches as $match) {
+      $tags[$match[1]][]= rtrim($match[2], ' */');
+    }
+    return $tags;
   }
 
   /** @return iterable */
@@ -95,13 +95,13 @@ class MetaInformation {
 
     if ($tag= $this->tags($method)['param'][$reflect->getPosition()] ?? null) {
       preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tag, $matches);
-      $returns= $matches[1];
+      $type= $matches[1];
     } else {
-      $returns= null;
+      $type= null;
     }
     return [
       DETAIL_ANNOTATIONS => $this->annotations->ofParameter($method, $reflect),
-      DETAIL_RETURNS     => $returns
+      DETAIL_RETURNS     => $type
     ];
   }
 }
