@@ -30,7 +30,7 @@ class MetaInformation {
   }
 
   public function tags($reflect) {
-    preg_match_all('/@(return|param)\s+(.+)/', $reflect->getDocComment(), $matches, PREG_SET_ORDER);
+    preg_match_all('/@([a-z]+)\s+(.+)/', $reflect->getDocComment(), $matches, PREG_SET_ORDER);
     $tags= [];
     foreach ($matches as $match) {
       $tags[$match[1]][]= rtrim($match[2], ' */');
@@ -64,7 +64,10 @@ class MetaInformation {
       return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
     }
 
-    return [DETAIL_ANNOTATIONS => $this->annotations->ofProperty($reflect)];
+    return [
+      DETAIL_ANNOTATIONS => $this->annotations->ofProperty($reflect),
+      DETAIL_RETURNS     => $this->tags($reflect)['type'][0] ?? null
+    ];
   }
 
   /** @return iterable */

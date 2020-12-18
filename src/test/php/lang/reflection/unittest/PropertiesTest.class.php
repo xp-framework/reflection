@@ -1,6 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Modifiers, CannotAccess, AccessingFailed};
+use lang\Primitive;
+use lang\reflection\{Modifiers, CannotAccess, AccessingFailed, TypeHint};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
 
@@ -126,6 +127,12 @@ class PropertiesTest {
       ['one' => $type->property('one'), 'two' => $type->property('two')],
       iterator_to_array($type->properties())
     );
+  }
+
+  #[Test]
+  public function type_from_apidoc() {
+    $type= $this->declare('{ /** @type string */ public $fixture; }');
+    Assert::equals(new TypeHint(Primitive::$STRING, false), $type->property('fixture')->constraint());
   }
 
   #[Test]

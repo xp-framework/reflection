@@ -89,6 +89,7 @@ foreach ($type->properties() as $name => $property) {
   $property->annotations();                // Annotations
   $property->annotation(Inject::class);    // Annotation or NULL
   $property->declaredIn();                 // Type
+  $property->constraint();                 // TypeHint
   $property->get($instance);               // (property value)
   $property->set($instance, $value);       // (value)
 }
