@@ -5,14 +5,14 @@
  * it to another source otherwise.
  */
 class MetaInformation {
-  public $delegate;
+  private $annotations;
 
-  public function __construct($delegate) {
-    $this->delegate= $delegate;
+  public function __construct($annotations) {
+    $this->annotations= $annotations;
   }
 
   public function evaluate($reflect, $code) {
-    return $this->delegate->evaluate($reflect, $code);
+    return $this->annotations->evaluate($reflect, $code);
   }
 
   /**
@@ -35,7 +35,7 @@ class MetaInformation {
       return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
     }
 
-    return [DETAIL_ANNOTATIONS => $this->delegate->ofType($reflect)];
+    return [DETAIL_ANNOTATIONS => $this->annotations->ofType($reflect)];
   }
 
   /** @return iterable */
@@ -45,7 +45,7 @@ class MetaInformation {
       return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
     }
 
-    return [DETAIL_ANNOTATIONS => $this->delegate->ofConstant($reflect)];
+    return [DETAIL_ANNOTATIONS => $this->annotations->ofConstant($reflect)];
   }
 
   /** @return iterable */
@@ -55,7 +55,7 @@ class MetaInformation {
       return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
     }
 
-    return [DETAIL_ANNOTATIONS => $this->delegate->ofProperty($reflect)];
+    return [DETAIL_ANNOTATIONS => $this->annotations->ofProperty($reflect)];
   }
 
   /** @return iterable */
@@ -65,7 +65,7 @@ class MetaInformation {
       return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
     }
 
-    return [DETAIL_ANNOTATIONS => $this->delegate->ofMethod($reflect)];
+    return [DETAIL_ANNOTATIONS => $this->annotations->ofMethod($reflect)];
   }
 
   /** @return iterable */
@@ -80,6 +80,6 @@ class MetaInformation {
         return [DETAIL_ANNOTATIONS => $r, DETAIL_RETURNS => $meta[DETAIL_ARGUMENTS][$reflect->getPosition()]];
       }
     }
-    return [DETAIL_ANNOTATIONS => $this->delegate->ofParameter($method, $reflect)];
+    return [DETAIL_ANNOTATIONS => $this->annotations->ofParameter($method, $reflect)];
   }
 }
