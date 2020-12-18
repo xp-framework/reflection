@@ -5,7 +5,7 @@ use util\Objects;
 
 class Constant extends Member {
 
-  protected function getAnnotations() { return Reflection::meta()->ofConstant($this->reflect); }
+  protected function meta() { return Reflection::meta()->ofConstant($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name; }

@@ -31,29 +31,41 @@ class MetaInformation {
 
   /** @return iterable */
   public function ofType($reflect) {
-    $meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null;
-    return $meta ? $this->annotations($meta) : $this->delegate->ofType($reflect);
+    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+    }
+
+    return [DETAIL_ANNOTATIONS => $this->delegate->ofType($reflect)];
   }
 
   /** @return iterable */
   public function ofConstant($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c][2][$reflect->name] ?? null;
-    return $meta ? $this->annotations($meta) : $this->delegate->ofConstant($reflect);
+    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+    }
+
+    return [DETAIL_ANNOTATIONS => $this->delegate->ofConstant($reflect)];
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c][0][$reflect->name] ?? null;
-    return $meta ? $this->annotations($meta) : $this->delegate->ofProperty($reflect);
+    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+    }
+
+    return [DETAIL_ANNOTATIONS => $this->delegate->ofProperty($reflect)];
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    $meta= \xp::$meta[$c][1][$reflect->name] ?? null;
-    return $meta ? $this->annotations($meta) : $this->delegate->ofMethod($reflect);
+    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
+      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+    }
+
+    return [DETAIL_ANNOTATIONS => $this->delegate->ofMethod($reflect)];
   }
 
   /** @return iterable */
