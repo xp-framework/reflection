@@ -39,12 +39,10 @@ class Property extends Member {
     } else {
       $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
 
-      // Check array, self and callable for more specific types, e.g. `string[]`,
+      // Check array and self for more specific types, e.g. `string[]`,
       // `static` or `function(): string` in api documentation
       if ('array' === $name) {
         $t= Type::$ARRAY;
-      } else if ('callable' === $name) {
-        $t= Type::$CALLABLE;
       } else if ('self' === $name) {
         $t= new XPClass($this->reflect->getDeclaringClass());
       } else {
