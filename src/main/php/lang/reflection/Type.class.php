@@ -4,7 +4,7 @@ use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
 
 class Type {
   private $reflect;
-  private $annotations= null;
+  private $meta= null;
 
   public function __construct($reflect) {
     $this->reflect= $reflect;
@@ -132,16 +132,19 @@ class Type {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::meta()->ofType($this->reflect);
-    return new Annotations($this->annotations);
+    $this->meta ?? $this->meta= Reflection::meta()->ofType($this->reflect);
+    return new Annotations($this->meta[DETAIL_ANNOTATIONS]);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::meta()->ofType($this->reflect);
+    $this->meta ?? $this->meta= Reflection::meta()->ofType($this->reflect);
 
     $t= strtr($type, '.', '\\');
-    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
+    return isset($this->meta[DETAIL_ANNOTATIONS][$t])
+      ? new Annotation($t, $this->meta[DETAIL_ANNOTATIONS][$t])
+      : null
+    ;
   }
 
   /** @return lang.reflection.Constants */

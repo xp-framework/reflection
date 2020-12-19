@@ -2,8 +2,8 @@
 
 use lang\Type;
 
-class TypeHint {
-  private $type, $arguments;
+class Constraint {
+  private $type, $present;
 
   public function __construct(Type $type, bool $present= true) {
     $this->type= $type;

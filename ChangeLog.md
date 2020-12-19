@@ -6,6 +6,9 @@ XP Reflection ChangeLog
 * Added `lang.reflect.Methods::annotated()` method to enumerate all
   methods with a given annotation
   (@thekid)
+* Merged PR #2: Use meta information (*not only for annotations, but also
+  for properties as well as method return and parameter types*)
+  (@thekid)
 * Fixed accessing meta data for type members via `xp::$meta` cache
   (@thekid)
 
