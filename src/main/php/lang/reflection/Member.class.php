@@ -3,7 +3,7 @@
 use lang\{XPClass, Reflection, Value};
 
 abstract class Member implements Value {
-  protected $reflect, $annotations;
+  protected $reflect, $meta;
 
   /** @param ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect */
   public function __construct($reflect) {
@@ -24,20 +24,23 @@ abstract class Member implements Value {
   }
 
   /** @return [:var] */
-  protected abstract function getAnnotations();
+  protected abstract function meta();
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= $this->getAnnotations();
-    return new Annotations($this->annotations);
+    $this->meta ?? $this->meta= $this->meta();
+    return new Annotations($this->meta[DETAIL_ANNOTATIONS]);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= $this->getAnnotations();
+    $this->meta ?? $this->meta= $this->meta();
 
     $t= strtr($type, '.', '\\');
-    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
+    return isset($this->meta[DETAIL_ANNOTATIONS][$t])
+      ? new Annotation($t, $this->meta[DETAIL_ANNOTATIONS][$t])
+      : null
+    ;
   }
 
   /** Returns this member's name */

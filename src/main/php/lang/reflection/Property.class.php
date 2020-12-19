@@ -1,13 +1,62 @@
 <?php namespace lang\reflection;
 
-use lang\Reflection;
+use lang\{Reflection, XPClass, Type, TypeUnion};
 
 class Property extends Member {
 
-  protected function getAnnotations() { return Reflection::meta()->ofProperty($this->reflect); }
+  protected function meta() { return Reflection::meta()->ofProperty($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }
+
+  /**
+   * Resolver handling `static`, `self` and `parent`.
+   *
+   * @return [:(function(string): lang.Type)]
+   */
+  protected function resolver() {
+    return [
+      'static' => function() { return new XPClass($this->reflect->class); },
+      'self'   => function() { return new XPClass($this->reflect->getDeclaringClass()); },
+      'parent' => function() { return new XPClass($this->reflect->getDeclaringClass()->getParentClass()); },
+    ];
+  }
+
+  /** @return lang.reflection.Constraint */
+  public function constraint() {
+    $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
+    if (null === $t) {
+      $present= false;
+
+      // Check for type in api documentation, defaulting to `var`
+      $t= Type::$VAR;
+    } else if ($t instanceof \ReflectionUnionType) {
+      $union= [];
+      foreach ($t->getTypes() as $component) {
+        $union[]= Type::resolve($component->getName(), $this->resolver());
+      }
+      return new Constraint(new TypeUnion($union));
+    } else {
+      $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
+
+      // Check array and self for more specific types, e.g. `string[]`,
+      // `static` or `function(): string` in api documentation
+      if ('array' === $name) {
+        $t= Type::$ARRAY;
+      } else if ('self' === $name) {
+        $t= new XPClass($this->reflect->getDeclaringClass());
+      } else {
+        return new Constraint(Type::resolve($name, $this->resolver()));
+      }
+      $present= true;
+    }
+
+    $this->meta ?? $this->meta= Reflection::meta()->ofProperty($this->reflect);
+    return new Constraint(
+      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
+      $present
+    );
+  }
 
   /**
    * Gets this property's value

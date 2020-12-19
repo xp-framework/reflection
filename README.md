@@ -89,6 +89,7 @@ foreach ($type->properties() as $name => $property) {
   $property->annotations();                // Annotations
   $property->annotation(Inject::class);    // Annotation or NULL
   $property->declaredIn();                 // Type
+  $property->constraint();                 // Constraint
   $property->get($instance);               // (property value)
   $property->set($instance, $value);       // (value)
 }
@@ -100,7 +101,7 @@ foreach ($type->methods() as $name => $method) {
   $method->annotations();                  // Annotations
   $method->annotation(Inject::class);      // Annotation or NULL
   $method->declaredIn();                   // Type
-  $method->returns();                      // TypeHint
+  $method->returns();                      // Constraint
   $method->parameters();                   // Parameters
   $method->parameter(0);                   // Parameter or NULL
   $method->closure($instance);             // Closure instance
@@ -120,7 +121,7 @@ foreach ($method->parameters() as $name => $parameter) {
   $parameter->variadic();                 // false
   $parameter->optional();                 // true
   $parameter->default();                  // (parameter default value)
-  $parameter->constraint();               // TypeHint
+  $parameter->constraint();               // Constraint
   $parameter->annotations();              // Annotations
   $parameter->annotation(Inject::class)   // Annotation or NULL
 }
