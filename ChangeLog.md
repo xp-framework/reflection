@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.7.0 / 2020-12-19
+
 * Added method `lang.reflection.Parameters::size()` which returns number
   of parameters
   (@thekid)
