@@ -21,8 +21,8 @@ class Methods extends Members {
     $t= strtr($annotation, '.', '\\');
     foreach ($this->reflect->getMethods() as $method) {
       if (0 !== strncmp($method->name, '__', 2)) {
-        $annotations= Reflection::meta()->ofMethod($method);
-        if (isset($annotations[$t])) yield $method->name => new Method($method, $annotations);
+        $meta= Reflection::meta()->ofMethod($method);
+        if (isset($meta[DETAIL_ANNOTATIONS][$t])) yield $method->name => new Method($method, $meta);
       }
     }
   }
