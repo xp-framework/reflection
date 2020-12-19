@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\meta\{FromAttributes, FromSyntaxTree};
-use lang\{Reflection, Type};
+use lang\{Reflection, Type, ClassNotFoundException};
 use unittest\{Assert, Test};
 
 class ReflectionTest {
@@ -50,5 +50,10 @@ class ReflectionTest {
   #[Test, Values([80000, 80100])]
   public function parser_for_php8($versionId) {
     Assert::instance(FromAttributes::class, Reflection::annotations($versionId));
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function of_non_existant() {
+    Reflection::of('non.existant.Type');
   }
 }

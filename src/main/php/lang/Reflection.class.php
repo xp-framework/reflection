@@ -2,6 +2,7 @@
 
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
+use lang\{ClassLoader, ClassNotFoundException};
 
 abstract class Reflection {
   private static $meta= null;
@@ -20,6 +21,7 @@ abstract class Reflection {
    *
    * @param  string|lang.XPClass|lang.reflection.Type|ReflectionClass|object $arg
    * @return lang.reflection.Type
+   * @throws lang.ClassNotFoundException
    */
   public static function of($arg) {
     if ($arg instanceof XPClass) {
@@ -31,7 +33,14 @@ abstract class Reflection {
     } else if (is_object($arg)) {
       return new Type(new \ReflectionObject($arg));
     } else {
-      return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
+
+      // Instantiatin ReflectionClass triggers autoloading mechanism, which in turn
+      // uses the default class loader to locate the class.
+      try {
+        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
+      } catch (\ReflectionException $e) {
+        throw new ClassNotFoundException(strtr($arg, '\\', '.'), [ClassLoader::getDefault()]);
+      }
     }
   }
 }

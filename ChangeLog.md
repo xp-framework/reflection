@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Changed `Reflection::of()` to raise `lang.ClassNotFoundException` when
+  a type name is passed as a string and loading the type fails.
+  (@thekid)
+
 ## 0.6.0 / 2020-12-19
 
 * Added `lang.reflect.Methods::annotated()` method to enumerate all
