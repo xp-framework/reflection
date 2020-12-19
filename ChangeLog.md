@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.6.0 / 2020-12-19
+
+* Added `lang.reflect.Methods::annotated()` method to enumerate all
+  methods with a given annotation
+  (@thekid)
 * Merged PR #2: Use meta information (*not only for annotations, but also
   for properties as well as method return and parameter types*)
   (@thekid)

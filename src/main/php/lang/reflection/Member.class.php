@@ -2,12 +2,20 @@
 
 use lang\{XPClass, Reflection, Value};
 
+/** Base class for constants, properties and methods */
 abstract class Member implements Value {
   protected $reflect, $meta;
 
-  /** @param ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect */
-  public function __construct($reflect) {
+  /**
+   * Creates a new member from a PHP reflection class, optionally passing
+   * pre-parsed meta information so that it won't need to be parsed again.
+   *
+   * @param  ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect
+   * @param  ?[:var] $meta 
+   */
+  public function __construct($reflect, $meta= null) {
     $this->reflect= $reflect;
+    $this->meta= $meta;
   }
 
   /**
