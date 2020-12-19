@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #2: Use meta information (*not only for annotations, but also
+  for properties as well as method return and parameter types*)
+  (@thekid)
 * Fixed accessing meta data for type members via `xp::$meta` cache
   (@thekid)
 
