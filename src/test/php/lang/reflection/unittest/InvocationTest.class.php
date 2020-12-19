@@ -2,7 +2,7 @@
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
 use lang\{Reflection, IllegalAccessException, Runnable, CommandLine};
-use unittest\{Assert, AssertionFailedError, Values, Expect, Test};
+use unittest\{Assert, AssertionFailedError, Before, Values, Expect, Test};
 
 class InvocationTest {
   use TypeDefinition;

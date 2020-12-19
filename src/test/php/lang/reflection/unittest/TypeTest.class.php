@@ -2,7 +2,7 @@
 
 use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods};
 use lang\{ElementNotFoundException, Reflection, Enum, XPClass, ClassLoader};
-use unittest\{Assert, Test};
+use unittest\{Assert, Before, Test};
 
 class TypeTest {
   private $fixture;
