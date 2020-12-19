@@ -1,25 +1,36 @@
 <?php namespace lang\reflection;
 
 class Parameters implements \IteratorAggregate {
-  private $list, $method;
+  private $method;
 
   /**
    * Creates a new parameters list
    *
-   * @param  ReflectionParameter[] $list
    * @param  ReflectionMethod $method
    */
-  public function __construct($list, $method= null) {
-    $this->list= $list;
+  public function __construct($method) {
     $this->method= $method;
   }
 
+  /**
+   * Returns number of parameters
+   *
+   * @param  bool $required Whether to count only required parameters
+   * @return int
+   */
+  public function size($required= false) {
+    return $required ? $this->method->getNumberOfRequiredParameters() : $this->method->getNumberOfParameters();
+  }
+
   /** @return ?lang.reflection.Parameter */
-  public function first() { return $this->list ? new Parameter($this->list[0], $this->method) : null; }
+  public function first() {
+    $list= $this->method->getParameters();
+    return $list ? new Parameter($list[0], $this->method) : null;
+  }
 
   /** @return iterable */
   public function getIterator() {
-    foreach ($this->list as $parameter) {
+    foreach ($this->method->getParameters() as $parameter) {
       yield $parameter->name => new Parameter($parameter, $this->method);
     }
   }

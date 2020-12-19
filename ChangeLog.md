@@ -3,13 +3,16 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added method `lang.reflection.Parameters::size()` which returns number
+  of parameters
+  (@thekid)
 * Changed `Reflection::of()` to raise `lang.ClassNotFoundException` when
   a type name is passed as a string and loading the type fails.
   (@thekid)
 
 ## 0.6.0 / 2020-12-19
 
-* Added `lang.reflect.Methods::annotated()` method to enumerate all
+* Added `lang.reflection.Methods::annotated()` method to enumerate all
   methods with a given annotation
   (@thekid)
 * Merged PR #2: Use meta information (*not only for annotations, but also

@@ -36,6 +36,6 @@ abstract class Routine extends Member {
    * @return lang.reflection.Parameters
    */
   public function parameters() {
-    return new Parameters($this->reflect->getParameters(), $this->reflect);
+    return new Parameters($this->reflect);
   }
 }

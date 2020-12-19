@@ -131,6 +131,18 @@ class MethodsTest {
     Assert::equals($expected, $actual);
   }
 
+  #[Test, Values([['fixture()', 0], ['fixture($a)', 1], ['fixture($a, $b)', 2], ['fixture($a, $b= null)', 2]])]
+  public function number_of_parameters($declaration, $expected) {
+    $method= $this->declare(sprintf('{ function %s { } }', $declaration))->method('fixture');
+    Assert::equals($expected, $method->parameters()->size());
+  }
+
+  #[Test, Values([['fixture()', 0], ['fixture($a)', 1], ['fixture($a, $b)', 2], ['fixture($a, $b= null)', 1]])]
+  public function number_of_required_parameters($declaration, $expected) {
+    $method= $this->declare('{ function fixture($arg) { } }')->method('fixture');
+    Assert::equals(1, $method->parameters()->size(true));
+  }
+
   #[Test]
   public function first_parameter() {
     $method= $this->declare('{ function fixture($arg) { } }')->method('fixture');
