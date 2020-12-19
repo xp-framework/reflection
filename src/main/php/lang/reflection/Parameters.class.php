@@ -3,11 +3,7 @@
 class Parameters implements \IteratorAggregate {
   private $method;
 
-  /**
-   * Creates a new parameters list
-   *
-   * @param  ReflectionMethod $method
-   */
+  /** @param ReflectionMethod $method */
   public function __construct($method) {
     $this->method= $method;
   }
