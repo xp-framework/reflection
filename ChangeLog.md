@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.6.0 / 2020-12-19
+
 * Added `lang.reflect.Methods::annotated()` method to enumerate all
   methods with a given annotation
   (@thekid)
