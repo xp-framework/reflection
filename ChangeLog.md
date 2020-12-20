@@ -3,15 +3,18 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added `comment()` accessor to `Type` and `Member` classes, returning
+  their respective api doc commments without `/` and `*`s, if any.
+  (@thekid)
 * Added support for including private and protected members by passing
   the `-a` / `--all` flag to the `xp reflect` subcommand.
   (@thekid)
 
 ## 0.8.0 / 2020-12-20
 
-* Added `lang.reflection.Types::traits()` to enumerate used traits.
+* Added `lang.reflection.Type::traits()` to enumerate used traits.
   (@thekid)
-* Added `lang.reflection.Types::interfaces()` to enumerate implemented
+* Added `lang.reflection.Type::interfaces()` to enumerate implemented
   interfaces of a class or interface parents, respectively.
   (@thekid)
 

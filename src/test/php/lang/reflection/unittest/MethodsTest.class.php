@@ -238,6 +238,30 @@ class MethodsTest {
   }
 
   #[Test]
+  public function without_comment() {
+    $t= $this->declare('{ public function fixture() { } }');
+    Assert::null($t->method('fixture')->comment());
+  }
+
+  #[Test]
+  public function with_single_line_comment() {
+    $t= $this->declare('{ /** Returns the fixture */ public function fixture() { } }');
+    Assert::equals('Returns the fixture', $t->method('fixture')->comment());
+  }
+
+  #[Test]
+  public function with_multi_line_comment() {
+    $t= $this->declare('{
+      /**
+       * Returns the fixture
+       * or NULL.
+       */
+      public function fixture() { }
+    }');
+    Assert::equals("Returns the fixture\nor NULL.", $t->method('fixture')->comment());
+  }
+
+  #[Test]
   public function hash_code() {
     $t= $this->declare('{ public function fixture() { } }');
     Assert::equals($t->name().'::fixture()', $t->method('fixture')->hashCode());

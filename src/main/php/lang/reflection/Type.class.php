@@ -6,6 +6,7 @@ class Type {
   private $reflect;
   private $meta= null;
 
+  /** @param ReflectionClass $reflect */
   public function __construct($reflect) {
     $this->reflect= $reflect;
   }
@@ -19,8 +20,8 @@ class Type {
   /** Returns corresponding lang.Type instance */
   public function class() { return new XPClass($this->reflect); }
 
-  /** @return lang.reflection.Modifiers */
-  public function modifiers() {
+  /** Returns this type's modifiers */
+  public function modifiers(): Modifiers {
     if (PHP_VERSION_ID >= 70400) return new Modifiers($this->reflect->getModifiers());
 
     // PHP 7.4 made type and member modifiers consistent. For versions before that,
@@ -74,12 +75,20 @@ class Type {
     return $this->reflect->name === $compare || $this->reflect->isSubclassOf($compare);
   }
 
-  /** @return ?self */
+  /**
+   * Returns this type's parent, if any
+   *
+   * @return ?self
+   */
   public function parent() {
     return ($parent= $this->reflect->getParentClass()) ? new self($parent) : null;
   }
 
-  /** @return self[] */
+  /**
+   * Returns implementations of classes, or parents of interfaces, respectively.
+   *
+   * @return self[]
+   */
   public function interfaces() {
     $r= [];
     foreach ($this->reflect->getInterfaces() as $interface) {
@@ -88,17 +97,17 @@ class Type {
     return $r;
   }
 
-  /** @return self[] */
+  /**
+   * Returns traits used by this type
+   *
+   * @return self[]
+   */
   public function traits() {
     $r= [];
     foreach ($this->reflect->getTraits() as $interface) {
       $r[]= new self($interface);
     }
     return $r;
-  }
-
-  public function evaluate($expression) {
-    return Reflection::meta()->evaluate($this->reflect, $expression);
   }
 
   /** @return ?lang.IClassLoader */
@@ -168,7 +177,7 @@ class Type {
   /** @return lang.reflection.Constants */
   public function constants() { return new Constants($this->reflect); }
 
-  /** @return lang.reflection.Constant */
+  /** @return ?lang.reflection.Constant */
   public function constant($name) {
 
     // Cannot use getReflectionConstant(), which does not exist in PHP 7.0.
@@ -180,7 +189,7 @@ class Type {
     ;
   }
 
-  /** @return lang.reflection.Property */
+  /** @return ?lang.reflection.Property */
   public function property(string $name) {
     return $this->reflect->hasProperty($name)
       ? new Property($this->reflect->getProperty($name))
@@ -191,7 +200,7 @@ class Type {
   /** @return lang.reflection.Properties */
   public function properties() { return new Properties($this->reflect); }
 
-  /** @return lang.reflection.Method */
+  /** @return ?lang.reflection.Method */
   public function method($name) {
     return $this->reflect->hasMethod($name)
       ? new Method($this->reflect->getMethod($name))
@@ -201,6 +210,26 @@ class Type {
 
   /** @return lang.reflection.Methods */
   public function methods() { return new Methods($this->reflect); }
+
+  /**
+   * Returns this type's doc comment, or NULL if there is none.
+   *
+   * @return ?string
+   */
+  public function comment() {
+    if (false === ($c= $this->reflect->getDocComment())) return null;
+    return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+  }
+
+  /**
+   * Evaluates a given expression in this type's context
+   *
+   * @param  string $expression
+   * @return var
+   */
+  public function evaluate($expression) {
+    return Reflection::meta()->evaluate($this->reflect, $expression);
+  }
 
   /** @return string */
   public function __toString() { return $this->reflect->name; }

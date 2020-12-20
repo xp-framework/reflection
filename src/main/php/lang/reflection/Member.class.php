@@ -91,6 +91,16 @@ abstract class Member implements Value {
   /** Returns the type this member is declared in */
   public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
 
+  /**
+   * Returns this type's doc comment, or NULL if there is none.
+   *
+   * @return ?string
+   */
+  public function comment() {
+    if (false === ($c= $this->reflect->getDocComment())) return null;
+    return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+  }
+
   /** @return string */
   public function hashCode() { return $this->compoundName(); }
 

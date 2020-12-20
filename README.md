@@ -19,6 +19,7 @@ $type= Reflection::of(Fixture::class);
 $type->name();                // org.example.Fixture
 $type->literal();             // Fixture::class
 $type->modifiers();           // Modifiers<public>
+$type->comment();             // (api doc comment)
 $type->class();               // lang.XPClass instance
 $type->classLoader();         // lang.ClassLoader instance
 $type->parent();              // Type or NULL
@@ -58,6 +59,7 @@ if ($constructor= $type->constructor()) {
   $constructor->name();                    // '__construct'
   $constructor->compoundName();            // 'org.example.Fixture::__construct()'
   $constructor->modifiers();               // Modifiers<public>
+  $constructor->comment();                 // (api doc comment)
   $constructor->annotations();             // Annotations
   $constructor->annotation(Inject::class); // Annotation or NULL
   $constructor->declaredIn();              // Type
@@ -79,6 +81,7 @@ foreach ($type->constants() as $name => $constant) {
   $constant->compoundName();               // 'org.example.Fixture::POWER'
   $constant->value();                      // 6100
   $constant->modifiers();                  // Modifiers<public>
+  $constant->comment();                    // (api doc comment)
   $constant->annotations();                // Annotations
   $constant->annotation(Inject::class);    // Annotation or NULL
   $constant->declaredIn();                 // Type
@@ -88,6 +91,7 @@ foreach ($type->properties() as $name => $property) {
   $property->name();                       // 'value'
   $property->compoundName();               // 'org.example.Fixture::$value'
   $property->modifiers();                  // Modifiers<public>
+  $property->comment();                    // (api doc comment)
   $property->annotations();                // Annotations
   $property->annotation(Inject::class);    // Annotation or NULL
   $property->declaredIn();                 // Type
@@ -99,6 +103,7 @@ foreach ($type->properties() as $name => $property) {
 foreach ($type->methods() as $name => $method) {
   $method->name();                         // 'fixture'
   $method->compoundName();                 // 'org.example.Fixture::fixture()'
+  $method->comment();                      // (api doc comment)
   $method->modifiers();                    // Modifiers<public>
   $method->annotations();                  // Annotations
   $method->annotation(Inject::class);      // Annotation or NULL

@@ -258,6 +258,11 @@ class TypeTest {
     $t= $this->declare('K_T', ['kind' => 'trait']);
     Assert::false($t->instantiable());
   }
+  #[Test]
+  public function without_comment() {
+    $t= $this->declare('N_C', ['kind' => 'class']);
+    Assert::null($t->comment());
+  }
 
   #[Test]
   public function string_cast_returns_type_literal() {
