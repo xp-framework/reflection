@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.9.0 / 2020-12-20
+
 * Wrapped exceptions from `closure()` in `lang.IllegalArgumentException`
   (@thekid)
 * Fixed method string representation when using PHP 8 native union types
