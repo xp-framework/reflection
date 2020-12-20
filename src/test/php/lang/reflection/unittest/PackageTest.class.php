@@ -6,9 +6,9 @@ use unittest\{Assert, Test};
 
 class PackageTest {
 
-  #[Test]
-  public function name() {
-    Assert::equals('lang.reflection', (new Package('lang.reflection'))->name());
+  #[Test, Values(['lang.reflection', 'lang\reflection', 'lang.reflection.'])]
+  public function name($arg) {
+    Assert::equals('lang.reflection', (new Package($arg))->name());
   }
 
   #[Test]
