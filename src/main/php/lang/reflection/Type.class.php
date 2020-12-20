@@ -27,20 +27,24 @@ class Type {
 
   /** Returns this type's modifiers */
   public function modifiers(): Modifiers {
-    if (PHP_VERSION_ID >= 70400) return new Modifiers($this->reflect->getModifiers());
+    if (PHP_VERSION_ID < 70400) {
 
-    // PHP 7.4 made type and member modifiers consistent. For versions before that,
-    // map PHP reflection modifiers to generic form
-    //
-    // @codeCoverageIgnoreStart
-    $m= $this->reflect->getModifiers();
-    $r= 0;
-    $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r |= MODIFIER_ABSTRACT;
-    $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r |= MODIFIER_ABSTRACT;
-    $m & \ReflectionClass::IS_FINAL && $r |= MODIFIER_FINAL;
+      // PHP 7.4 made type and member modifiers consistent. For versions before that,
+      // map PHP reflection modifiers to generic form
+      //
+      // @codeCoverageIgnoreStart
+      $m= $this->reflect->getModifiers();
+      $r= 0;
+      $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r |= Modifiers::IS_ABSTRACT;
+      $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r |= Modifiers::IS_ABSTRACT;
+      $m & \ReflectionClass::IS_FINAL && $r |= Modifiers::IS_FINAL;
+      // @codeCoverageIgnoreEnd
+    } else {
+      $r= $this->reflect->getModifiers();
+    }
 
+    $this->reflect->isInternal() && $r |= Modifiers::IS_NATIVE;
     return new Modifiers($r);
-    // @codeCoverageIgnoreEnd
   }
 
   /** Returns type kind */

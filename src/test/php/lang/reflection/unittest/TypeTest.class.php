@@ -57,6 +57,12 @@ class TypeTest {
   }
 
   #[Test]
+  public function native_modifiers() {
+    $t= Reflection::of(\Throwable::class);
+    Assert::equals(new Modifiers('public native'), $t->modifiers());
+  }
+
+  #[Test]
   public function class_kind() {
     $t= $this->declare('K_C', ['kind' => 'class']);
     Assert::equals(Kind::$CLASS, $t->kind());
@@ -132,7 +138,7 @@ class TypeTest {
   }
 
   #[Test]
-  public function no_classLoader_for_internal_classes() {
+  public function no_classLoader_for_native_classes() {
     Assert::null(Reflection::of(\Throwable::class)->classLoader());
   }
 
