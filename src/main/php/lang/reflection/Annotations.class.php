@@ -14,12 +14,15 @@ class Annotations implements \IteratorAggregate {
     }
   }
 
+  /**
+   * Returns whether a given annotation type is present
+   *
+   * @param  string $type
+   * @return ?lang.reflection.Annotation
+   */
   public function provides($type) {
     $t= strtr($type, '.', '\\');
-    if (isset($this->annotations[$t])) return true;
-
-    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
-    return isset($this->annotations[$n]);
+    return isset($this->annotations[$t]);
   }
 
   /**
@@ -30,9 +33,6 @@ class Annotations implements \IteratorAggregate {
    */
   public function type($type) {
     $t= strtr($type, '.', '\\');
-    if (isset($this->annotations[$t])) return new Annotation($t, $this->annotations[$t]);
-
-    $n= lcfirst(false === ($p= strrpos($t, '\\')) ? $t : substr($t, $p + 1));
-    return isset($this->annotations[$n]) ? new Annotation($n, $this->annotations[$n]) : null;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 }
