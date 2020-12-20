@@ -7,43 +7,28 @@ class PackageInformation {
 
   /** @param string $package */
   public function __construct($package, $flags) {
-    $this->package= rtrim($package, '.');
+    $this->package= Reflection::of($package);
     $this->flags= $flags;
   }
 
   /** @return iterable */
   public function sources() {
-    foreach (ClassLoader::getLoaders() as $loader) {
-      if ($loader->providesPackage($this->package)) yield $loader;
-    }
+    yield from $this->package->classLoaders();
   }
 
   public function display($out) {
-    $out->format('package %s {', $this->package);
-
-    $ext= strlen(\xp::CLASS_FILE_EXT);
-    $order= [
-      'interface' => [],
-      'trait'     => [],
-      'enum'      => [],
-      'class'     => []
-    ];
-
-    // Child packages
-    $loader= ClassLoader::getDefault();
-    $base= $this->package.'.';
+    $out->format('package %s {', $this->package->name());
     $i= 0;
-    foreach ($loader->packageContents($this->package) as $entry) {
-      if ('/' === $entry[strlen($entry) - 1]) {
-        $out->line('  package '.$base.substr($entry, 0, -1));
-        $i++;
-      } else if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
-        $type= Reflection::of($loader->loadClass0($base.substr($entry, 0, -$ext)));
-        $order[$type->kind()->name()][$type->name()]= $type;
-      }
+    foreach ($this->package->packages() as $package) {
+      $out->line('  package '.$package->name());
+      $i++;
     }
 
-    // Enumerate types - ordered by type, then by name
+    // Compile types into a custom order
+    $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
+    foreach ($this->package->types() as $type) {
+      $order[$type->kind()->name()][$type->name()]= $type;
+    }
     foreach ($order as $type => $types) {
       if (empty($types)) continue;
       if ($i) $out->line();

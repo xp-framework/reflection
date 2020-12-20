@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods};
+use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods, Package};
 use lang\{ElementNotFoundException, Reflection, Enum, Runnable, XPClass, ClassLoader};
 use unittest\{Assert, Before, Test};
 
@@ -36,6 +36,16 @@ class TypeTest {
   #[Test]
   public function literal() {
     Assert::equals(self::class.'Fixture', $this->fixture->literal());
+  }
+
+  #[Test]
+  public function package() {
+    Assert::equals(new Package(__NAMESPACE__), $this->fixture->package());
+  }
+
+  #[Test]
+  public function global_namespace() {
+    Assert::null(Reflection::of(\Throwable::class)->package());
   }
 
   #[Test]

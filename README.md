@@ -22,6 +22,7 @@ $type->modifiers();           // Modifiers<public>
 $type->comment();             // (api doc comment)
 $type->class();               // lang.XPClass instance
 $type->classLoader();         // lang.ClassLoader instance
+$type->package();             // Package or NULL
 $type->parent();              // Type or NULL
 $type->interfaces();          // Type[]
 $type->traits();              // Type[]
@@ -132,4 +133,20 @@ foreach ($method->parameters() as $name => $parameter) {
   $parameter->annotations();              // Annotations
   $parameter->annotation(Inject::class)   // Annotation or NULL
 }
+```
+
+Packages can be reflected upon by passing namespace names to `Reflection::of()`.
+
+```php
+namespace org\example;
+
+use lang\Reflection;
+
+$type= Reflection::of(__NAMESPACE__);
+
+$type->name();                // org.example
+$type->literal();             // 'org\example'
+$type->types();               // iterable with Type instances
+$type->packages();            // iterable with Package instances
+$type->classLoaders();        // iterable with lang.ClassLoader instances
 ```

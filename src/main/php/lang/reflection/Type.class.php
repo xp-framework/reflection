@@ -81,6 +81,16 @@ class Type {
   }
 
   /**
+   * Returns this type's package, or NULL if this type is in the global namespace.
+   *
+   * @return ?lang.reflection.Package
+   */
+  public function package() {
+    $name= $this->reflect->getNamespaceName();
+    return $name ? new Package($name) : null;
+  }
+
+  /**
    * Returns this type's parent, if any
    *
    * @return ?self
