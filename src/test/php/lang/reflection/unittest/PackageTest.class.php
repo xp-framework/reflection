@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use lang\IllegalArgumentException;
 use lang\reflection\Package;
 use unittest\{Assert, Test};
 
@@ -39,5 +40,20 @@ class PackageTest {
       'lang.reflection.Type[]',
       iterator_to_array((new Package('lang.reflection'))->types())
     );
+  }
+
+  #[Test]
+  public function type_via_short_name() {
+    Assert::equals(self::class, (new Package(__NAMESPACE__))->type('PackageTest')->literal());
+  }
+
+  #[Test]
+  public function type_via_full_name() {
+    Assert::equals(self::class, (new Package(__NAMESPACE__))->type(self::class)->literal());
+  }
+
+  #[Test, Expect(class: IllegalArgumentException::class, withMessage: 'Given type util.Date is not in package lang')]
+  public function type_with_namespace() {
+    (new Package('lang'))->type('util.Date');
   }
 }

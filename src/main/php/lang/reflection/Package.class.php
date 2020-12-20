@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{ClassLoader, IClassLoader, Reflection};
+use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException};
 
 /** Represents a namespace, which may exist in various class loaders */
 class Package {
@@ -76,6 +76,26 @@ class Package {
       if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
         yield Reflection::of($loader->loadClass0($base.substr($entry, 0, -$ext)));
       }
+    }
+  }
+
+  /**
+   * Returns a given type
+   *
+   * @param  string $name
+   * @return lang.reflection.Type
+   * @throws lang.IllegalArgumentException
+   */
+  public function type($name) {
+    $type= strtr($name, '\\', '.');
+    $p= strrpos($type, '.');
+
+    if (false === $p) {
+      return Reflection::of($this->name.'.'.$type);
+    } else if (0 === strncmp($this->name, $type, $p)) {
+      return Reflection::of($type);
+    } else {
+      throw new IllegalArgumentException('Given type '.$type.' is not in package '.$this->name);
     }
   }
 }

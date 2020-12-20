@@ -144,6 +144,7 @@ $package= Reflection::of('org.example');
 
 $package->name();          // org.example
 $package->literal();       // 'org\example'
+$package->type('Fixture'); // Type instance
 $package->types();         // iterable with Type instances
 $package->parent()         // Package or NULL
 $package->children();      // iterable with Package instances
