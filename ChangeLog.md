@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #3: Add reflection on packages (a.k.a. namespaces) - @thekid
+* Added `native` modifier to internal classes - @thekid
+
 ## 0.9.0 / 2020-12-20
 
 * Wrapped exceptions from `closure()` in `lang.IllegalArgumentException`
