@@ -264,10 +264,16 @@ class TypeTest {
     $t= $this->declare('K_T', ['kind' => 'trait']);
     Assert::false($t->instantiable());
   }
+
   #[Test]
   public function without_comment() {
     $t= $this->declare('N_C', ['kind' => 'class']);
     Assert::null($t->comment());
+  }
+
+  #[Test]
+  public function with_comment() {
+    Assert::equals('Used by TypeTest', Reflection::of(WithComment::class)->comment());
   }
 
   #[Test]

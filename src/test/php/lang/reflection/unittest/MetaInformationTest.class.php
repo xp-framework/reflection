@@ -10,7 +10,8 @@ class MetaInformationTest {
   public function initialize() {
     $annotations= [
       DETAIL_ANNOTATIONS => ['annotated' => 'test'],
-      DETAIL_TARGET_ANNO => ['annotated' => Annotated::class]
+      DETAIL_TARGET_ANNO => ['annotated' => Annotated::class],
+      DETAIL_COMMENT     => 'Test'
     ];
     \xp::$meta['lang.reflection.unittest.Fixture']= [
       'class' => $annotations,
@@ -31,7 +32,8 @@ class MetaInformationTest {
         'value' => [
           DETAIL_ANNOTATIONS => [],
           DETAIL_ARGUMENTS   => [],
-          DETAIL_RETURNS     => 'function(): var'
+          DETAIL_RETURNS     => 'function(): var',
+          DETAIL_COMMENT     => 'Test'
         ]
       ]
     ];
@@ -44,11 +46,22 @@ class MetaInformationTest {
   }
 
   #[Test]
+  public function type_comment() {
+    Assert::equals('Test', (new MetaInformation(null))->typeComment($this->reflect));
+  }
+
+  #[Test]
   public function type_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->typeAnnotations($this->reflect)
     );
+  }
+
+  #[Test]
+  public function constant_comment() {
+    $c= new \ReflectionClassConstant($this->reflect->name, 'TEST');
+    Assert::equals('Test', (new MetaInformation(null))->constantComment($c));
   }
 
   #[Test]
@@ -58,6 +71,12 @@ class MetaInformationTest {
       [Annotated::class => ['test']],
       (new MetaInformation(null))->constantAnnotations($c)
     );
+  }
+
+  #[Test]
+  public function property_comment() {
+    $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
+    Assert::equals('Test', (new MetaInformation(null))->propertyComment($p));
   }
 
   #[Test]
@@ -77,6 +96,13 @@ class MetaInformationTest {
       (new MetaInformation(null))->propertyType($p)
     );
   }
+
+  #[Test]
+  public function method_comment() {
+    $m= new \ReflectionMethod($this->reflect->name, 'value');
+    Assert::equals('Test', (new MetaInformation(null))->methodComment($m));
+  }
+
 
   #[Test]
   public function method_annotations() {
