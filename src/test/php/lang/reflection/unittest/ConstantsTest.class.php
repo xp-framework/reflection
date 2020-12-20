@@ -23,6 +23,16 @@ class ConstantsTest {
   }
 
   #[Test]
+  public function no_comment() {
+    Assert::null($this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
+  }
+
+  #[Test]
+  public function with_comment() {
+    Assert::equals('Test', $this->declare('{ /** Test */ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
+  }
+
+  #[Test]
   public function declaredIn() {
     $t= $this->declare('{ const FIXTURE = "test";}');
     Assert::equals($t, $t->constant('FIXTURE')->declaredIn());
