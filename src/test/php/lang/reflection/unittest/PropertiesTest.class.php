@@ -142,10 +142,37 @@ class PropertiesTest {
   }
 
   #[Test]
-  public function string_representation() {
+  public function string_representation_without_type() {
     $t= $this->declare('{ public $fixture; }');
     Assert::equals(
-      'public $fixture',
+      'public var $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test]
+  public function string_representation_with_type_from_apidoc() {
+    $t= $this->declare('{ /** @type string */ public $fixture; }');
+    Assert::equals(
+      'public string $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  public function string_representation_with_type_declaration() {
+    $t= $this->declare('{ public string $fixture; }');
+    Assert::equals(
+      'public string $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function string_representation_with_union_type_declaration() {
+    $t= $this->declare('{ public string|int $fixture; }');
+    Assert::equals(
+      'public string|int $fixture',
       $t->property('fixture')->toString()
     );
   }

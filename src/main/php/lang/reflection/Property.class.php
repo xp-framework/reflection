@@ -117,6 +117,21 @@ class Property extends Member {
 
   /** @return string */
   public function toString() {
-    return Modifiers::namesOf($this->reflect->getModifiers()).' $'.$this->reflect->name;
+
+    // Compile property type
+    $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
+    if (null === $t) {
+      $name= Reflection::meta()->propertyType($this->reflect) ?? 'var';
+    } else if ($t instanceof \ReflectionUnionType) {
+      $name= '';
+      foreach ($t->getTypes() as $component) {
+        $name.= '|'.$component->getName();
+      }
+      $name= substr($name, 1);
+    } else {
+      $name= $t->getName();
+    }
+
+    return Modifiers::namesOf($this->reflect->getModifiers()).' '.$name.' $'.$this->reflect->name;
   }
 }

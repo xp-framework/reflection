@@ -3,6 +3,7 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Included property type in string representation - @thekid
 * Added support for showing type documentation and members' purpose (its
   documentation's first sentence) by passing the `-d` / `--doc` flag to
   the `xp reflect` subcommand.
