@@ -47,7 +47,7 @@ class MetaInformationTest {
   public function type_annotations() {
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofType($this->reflect)[DETAIL_ANNOTATIONS]
+      (new MetaInformation(null))->typeAnnotations($this->reflect)
     );
   }
 

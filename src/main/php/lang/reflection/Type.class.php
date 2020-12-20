@@ -4,7 +4,7 @@ use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
 
 class Type {
   private $reflect;
-  private $meta= null;
+  private $annotations= null;
 
   /** @param ReflectionClass $reflect */
   public function __construct($reflect) {
@@ -17,8 +17,8 @@ class Type {
   /** Returns type literal (in namespaced form) */
   public function literal(): string { return $this->reflect->name; }
 
-  /** Returns corresponding lang.Type instance */
-  public function class() { return new XPClass($this->reflect); }
+  /** Returns corresponding lang.XPClass instance */
+  public function class(): XPClass { return new XPClass($this->reflect); }
 
   /** Returns this type's modifiers */
   public function modifiers(): Modifiers {
@@ -159,19 +159,16 @@ class Type {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->meta ?? $this->meta= Reflection::meta()->ofType($this->reflect);
-    return new Annotations($this->meta[DETAIL_ANNOTATIONS]);
+    $this->annotations ?? $this->annotations= Reflection::meta()->typeAnnotations($this->reflect);
+    return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->meta ?? $this->meta= Reflection::meta()->ofType($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->typeAnnotations($this->reflect);
 
     $t= strtr($type, '.', '\\');
-    return isset($this->meta[DETAIL_ANNOTATIONS][$t])
-      ? new Annotation($t, $this->meta[DETAIL_ANNOTATIONS][$t])
-      : null
-    ;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 
   /** @return lang.reflection.Constants */
@@ -217,8 +214,7 @@ class Type {
    * @return ?string
    */
   public function comment() {
-    if (false === ($c= $this->reflect->getDocComment())) return null;
-    return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+    return Reflection::meta()->typeComment($this->reflect);
   }
 
   /**

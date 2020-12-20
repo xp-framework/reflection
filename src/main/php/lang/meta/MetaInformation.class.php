@@ -38,14 +38,35 @@ class MetaInformation {
     return $tags;
   }
 
-  /** @return iterable */
-  public function ofType($reflect) {
+  /**
+   * Returns annotation map (type => arguments) for a given type
+   *
+   * @param  ReflectionClass $reflect
+   * @return [:var[]]
+   */
+  public function typeAnnotations($reflect) {
     if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+      return $this->annotations($meta);
+    } else {
+      return $this->annotations->ofType($reflect);
     }
-
-    return [DETAIL_ANNOTATIONS => $this->annotations->ofType($reflect)];
   }
+
+  /**
+   * Returns API doc comment for a given type
+   *
+   * @param  ReflectionClass $reflect
+   * @return ?string
+   */
+  public function typeComment($reflect) {
+    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
+      return $meta[DETAIL_COMMENT];
+    } else if (false === ($c= $reflect->getDocComment())) {
+      return null;
+    } else {
+      return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+    }
+  }  
 
   /** @return iterable */
   public function ofConstant($reflect) {
