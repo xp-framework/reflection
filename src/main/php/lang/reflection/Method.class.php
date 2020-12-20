@@ -26,11 +26,14 @@ class Method extends Routine {
 
     // PHP 7.x generates warnings and returns NULL instead of throwing an
     // exception from ReflectionMethod::getClosure()
+    //
+    // @codeCoverageIgnoreStart
     if (null === $closure) {
       $e= new IllegalArgumentException('Cannot get closure');
       \xp::gc(__FILE__);
       throw $e;
     }
+    // @codeCoverageIgnoreEnd
 
     return $closure;
   }
