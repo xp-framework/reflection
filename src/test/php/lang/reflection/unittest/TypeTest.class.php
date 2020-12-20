@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods};
-use lang\{ElementNotFoundException, Reflection, Enum, XPClass, ClassLoader};
+use lang\{ElementNotFoundException, Reflection, Enum, Runnable, XPClass, ClassLoader};
 use unittest\{Assert, Before, Test};
 
 class TypeTest {
@@ -89,6 +89,24 @@ class TypeTest {
   public function enum_parent() {
     $t= $this->declare('K_E', ['kind' => 'class', 'extends' => [Enum::class]], '{ public static $M; }');
     Assert::equals(Reflection::of(Enum::class), $t->parent());
+  }
+
+  #[Test]
+  public function class_without_interfaces() {
+    $t= $this->declare('C_NI', ['kind' => 'class', 'implements' => []], '{ }');
+    Assert::equals([], $t->interfaces());
+  }
+
+  #[Test]
+  public function class_interfaces() {
+    $t= $this->declare('C_WI', ['kind' => 'class', 'implements' => [Runnable::class]], '{ public function run() { } }');
+    Assert::equals([Reflection::of(Runnable::class)], $t->interfaces());
+  }
+
+  #[Test]
+  public function interface_parents() {
+    $t= $this->declare('I_WP', ['kind' => 'interface', 'extends' => [Runnable::class]], '{ }');
+    Assert::equals([Reflection::of(Runnable::class)], $t->interfaces());
   }
 
   #[Test]

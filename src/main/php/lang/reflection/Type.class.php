@@ -79,6 +79,15 @@ class Type {
     return ($parent= $this->reflect->getParentClass()) ? new self($parent) : null;
   }
 
+  /** @return self[] */
+  public function interfaces() {
+    $r= [];
+    foreach ($this->reflect->getInterfaces() as $interface) {
+      $r[]= new self($interface);
+    }
+    return $r;
+  }
+
   public function evaluate($expression) {
     return Reflection::meta()->evaluate($this->reflect, $expression);
   }

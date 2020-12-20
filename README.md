@@ -22,6 +22,7 @@ $type->modifiers();           // Modifiers<public>
 $type->class();               // lang.XPClass instance
 $type->classLoader();         // lang.ClassLoader instance
 $type->parent();              // Type or NULL
+$type->interfaces();          // Type[]
 $type->kind();                // Kind::$INTERFACE, Kind::$TRAIT, Kind::$CLASS, Kind::$ENUM
 $type->is(Base::class);       // true
 

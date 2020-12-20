@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added `lang.reflection.Types::interfaces()` to enumerate implemented
+  interfaces of a class or interface parents, respectively.
+  (@thekid)
+
 ## 0.7.0 / 2020-12-19
 
 * Added method `lang.reflection.Parameters::size()` which returns number
