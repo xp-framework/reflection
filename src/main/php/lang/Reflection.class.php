@@ -1,16 +1,20 @@
 <?php namespace lang;
 
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
-use lang\reflection\Type;
+use lang\reflection\{Type, Package};
 use lang\{ClassLoader, ClassNotFoundException};
 
 /**
  * Factory for reflection instances.
  *
  * ```php
+ * // Types can be instantiated by names, instances or via lang.XPClass
  * $type= Reflection::of(Runnable::class);
  * $type= Reflection::of($instance);
  * $type= Reflection::of(XPClass::forName('lang.Value'));
+ *
+ * // Packages can be instantiated via their name
+ * $package= Reflection::of('lang.reflection');
  * ```
  *
  * @test lang.reflection.unittest.ReflectionTest
@@ -22,16 +26,16 @@ abstract class Reflection {
     return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
   }
 
-  /** @return lang.annotations.FromMeta */
-  public static function meta() {
+  /** Lazy-loads meta information extraction */
+  public static function meta(): MetaInformation {
     return self::$meta ?? self::$meta= new MetaInformation(self::annotations(PHP_VERSION_ID));
   }
 
   /**
    * Creates a new reflection instance
    *
-   * @param  string|lang.XPClass|lang.reflection.Type|ReflectionClass|object $arg
-   * @return lang.reflection.Type
+   * @param  string|object|lang.XPClass|lang.reflection.Type|ReflectionClass $arg
+   * @return lang.reflection.Type|lang.reflection.Package
    * @throws lang.ClassNotFoundException
    */
   public static function of($arg) {
@@ -44,13 +48,18 @@ abstract class Reflection {
     } else if (is_object($arg)) {
       return new Type(new \ReflectionObject($arg));
     } else {
+      $cl= ClassLoader::getDefault();
+      $name= strtr($arg, '\\', '.');
+      if ($cl->providesClass($name)) {
+        return new Type(new \ReflectionClass($cl->loadClass0($name)));
+      } else if ($cl->providesPackage($name)) {
+        return new Package($name);
+      }
 
-      // Instantiatin ReflectionClass triggers autoloading mechanism, which in turn
-      // uses the default class loader to locate the class.
       try {
-        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
+        return new Type(new \ReflectionClass(strtr($arg,  '.', '\\')));
       } catch (\ReflectionException $e) {
-        throw new ClassNotFoundException(strtr($arg, '\\', '.'), [ClassLoader::getDefault()]);
+        throw new ClassNotFoundException($name, [$cl]);
       }
     }
   }
