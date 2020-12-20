@@ -56,7 +56,7 @@ class MetaInformationTest {
     $c= new \ReflectionClassConstant($this->reflect->name, 'TEST');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofConstant($c)[DETAIL_ANNOTATIONS]
+      (new MetaInformation(null))->constantAnnotations($c)
     );
   }
 
@@ -65,7 +65,7 @@ class MetaInformationTest {
     $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofProperty($p)[DETAIL_ANNOTATIONS]
+      (new MetaInformation(null))->propertyAnnotations($p)
     );
   }
 
@@ -74,7 +74,7 @@ class MetaInformationTest {
     $p= new \ReflectionProperty($this->reflect->name, 'value');
     Assert::equals(
       'function(): var',
-      (new MetaInformation(null))->ofProperty($p)[DETAIL_RETURNS]
+      (new MetaInformation(null))->propertyType($p)
     );
   }
 
@@ -83,7 +83,7 @@ class MetaInformationTest {
     $m= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofMethod($m)[DETAIL_ANNOTATIONS]
+      (new MetaInformation(null))->methodAnnotations($m)
     );
   }
 
@@ -92,7 +92,7 @@ class MetaInformationTest {
     $m= new \ReflectionMethod($this->reflect->name, 'value');
     Assert::equals(
       'function(): var',
-      (new MetaInformation(null))->ofMethod($m)[DETAIL_RETURNS]
+      (new MetaInformation(null))->methodReturns($m)
     );
   }
 
@@ -101,7 +101,7 @@ class MetaInformationTest {
     $method= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
-      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])[DETAIL_ANNOTATIONS]
+      (new MetaInformation(null))->parameterAnnotations($method, $method->getParameters()[0])
     );
   }
 
@@ -110,7 +110,7 @@ class MetaInformationTest {
     $method= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       'var',
-      (new MetaInformation(null))->ofParameter($method, $method->getParameters()[0])[DETAIL_RETURNS]
+      (new MetaInformation(null))->parameterType($method, $method->getParameters()[0])
     );
   }
 }

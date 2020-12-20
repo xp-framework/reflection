@@ -4,18 +4,18 @@ use lang\{XPClass, Reflection, Value};
 
 /** Base class for constants, properties and methods */
 abstract class Member implements Value {
-  protected $reflect, $meta;
+  protected $reflect, $annotations;
 
   /**
    * Creates a new member from a PHP reflection class, optionally passing
    * pre-parsed meta information so that it won't need to be parsed again.
    *
    * @param  ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect
-   * @param  ?[:var] $meta 
+   * @param  ?[:var] $annotations 
    */
-  public function __construct($reflect, $meta= null) {
+  public function __construct($reflect, $annotations= null) {
     $this->reflect= $reflect;
-    $this->meta= $meta;
+    $this->annotations= $annotations;
   }
 
   /**
@@ -36,18 +36,16 @@ abstract class Member implements Value {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->meta ?? $this->meta= $this->meta();
-    return new Annotations($this->meta[DETAIL_ANNOTATIONS]);
+    $this->annotations ?? $this->annotations= $this->meta();
+    return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->meta ?? $this->meta= $this->meta();
+    $this->annotations ?? $this->annotations= $this->meta();
 
     $t= strtr($type, '.', '\\');
-    return isset($this->meta[DETAIL_ANNOTATIONS][$t])
-      ? new Annotation($t, $this->meta[DETAIL_ANNOTATIONS][$t])
-      : null
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null
     ;
   }
 
@@ -92,14 +90,11 @@ abstract class Member implements Value {
   public function declaredIn(): Type { return new Type($this->reflect->getDeclaringClass()); }
 
   /**
-   * Returns this type's doc comment, or NULL if there is none.
+   * Returns this member's doc comment, or NULL if there is none.
    *
    * @return ?string
    */
-  public function comment() {
-    if (false === ($c= $this->reflect->getDocComment())) return null;
-    return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
-  }
+  public abstract function comment();
 
   /** @return string */
   public function hashCode() { return $this->compoundName(); }

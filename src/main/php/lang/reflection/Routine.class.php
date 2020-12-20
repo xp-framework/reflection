@@ -5,7 +5,14 @@ use lang\Reflection;
 abstract class Routine extends Member {
 
   /** @return [:var] */
-  protected function meta() { return Reflection::meta()->ofMethod($this->reflect); }
+  protected function meta() { return Reflection::meta()->methodAnnotations($this->reflect); }
+
+  /**
+   * Returns this routines's doc comment, or NULL if there is none.
+   *
+   * @return ?string
+   */
+  public function comment() { return Reflection::meta()->methodComment($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::[NAME]()`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name.'()'; }

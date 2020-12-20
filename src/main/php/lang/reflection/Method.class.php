@@ -74,11 +74,8 @@ class Method extends Routine {
     }
 
     // Use meta information
-    $this->meta ?? $this->meta= $this->meta();
-    return new Constraint(
-      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
-      $present
-    );
+    $name= Reflection::meta()->methodReturns($this->reflect);
+    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
   }
 
   /** @return string */
@@ -95,7 +92,7 @@ class Method extends Routine {
         preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tags['param'][$i], $matches);
         $type= $matches[1] ?? $tags['param'][$i];
       } else {
-        $type= 'var';
+        $type= $parameter->isVariadic() ? 'var...' : 'var';
       }
       $sig.= ', '.$type.' $'.$parameter->name;
     }

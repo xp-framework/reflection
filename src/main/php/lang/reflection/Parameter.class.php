@@ -37,19 +37,16 @@ class Parameter {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->meta ?? $this->meta= Reflection::meta()->ofParameter($this->method, $this->reflect);
-    return new Annotations($this->meta[DETAIL_ANNOTATIONS]);
+    $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
+    return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->meta ?? $this->meta= Reflection::meta()->ofParameter($this->method, $this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
 
     $t= strtr($type, '.', '\\');
-    return isset($this->meta[DETAIL_ANNOTATIONS][$t])
-      ? new Annotation($t, $this->meta[DETAIL_ANNOTATIONS][$t])
-      : null
-    ;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 
   /**
@@ -96,10 +93,7 @@ class Parameter {
       $present= true;
     }
 
-    $this->meta ?? $this->meta= Reflection::meta()->ofParameter($this->method, $this->reflect);
-    return new Constraint(
-      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
-      $present
-    );
+    $name= Reflection::meta()->parameterType($this->method, $this->reflect);
+    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
   }
 }

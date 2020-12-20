@@ -68,64 +68,170 @@ class MetaInformation {
     }
   }  
 
-  /** @return iterable */
-  public function ofConstant($reflect) {
+  /**
+   * Returns annotation map (type => arguments) for a given constant
+   *
+   * @param  ReflectionClassConstant $reflect
+   * @return [:var[]]
+   */
+  public function constantAnnotations($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
     if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta)];
+      return $this->annotations($meta);
+    } else {
+      return $this->annotations->ofConstant($reflect);
     }
-
-    return [DETAIL_ANNOTATIONS => $this->annotations->ofConstant($reflect)];
   }
 
-  /** @return iterable */
-  public function ofProperty($reflect) {
+  /**
+   * Returns comment for a given constant
+   *
+   * @param  ReflectionClassConstant $reflect
+   * @return ?string
+   */
+  public function constantComment($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
+      return $meta[DETAIL_COMMENT];
+    } else if (false === ($c= $reflect->getDocComment())) {
+      return null;
+    } else {
+      return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+    }
+  }
+
+  /**
+   * Returns annotation map (type => arguments) for a given property
+   *
+   * @param  ReflectionProperty $reflect
+   * @return [:var[]]
+   */
+  public function propertyAnnotations($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
+      return $this->annotations($meta);
+    } else {
+      return $this->annotations->ofProperty($reflect);
     }
-
-    return [
-      DETAIL_ANNOTATIONS => $this->annotations->ofProperty($reflect),
-      DETAIL_RETURNS     => $this->tags($reflect)['type'][0] ?? null
-    ];
   }
 
-  /** @return iterable */
-  public function ofMethod($reflect) {
+  /**
+   * Returns type for a given property
+   *
+   * @param  ReflectionProperty $reflect
+   * @return ?string
+   */
+  public function propertyType($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
+      return $meta[DETAIL_RETURNS];
+    } else {
+      return $this->tags($reflect)['type'][0] ?? null;
+    }
+  }
+
+  /**
+   * Returns comment for a given property
+   *
+   * @param  ReflectionProperty $reflect
+   * @return ?string
+   */
+  public function propertyComment($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
+      return $meta[DETAIL_COMMENT];
+    } else if (false === ($c= $reflect->getDocComment())) {
+      return null;
+    } else {
+      return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+    }
+  }
+
+  /**
+   * Returns annotation map (type => arguments) for a given method
+   *
+   * @param  ReflectionMethod $reflect
+   * @return [:var[]]
+   */
+  public function methodAnnotations($reflect) {
     $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
-      return [DETAIL_ANNOTATIONS => $this->annotations($meta), DETAIL_RETURNS => $meta[DETAIL_RETURNS]];
+      return $this->annotations($meta);
+    } else {
+      return $this->annotations->ofMethod($reflect);
     }
-
-    return [
-      DETAIL_ANNOTATIONS => $this->annotations->ofMethod($reflect),
-      DETAIL_RETURNS     => $this->tags($reflect)['return'][0] ?? null
-    ];
   }
 
-  /** @return iterable */
-  public function ofParameter($method, $reflect) {
+  /**
+   * Returns return type for a given method
+   *
+   * @param  ReflectionMethod $reflect
+   * @return ?string
+   */
+  public function methodReturns($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
+      return $meta[DETAIL_RETURNS];
+    } else {
+      return $this->tags($reflect)['return'][0] ?? null;
+    }
+  }
+
+  /**
+   * Returns comment for a given method
+   *
+   * @param  ReflectionMethod $reflect
+   * @return ?string
+   */
+  public function methodComment($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
+      return $meta[DETAIL_COMMENT];
+    } else if (false === ($c= $reflect->getDocComment())) {
+      return null;
+    } else {
+      return trim(preg_replace('/\n\s+\* ?/', "\n", substr($c, 3, -2)));
+    }
+  }
+
+  /**
+   * Returns annotation map (type => arguments) for a given method
+   *
+   * @param  ReflectionMethod $method
+   * @param  ReflectionParameter $reflect
+   * @return [:var[]]
+   */
+  public function parameterAnnotations($method, $reflect) {
     $c= strtr($method->getDeclaringClass()->name, '\\', '.');
-    if ($meta= \xp::$meta[$c][1][$method->name] ?? null) {
-      if ($param= $meta[DETAIL_TARGET_ANNO]['$'.$reflect->name] ?? null) {
+    if ($target= \xp::$meta[$c][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
+      if ($param= $target['$'.$reflect->name] ?? null) {
         $r= [];
         foreach ($param as $name => $value) {
-          $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
+          $r[$target[$name] ?? $name]= (array)$value;
         }
-        return [DETAIL_ANNOTATIONS => $r, DETAIL_RETURNS => $meta[DETAIL_ARGUMENTS][$reflect->getPosition()]];
+        return $r;
       }
     }
+    return $this->annotations->ofParameter($method, $reflect);
+  }
 
-    if ($tag= $this->tags($method)['param'][$reflect->getPosition()] ?? null) {
+  /**
+   * Returns type for a given method and parameter
+   *
+   * @param  ReflectionMethod $method
+   * @param  ReflectionParameter $reflect
+   * @return [:var[]]
+   */
+  public function parameterType($method, $reflect) {
+    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
+    $p= $reflect->getPosition();
+    if ($meta= \xp::$meta[$c][1][$method->name][DETAIL_ARGUMENTS][$p] ?? null) {
+      return $meta;
+    } else if ($tag= $this->tags($method)['param'][$p] ?? null) {
       preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tag, $matches);
-      $type= $matches[1];
-    } else {
-      $type= null;
+      return $matches[1];
     }
-    return [
-      DETAIL_ANNOTATIONS => $this->annotations->ofParameter($method, $reflect),
-      DETAIL_RETURNS     => $type
-    ];
+
+    return null;
   }
 }

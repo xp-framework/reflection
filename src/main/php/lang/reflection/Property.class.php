@@ -4,7 +4,14 @@ use lang\{Reflection, XPClass, Type, TypeUnion};
 
 class Property extends Member {
 
-  protected function meta() { return Reflection::meta()->ofProperty($this->reflect); }
+  protected function meta() { return Reflection::meta()->propertyAnnotations($this->reflect); }
+
+  /**
+   * Returns this property's doc comment, or NULL if there is none.
+   *
+   * @return ?string
+   */
+  public function comment() { return Reflection::meta()->propertyComment($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }
@@ -51,11 +58,8 @@ class Property extends Member {
       $present= true;
     }
 
-    $this->meta ?? $this->meta= Reflection::meta()->ofProperty($this->reflect);
-    return new Constraint(
-      isset($this->meta[DETAIL_RETURNS]) ? Type::resolve($this->meta[DETAIL_RETURNS], $this->resolver()) : $t,
-      $present
-    );
+    $name= Reflection::meta()->propertyType($this->reflect);
+    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
   }
 
   /**
