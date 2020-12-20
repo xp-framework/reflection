@@ -2,7 +2,7 @@
 
 class EnumInformation extends TypeInformation {
  
-  public function display($out) {
+  public function display($flags, $out) {
     $out->writeLinef(
       '%s enum %s%s%s {',
       $this->type->modifiers(),
@@ -10,8 +10,9 @@ class EnumInformation extends TypeInformation {
       $this->extends($this->type),
       $this->implements($this->type)
     );
-    $properties= $this->partition($this->type->properties());
-    $methods= $this->partition($this->type->methods());
+
+    $properties= $this->partition($this->type->properties(), $flags & Information::ALL);
+    $methods= $this->partition($this->type->methods(), $flags & Information::ALL);
 
     // List enum properties
     $props= '';

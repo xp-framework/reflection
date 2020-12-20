@@ -2,7 +2,7 @@
 
 class InterfaceInformation extends TypeInformation {
 
-  public function display($out) {
+  public function display($flags, $out) {
     $out->writeLinef(
       '%s interface %s%s {',
       $this->type->modifiers(),
@@ -10,8 +10,8 @@ class InterfaceInformation extends TypeInformation {
       $this->parents($this->type)
     );
 
-    $properties= $this->partition($this->type->properties());
-    $methods= $this->partition($this->type->methods());
+    $properties= $this->partition($this->type->properties(), $flags & Information::ALL);
+    $methods= $this->partition($this->type->methods(), $flags & Information::ALL);
 
     $section= 0;
     if ($properties['class']) {

@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for including private and protected members by passing
+  the `-a` / `--all` flag to the `xp reflect` subcommand.
+  (@thekid)
+
 ## 0.8.0 / 2020-12-20
 
 * Added `lang.reflection.Types::traits()` to enumerate used traits.

@@ -3,6 +3,9 @@
 use lang\{Enum, Reflection};
 
 abstract class Information extends Enum {
+  const ALL      = 0x01;
+  const COMMENTS = 0x02; 
+
   public static $CLASS, $INTERFACE, $TRAIT, $ENUM;
   
   static function __static() {
@@ -30,10 +33,20 @@ abstract class Information extends Enum {
    * Factory for information based on a type
    *
    * @param  lang.XPClass $class
-   * @return self
+   * @return xp.reflection.TypeInformation
    */
   public static function forClass($class) {
     $type= Reflection::of($class);
     return Enum::valueOf(self::class, strtoupper($type->kind()->name()))->newInstance($type);
+  }
+
+  /**
+   * Factory for information based on a package name
+   *
+   * @param  string $name
+   * @return xp.reflection.PackageInformation
+   */
+  public static function forPackage($name) {
+    return new PackageInformation($name);
   }
 }

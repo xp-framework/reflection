@@ -17,7 +17,7 @@ class PackageInformation {
     }
   }
 
-  public function display($out) {
+  public function display($flags, $out) {
     $out->writeLinef('package %s {', $this->package);
 
     $ext= strlen(\xp::CLASS_FILE_EXT);

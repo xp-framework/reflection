@@ -2,7 +2,7 @@
 
 class ClassInformation extends TypeInformation {
 
-  public function display($out) {
+  public function display($flags, $out) {
     $out->writeLinef(
       '%s class %s%s%s {',
       $this->type->modifiers(),
@@ -11,8 +11,8 @@ class ClassInformation extends TypeInformation {
       $this->implements($this->type)
     );
 
-    $properties= $this->partition($this->type->properties());
-    $methods= $this->partition($this->type->methods());
+    $properties= $this->partition($this->type->properties(), $flags & Information::ALL);
+    $methods= $this->partition($this->type->methods(), $flags & Information::ALL);
 
     $section= 0;
     if ($properties['class']) {

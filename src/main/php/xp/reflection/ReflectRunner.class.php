@@ -3,6 +3,29 @@
 use lang\{Reflect, Enum, ClassLoader};
 use util\cmd\Console;
 
+/**
+ * Displays reflection information about types and packages
+ * ========================================================================
+ *
+ * - Displays information about the `Value` interface
+ *   ```sh
+ *   $ xp reflect lang.Value
+ *   ```
+ * - Displays information about the `Person` class
+ *   ```sh
+ *   $ xp reflect org.example.Person
+ *   ```
+ * - Displays information about the `Kind` enum
+ *   ```sh
+ *   $ xp reflect src/main/php/org/example/Kind.class.php
+ *   ```
+ * - Displays information about the `org.example` namespace
+ *   ```sh
+ *   $ xp reflect org.example
+ *   ```
+ *
+ * Pass the `-a` flag to include private and protected members.
+ */
 class ReflectRunner {
 
   /** 
@@ -24,17 +47,20 @@ class ReflectRunner {
     } else if ($cl->providesClass($name)) {
       $information= Information::forClass($cl->loadClass($name));
     } else if ($cl->providesPackage($name)) {
-      $information= new PackageInformation($name);
+      $information= Information::forPackage($name);
     } else {
       Console::$err->writeLine('Error: '.$name.' is neither a class nor a package');
       return 2;
     }
 
+    $flags= 0;
+    if (in_array('-a', $args) || in_array('--all', $args)) $flags |= Information::ALL;
+
     foreach ($information->sources() as $source) {
       Console::writeLine("\e[33m@", $source, "\e[0m");
     }
 
-    $information->display(new WithHighlighting(Console::$out, [
+    $information->display($flags, new WithHighlighting(Console::$out, [
       '/(class|enum|trait|interface|package|directory|function) (.+)/'      => "\e[34m\$1\e[0m \$2",
       '/(extends|implements) ([^ ]+)/'                                      => "\e[34m\$1\e[0m \$2",
       '/\b(var|int|string|float|array|iterable|object|void|static|self)\b/' => "\e[36m\$1\e[0m",
