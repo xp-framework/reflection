@@ -39,7 +39,7 @@ class PackageInformation {
         $i++;
       } else if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
         $type= Reflection::of($loader->loadClass0($base.substr($entry, 0, -$ext)));
-        $order[$type->kind()->name()][]= $type;
+        $order[$type->kind()->name()][$type->name()]= $type;
       }
     }
 
@@ -48,7 +48,7 @@ class PackageInformation {
       if (empty($types)) continue;
       if ($i) $out->line();
 
-      usort($types, function($a, $b) { return $a->name() <=> $b->name(); });
+      ksort($types);
       $i= 0;
       foreach ($types as $type) {
         if ($this->flags & Information::DOC && ($comment= $type->comment())) {
