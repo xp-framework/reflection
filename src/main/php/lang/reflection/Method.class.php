@@ -80,26 +80,24 @@ class Method extends Routine {
 
   /** @return string */
   public function toString() {
-    $tags= Reflection::meta()->tags($this->reflect);
+    $meta= Reflection::meta();
+    $params= $meta->methodParameterTypes($this->reflect);
 
     // Compile signature
     $sig= '';
     foreach ($this->reflect->getParameters() as $i => $parameter) {
       $t= $parameter->getType();
-      if ($t instanceof \ReflectionUnionType) {
+      if (null === $t) {
+        $type= $params[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
+      } else if ($t instanceof \ReflectionUnionType) {
         $name= '';
         foreach ($t->getTypes() as $component) {
           $name.= '|'.$component->getName();
         }
         $type= substr($name, 1);
-      } else if ($t) {
+      } else {
         $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
         $parameter->isVariadic() && $type.= '...';
-      } else if (isset($tags['param'][$i])) {
-        preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tags['param'][$i], $matches);
-        $type= $matches[1] ?? $tags['param'][$i];
-      } else {
-        $type= $parameter->isVariadic() ? 'var...' : 'var';
       }
       $sig.= ', '.$type.' $'.$parameter->name;
     }
@@ -114,11 +112,8 @@ class Method extends Routine {
       $returns= substr($name, 1);
     } else if ($t) {
       $returns= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
-    } else if (isset($tags['return'][0])) {
-      preg_match('/([^ ]+)( .+)?/i', $tags['return'][0], $matches);
-      $returns= $matches[1] ?? $tags['return'][0];
     } else {
-      $returns= 'var';
+      $returns= $meta->methodReturns($this->reflect) ?? 'var';
     }
 
     return 

@@ -96,21 +96,22 @@ class MetaInformationTest {
     );
   }
 
+
+  #[Test]
+  public function method_parameter_types() {
+    $method= new \ReflectionMethod($this->reflect->name, '__construct');
+    Assert::equals(
+      ['var'],
+      (new MetaInformation(null))->methodParameterTypes($method, $method->getParameters()[0])
+    );
+  }
+
   #[Test]
   public function parameter_annotations() {
     $method= new \ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->parameterAnnotations($method, $method->getParameters()[0])
-    );
-  }
-
-  #[Test]
-  public function parameter_type() {
-    $method= new \ReflectionMethod($this->reflect->name, '__construct');
-    Assert::equals(
-      'var',
-      (new MetaInformation(null))->parameterType($method, $method->getParameters()[0])
     );
   }
 }

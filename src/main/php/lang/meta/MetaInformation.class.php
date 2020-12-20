@@ -29,7 +29,13 @@ class MetaInformation {
     return $r;
   }
 
-  public function tags($reflect) {
+  /**
+   * Parses tags from API documentation
+   *
+   * @param  ReflectionClass|ReflectionConstant|ReflectionProperty|ReflectionMethod $reflect
+   * @return [:var]
+   */
+  private function tags($reflect) {
     preg_match_all('/@([a-z]+)\s+(.+)/', $reflect->getDocComment(), $matches, PREG_SET_ORDER);
     $tags= [];
     foreach ($matches as $match) {
@@ -195,6 +201,23 @@ class MetaInformation {
   }
 
   /**
+   * Returns parameter types for a given method
+   *
+   * @param  ReflectionMethod $method
+   * @return string[]
+   */
+  public function methodParameterTypes($method) {
+    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][1][$method->name][DETAIL_ARGUMENTS] ?? null) return $meta;
+
+    $r= [];
+    foreach ($this->tags($method)['param'] ?? [] as $tag) {
+      $r[]= false === ($p= strpos($tag, ' $')) ? $tag : substr($tag, 0, $p);
+    }
+    return $r;
+  }
+
+  /**
    * Returns annotation map (type => arguments) for a given method
    *
    * @param  ReflectionMethod $method
@@ -213,25 +236,5 @@ class MetaInformation {
       }
     }
     return $this->annotations->ofParameter($method, $reflect);
-  }
-
-  /**
-   * Returns type for a given method and parameter
-   *
-   * @param  ReflectionMethod $method
-   * @param  ReflectionParameter $reflect
-   * @return [:var[]]
-   */
-  public function parameterType($method, $reflect) {
-    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
-    $p= $reflect->getPosition();
-    if ($meta= \xp::$meta[$c][1][$method->name][DETAIL_ARGUMENTS][$p] ?? null) {
-      return $meta;
-    } else if ($tag= $this->tags($method)['param'][$p] ?? null) {
-      preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tag, $matches);
-      return $matches[1];
-    }
-
-    return null;
   }
 }

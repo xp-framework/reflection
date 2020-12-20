@@ -13,19 +13,23 @@ class Constructor extends Routine {
 
   /** @return string */
   public function toString() {
-    $tags= Reflection::meta()->tags($this->reflect);
+    $params= Reflection::meta()->methodParameterTypes($this->reflect);
 
     // Compile signature
     $sig= '';
     foreach ($this->reflect->getParameters() as $i => $parameter) {
-      if ($t= $parameter->getType()) {
+      $t= $parameter->getType();
+      if (null === $t) {
+        $type= $params[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
+      } else if ($t instanceof \ReflectionUnionType) {
+        $name= '';
+        foreach ($t->getTypes() as $component) {
+          $name.= '|'.$component->getName();
+        }
+        $type= substr($name, 1);
+      } else {
         $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
         $parameter->isVariadic() && $type.= '...';
-      } else if (isset($tags['param'][$i])) {
-        preg_match('/([^ ]+)( \$?[a-z_]+)/i', $tags['param'][$i], $matches);
-        $type= $matches[1] ?? $tags['param'][$i];
-      } else {
-        $type= 'var';
       }
       $sig.= ', '.$type.' $'.$parameter->name;
     }

@@ -93,7 +93,9 @@ class Parameter {
       $present= true;
     }
 
-    $name= Reflection::meta()->parameterType($this->method, $this->reflect);
-    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
+    // Use meta information
+    $p= $this->reflect->getPosition();
+    $names= Reflection::meta()->methodParameterTypes($this->method);
+    return new Constraint(isset($names[$p]) ? Type::resolve($names[$p], $this->resolver()) : $t, $present);
   }
 }
