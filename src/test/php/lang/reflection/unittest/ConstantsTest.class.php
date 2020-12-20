@@ -27,7 +27,7 @@ class ConstantsTest {
     Assert::null($this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }
 
-  #[Test]
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
   public function with_comment() {
     Assert::equals('Test', $this->declare('{ /** Test */ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }

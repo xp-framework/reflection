@@ -26,6 +26,8 @@ module xp-framework/reflect {
 
         public function getValue() { return $this->reflect->getConstant($this->name); }
 
+        public function getDocComment() { return false; }
+
         public function getDeclaringClass() { 
           $reflect= $this->reflect;
           do {
