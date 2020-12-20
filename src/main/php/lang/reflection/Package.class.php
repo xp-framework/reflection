@@ -39,6 +39,16 @@ class Package {
   }
 
   /**
+   * Returns this package's parent, if any
+   *
+   * @return ?self
+   */
+  public function parent() {
+    $p= strrpos($this->name, '.');
+    return false === $p ? null : new Package(substr($this->name, 0, $p));
+  }
+
+  /**
    * Returns this package's child packages
    *
    * @return iterable

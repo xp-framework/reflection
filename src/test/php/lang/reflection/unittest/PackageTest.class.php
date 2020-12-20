@@ -21,7 +21,12 @@ class PackageTest {
   }
 
   #[Test]
-  public function child_packages() {
+  public function parent() {
+    Assert::equals(new Package('lang'), (new Package('lang.reflection'))->parent());
+  }
+
+  #[Test]
+  public function children() {
     Assert::equals(
       [new Package('lang.reflection.unittest')],
       iterator_to_array((new Package('lang.reflection'))->children())
