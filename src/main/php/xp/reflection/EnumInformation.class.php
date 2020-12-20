@@ -1,15 +1,14 @@
 <?php namespace xp\reflection;
 
 class EnumInformation extends TypeInformation {
-
-  public function sources() { return [$this->type->classLoader()]; }
  
   public function display($out) {
     $out->writeLinef(
-      '%s enum %s%s {',
+      '%s enum %s%s%s {',
       $this->type->modifiers(),
       $this->type->name(),
-      (($parent= $this->type->parent()) ? ' extends '.$parent->name() : '')
+      $this->extends($this->type),
+      $this->implements($this->type)
     );
     $properties= $this->partition($this->type->properties());
     $methods= $this->partition($this->type->methods());

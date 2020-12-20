@@ -1,14 +1,13 @@
 <?php namespace xp\reflection;
 
-class ClassInformation extends TypeInformation {
+class InterfaceInformation extends TypeInformation {
 
   public function display($out) {
     $out->writeLinef(
-      '%s class %s%s%s {',
+      '%s interface %s%s {',
       $this->type->modifiers(),
       $this->type->name(),
-      $this->extends($this->type),
-      $this->implements($this->type)
+      $this->parents($this->type)
     );
 
     $properties= $this->partition($this->type->properties());
@@ -20,18 +19,6 @@ class ClassInformation extends TypeInformation {
       foreach ($properties['class'] as $property) {
         $out->writeLine('  ', $property->toString());
       }
-    }
-
-    if ($properties['instance']) {
-      $section++ && $out->writeLine();
-      foreach ($properties['instance'] as $property) {
-        $out->writeLine('  ', $property->toString());
-      }
-    }
-
-    if ($constructor= $this->type->constructor()) {
-      $section++ && $out->writeLine();
-      $out->writeLine('  ', $constructor->toString());
     }
 
     if ($methods['class']) {
