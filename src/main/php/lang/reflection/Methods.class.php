@@ -4,7 +4,11 @@ use lang\Reflection;
 
 class Methods extends Members {
 
-  /** @return iterable */
+  /**
+   * Returns all methods
+   *
+   * @return iterable
+   */
   public function getIterator() {
     foreach ($this->reflect->getMethods() as $method) {
       if (0 !== strncmp($method->name, '__', 2)) yield $method->name => new Method($method);

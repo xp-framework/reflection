@@ -2,7 +2,11 @@
 
 class Properties extends Members {
 
-  /** @return iterable */
+  /**
+   * Returns all properties
+   *
+   * @return iterable
+   */
   public function getIterator() {
     foreach ($this->reflect->getProperties() as $property) {
       if (0 !== strncmp($property->name, '__', 2)) {
@@ -12,7 +16,7 @@ class Properties extends Members {
   }
 
   /**
-   * Returns a method by a given name, or NULL
+   * Returns a property by a given name, or NULL
    *
    * @param  string $name
    * @return ?lang.reflection.Property

@@ -2,7 +2,11 @@
 
 class Constants extends Members {
 
-  /** @return iterable */
+  /**
+   * Returns all constants
+   *
+   * @return iterable
+   */
   public function getIterator() {
     if (PHP_VERSION_ID >= 70100) {
       foreach ($this->reflect->getReflectionConstants() as $constant) {
@@ -26,7 +30,7 @@ class Constants extends Members {
   }
 
   /**
-   * Returns a method by a given name, or NULL
+   * Returns a constant by a given name, or NULL
    *
    * @param  string $name
    * @return ?lang.reflection.Constant
