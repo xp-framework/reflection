@@ -8,7 +8,8 @@ class Method extends Routine {
    * Returns a closure
    *
    * @param  ?object $instance
-   * @return \Closure
+   * @return Closure
+   * @throws lang.IllegalArgumentException for incorrect or missing instances
    */
   public function closure($instance= null) {
     try {
