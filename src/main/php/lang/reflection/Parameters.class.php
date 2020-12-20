@@ -1,5 +1,10 @@
 <?php namespace lang\reflection;
 
+/**
+ * Method or constructor parameters enumeration and lookup
+ *
+ * @test lang.reflection.unittest.MethodsTest
+ */
 class Parameters implements \IteratorAggregate {
   private $method;
 

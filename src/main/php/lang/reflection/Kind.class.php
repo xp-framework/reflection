@@ -2,6 +2,11 @@
 
 use lang\Enum;
 
+/**
+ * Value type kind enumeration
+ *
+ * @see  lang.reflection.Type::kind()
+ */
 class Kind extends Enum {
   public static $INTERFACE, $TRAIT, $CLASS, $ENUM;
 

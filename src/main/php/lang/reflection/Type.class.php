@@ -2,6 +2,11 @@
 
 use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
 
+/**
+ * Reflection for a value type: classes, interfaces, traits and enums
+ *
+ * @test lang.reflection.unittest.TypeTest
+ */
 class Type {
   private $reflect;
   private $annotations= null;

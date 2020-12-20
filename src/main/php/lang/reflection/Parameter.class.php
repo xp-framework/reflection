@@ -2,6 +2,11 @@
 
 use lang\{Reflection, Type, TypeUnion, XPClass, IllegalStateException};
 
+/**
+ * Reflection for a method's or constructor's parameter
+ *
+ * @test lang.reflection.unittest.MethodsTest
+ */
 class Parameter {
   private $reflect, $method;
   private $annotations= null;

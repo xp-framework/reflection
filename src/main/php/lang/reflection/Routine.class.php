@@ -2,6 +2,7 @@
 
 use lang\Reflection;
 
+/** Base class for methods and constructors */
 abstract class Routine extends Member {
 
   /** @return [:var] */

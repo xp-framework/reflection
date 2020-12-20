@@ -1,5 +1,10 @@
 <?php namespace lang\reflection;
 
+/**
+ * Type and member annotations enumeration and lookup
+ *
+ * @test lang.reflection.unittest.AnnotationTest
+ */
 class Annotations implements \IteratorAggregate {
   private $annotations;
 

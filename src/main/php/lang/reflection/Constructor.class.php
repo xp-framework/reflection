@@ -2,6 +2,12 @@
 
 use lang\Reflection;
 
+/**
+ * Reflection for a type's constructor
+ *
+ * @test lang.reflection.unittest.ConstructorTest
+ * @test lang.reflection.unittest.InstantiationTest
+ */
 class Constructor extends Routine {
   private $class;
 

@@ -3,6 +3,11 @@
 use lang\{Value, XPClass};
 use util\Objects;
 
+/**
+ * Reflection for a single annotation
+ *
+ * @test lang.reflection.unittest.AnnotationTest
+ */
 class Annotation implements Value {
   private $type, $arguments;
 

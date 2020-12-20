@@ -3,6 +3,11 @@
 use lang\Reflection;
 use util\Objects;
 
+/**
+ * Reflection for a single constant
+ *
+ * @test lang.reflection.unittest.ConstantsTest
+ */
 class Constant extends Member {
 
   protected function meta() { return Reflection::meta()->constantAnnotations($this->reflect); }

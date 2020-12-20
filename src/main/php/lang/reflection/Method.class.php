@@ -2,6 +2,12 @@
 
 use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
+/**
+ * Reflection for a single method
+ *
+ * @test lang.reflection.unittest.MethodsTest
+ * @test lang.reflection.unittest.InvocationTest
+ */
 class Method extends Routine {
 
   /**

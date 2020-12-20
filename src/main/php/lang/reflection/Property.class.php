@@ -2,6 +2,11 @@
 
 use lang\{Reflection, XPClass, Type, TypeUnion};
 
+/**
+ * Reflection for a single property
+ *
+ * @test lang.reflection.unittest.PropertiesTest
+ */
 class Property extends Member {
 
   protected function meta() { return Reflection::meta()->propertyAnnotations($this->reflect); }

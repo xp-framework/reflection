@@ -1,5 +1,10 @@
 <?php namespace lang\reflection;
 
+/**
+ * Type properties enumeration and lookup
+ *
+ * @test lang.reflection.unittest.PropertiesTest
+ */
 class Properties extends Members {
 
   /**

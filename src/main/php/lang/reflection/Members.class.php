@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+/** Base class for constants, properties and methods enumerations */
 abstract class Members implements \IteratorAggregate {
   protected $reflect;
 

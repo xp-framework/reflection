@@ -2,6 +2,11 @@
 
 use lang\Value;
 
+/**
+ * Type and member modifiers
+ *
+ * @test lang.reflection.unittest.ModifiersTest
+ */
 class Modifiers implements Value {
   const IS_STATIC    = MODIFIER_STATIC;
   const IS_ABSTRACT  = MODIFIER_ABSTRACT;

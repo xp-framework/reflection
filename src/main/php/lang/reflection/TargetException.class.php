@@ -2,6 +2,7 @@
 
 use lang\XPException;
 
+/** Indicates invoking a given target fails */
 abstract class TargetException extends XPException {
   private $target;
 

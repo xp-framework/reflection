@@ -2,6 +2,11 @@
 
 use lang\Reflection;
 
+/**
+ * Type methods enumeration and lookup
+ *
+ * @test lang.reflection.unittest.MethodsTest
+ */
 class Methods extends Members {
 
   /**

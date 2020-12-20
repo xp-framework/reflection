@@ -2,6 +2,9 @@
 
 use lang\Type;
 
+/**
+ * Type constraints on parameters and return types
+ */
 class Constraint {
   private $type, $present;
 

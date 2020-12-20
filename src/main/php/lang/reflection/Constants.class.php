@@ -1,5 +1,10 @@
 <?php namespace lang\reflection;
 
+/**
+ * Type constants enumeration and lookup
+ *
+ * @test lang.reflection.unittest.ConstantsTest
+ */
 class Constants extends Members {
 
   /**
