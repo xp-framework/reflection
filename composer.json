@@ -10,6 +10,9 @@
     "xp-framework/ast": "^7.0",
     "php" : ">=7.0.0"
   },
+  "suggest" : {
+    "php" : ">=7.4.0"
+  },
   "require-dev" : {
     "xp-framework/unittest": "^11.0 | ^10.0"
   },
