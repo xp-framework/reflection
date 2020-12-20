@@ -68,7 +68,7 @@ class TypeTest {
 
   #[Test]
   public function native_modifiers() {
-    $t= Reflection::of(\Throwable::class);
+    $t= Reflection::of(\ReflectionClass::class);
     Assert::equals(new Modifiers('public native'), $t->modifiers());
   }
 
