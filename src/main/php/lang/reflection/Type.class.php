@@ -88,6 +88,15 @@ class Type {
     return $r;
   }
 
+  /** @return self[] */
+  public function traits() {
+    $r= [];
+    foreach ($this->reflect->getTraits() as $interface) {
+      $r[]= new self($interface);
+    }
+    return $r;
+  }
+
   public function evaluate($expression) {
     return Reflection::meta()->evaluate($this->reflect, $expression);
   }

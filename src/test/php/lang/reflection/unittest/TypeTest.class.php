@@ -110,6 +110,18 @@ class TypeTest {
   }
 
   #[Test]
+  public function class_without_traits() {
+    $t= $this->declare('C_NT', ['kind' => 'class', 'use' => []], '{ }');
+    Assert::equals([], $t->traits());
+  }
+
+  #[Test]
+  public function class_traits() {
+    $t= $this->declare('C_WT', ['kind' => 'class', 'use' => [TypeDefinition::class]], '{ }');
+    Assert::equals([Reflection::of(TypeDefinition::class)], $t->traits());
+  }
+
+  #[Test]
   public function class() {
     Assert::equals(new XPClass($this->fixture->literal()), $this->fixture->class());
   }

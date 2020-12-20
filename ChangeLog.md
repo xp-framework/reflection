@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added `lang.reflection.Types::traits()` to enumerate used traits.
+  (@thekid)
 * Added `lang.reflection.Types::interfaces()` to enumerate implemented
   interfaces of a class or interface parents, respectively.
   (@thekid)
