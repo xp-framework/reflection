@@ -35,26 +35,31 @@ class ReflectRunner {
    * @return int
    */
   public static function main($args) {
-    $name= array_shift($args);
-    if (null === $name || '' === $name) {
-      Console::$err->writeLine('Error: no class or package name given');
-      return 1;
+    $cl= ClassLoader::getDefault();
+
+    $flags= 0;
+    $name= null;
+    foreach ($args as $arg) {
+      if ('-a' === $arg || '--all' === $arg) {
+        $flags |= Information::ALL;
+      } else {
+        $name= $arg;
+      }
     }
 
-    $cl= ClassLoader::getDefault();
-    if (strstr($name, \xp::CLASS_FILE_EXT)) {
+    if (null === $name) {
+      Console::$err->writeLine('Error: no class or package name given');
+      return 1;
+    } else if (strstr($name, \xp::CLASS_FILE_EXT)) {
       $information= Information::forClass($cl->loadUri(realpath($name)));
     } else if ($cl->providesClass($name)) {
       $information= Information::forClass($cl->loadClass($name));
     } else if ($cl->providesPackage($name)) {
       $information= Information::forPackage($name);
     } else {
-      Console::$err->writeLine('Error: '.$name.' is neither a class nor a package');
+      Console::$err->writeLine('Error: "'.$name.'" neither refers to an existing class or package');
       return 2;
     }
-
-    $flags= 0;
-    if (in_array('-a', $args) || in_array('--all', $args)) $flags |= Information::ALL;
 
     foreach ($information->sources() as $source) {
       Console::writeLine("\e[33m@", $source, "\e[0m");
