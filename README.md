@@ -138,15 +138,13 @@ foreach ($method->parameters() as $name => $parameter) {
 Packages can be reflected upon by passing namespace names to `Reflection::of()`.
 
 ```php
-namespace org\example;
-
 use lang\Reflection;
 
-$type= Reflection::of(__NAMESPACE__);
+$package= Reflection::of('org.example');
 
-$type->name();                // org.example
-$type->literal();             // 'org\example'
-$type->types();               // iterable with Type instances
-$type->packages();            // iterable with Package instances
-$type->classLoaders();        // iterable with lang.ClassLoader instances
+$package->name();          // org.example
+$package->literal();       // 'org\example'
+$package->types();         // iterable with Type instances
+$package->packages();      // iterable with Package instances
+$package->classLoaders();  // iterable with lang.ClassLoader instances
 ```
