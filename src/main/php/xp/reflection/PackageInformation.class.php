@@ -38,7 +38,7 @@ class PackageInformation {
         $out->line('  package '.$base.substr($entry, 0, -1));
         $i++;
       } else if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
-        $type= Reflection::of($loader->loadClass($base.substr($entry, 0, -$ext)));
+        $type= Reflection::of($loader->loadClass0($base.substr($entry, 0, -$ext)));
         $order[$type->kind()->name()][]= $type;
       }
     }
