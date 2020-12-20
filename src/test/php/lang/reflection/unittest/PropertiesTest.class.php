@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\Primitive;
 use lang\reflection\{Modifiers, CannotAccess, AccessingFailed, Constraint};
+use lang\{Type, Primitive, TypeUnion};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
 
@@ -148,7 +148,37 @@ class PropertiesTest {
   #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
   public function type_from_declaration() {
     $type= $this->declare('{ public string $fixture; }');
-    Assert::equals(new Constraint(Primitive::$STRING, true), $type->property('fixture')->constraint());
+    Assert::equals(
+      new Constraint(Primitive::$STRING, true),
+      $type->property('fixture')->constraint()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  public function type_from_array_declaration() {
+    $type= $this->declare('{ public array $fixture; }');
+    Assert::equals(
+      new Constraint(Type::$ARRAY, true),
+      $type->property('fixture')->constraint()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  public function type_from_self_declaration() {
+    $type= $this->declare('{ public self $fixture; }');
+    Assert::equals(
+      new Constraint($type->class(), true),
+      $type->property('fixture')->constraint()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function type_from_union_declaration() {
+    $type= $this->declare('{ public string|int $fixture; }');
+    Assert::equals(
+      new Constraint(new TypeUnion([Primitive::$STRING, Primitive::$INT]), true),
+      $type->property('fixture')->constraint()
+    );
   }
 
   #[Test]
