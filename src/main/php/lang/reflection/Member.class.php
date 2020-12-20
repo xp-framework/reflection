@@ -8,10 +8,10 @@ abstract class Member implements Value {
 
   /**
    * Creates a new member from a PHP reflection class, optionally passing
-   * pre-parsed meta information so that it won't need to be parsed again.
+   * pre-parsed meta information.
    *
    * @param  ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect
-   * @param  ?[:var] $annotations 
+   * @param  ?[:var] $annotations If present, will not be re-parsed
    */
   public function __construct($reflect, $annotations= null) {
     $this->reflect= $reflect;
