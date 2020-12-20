@@ -17,8 +17,8 @@ class PackageInformation {
     }
   }
 
-  public function display($flags, $out) {
-    $out->writeLinef('package %s {', $this->package);
+  public function display($out) {
+    $out->format('package %s {', $this->package);
 
     $ext= strlen(\xp::CLASS_FILE_EXT);
     $order= [
@@ -34,7 +34,7 @@ class PackageInformation {
     $i= 0;
     foreach ($loader->packageContents($this->package) as $entry) {
       if ('/' === $entry[strlen($entry) - 1]) {
-        $out->writeLine('  package '.$base.substr($entry, 0, -1));
+        $out->line('  package '.$base.substr($entry, 0, -1));
         $i++;
       } else if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
         $type= Reflection::of($loader->loadClass($base.substr($entry, 0, -$ext)));
@@ -45,16 +45,16 @@ class PackageInformation {
     // Enumerate types - ordered by type, then by name
     foreach ($order as $type => $types) {
       if (empty($types)) continue;
-      if ($i) $out->writeLine();
+      if ($i) $out->line();
 
       usort($types, function($a, $b) { return $a->name() <=> $b->name(); });
       $i= 0;
       foreach ($types as $type) {
-        $out->writeLine('  ', $type->modifiers()->names(true).' '.$type->kind()->name().' '.$type->name());
+        $out->line('  ', $type->modifiers()->names(true).' '.$type->kind()->name().' '.$type->name());
         $i++;
       }
     }
 
-    $out->writeLine('}');
+    $out->line('}');
   }
 }

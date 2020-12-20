@@ -2,8 +2,9 @@
 
 class EnumInformation extends TypeInformation {
  
-  public function display($flags, $out) {
-    $out->writeLinef(
+  public function display($out) {
+    $this->documentation($out, $this->type);
+    $out->format(
       '%s enum %s%s%s {',
       $this->type->modifiers(),
       $this->type->name(),
@@ -11,32 +12,40 @@ class EnumInformation extends TypeInformation {
       $this->implements($this->type)
     );
 
-    $properties= $this->partition($this->type->properties(), $flags & Information::ALL);
-    $methods= $this->partition($this->type->methods(), $flags & Information::ALL);
+    $properties= $this->partition($this->type->properties());
+    $methods= $this->partition($this->type->methods());
 
     // List enum properties
     $props= '';
     foreach ($properties['class'] as $property) {
       if ($property->modifiers()->isStatic()) $props.= ', $'.$property->name();
     }
-    $out->writeLine('  ', substr($props, 2), ';');
+    $out->line('  ', substr($props, 2), ';');
+
+    // List instance properties, if any
+    if ($properties['instance']) {
+      $out->line();
+      foreach ($properties['instance'] as $property) {
+        $this->member($out, $property);
+      }
+    }
 
     // List static methods, if any
     if ($methods['class']) {
-      $out->writeLine();
+      $out->line();
       foreach ($methods['class'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
     }
 
     // List instance methods, if any
     if ($methods['instance']) {
-      $out->writeLine();
+      $out->line();
       foreach ($methods['instance'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
     }
 
-    $out->writeLine('}');
+    $out->line('}');
   }
 }

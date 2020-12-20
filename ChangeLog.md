@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for showing type documentation and members' purpose (its
+  documentation's first sentence) by passing the `-d` / `--doc` flag to
+  the `xp reflect` subcommand.
+  (@thekid)
 * Added `comment()` accessor to `Type` and `Member` classes, returning
   their respective api doc commments without `/` and `*`s, if any.
   (@thekid)

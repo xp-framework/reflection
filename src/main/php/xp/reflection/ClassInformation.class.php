@@ -2,8 +2,9 @@
 
 class ClassInformation extends TypeInformation {
 
-  public function display($flags, $out) {
-    $out->writeLinef(
+  public function display($out) {
+    $this->documentation($out, $this->type);
+    $out->format(
       '%s class %s%s%s {',
       $this->type->modifiers(),
       $this->type->name(),
@@ -11,43 +12,43 @@ class ClassInformation extends TypeInformation {
       $this->implements($this->type)
     );
 
-    $properties= $this->partition($this->type->properties(), $flags & Information::ALL);
-    $methods= $this->partition($this->type->methods(), $flags & Information::ALL);
+    $properties= $this->partition($this->type->properties());
+    $methods= $this->partition($this->type->methods());
 
     $section= 0;
     if ($properties['class']) {
-      $section++ && $out->writeLine();
+      $section++ && $out->line();
       foreach ($properties['class'] as $property) {
-        $out->writeLine('  ', $property->toString());
+        $this->member($out, $property);
       }
     }
 
     if ($properties['instance']) {
-      $section++ && $out->writeLine();
+      $section++ && $out->line();
       foreach ($properties['instance'] as $property) {
-        $out->writeLine('  ', $property->toString());
+        $this->member($out, $property);
       }
     }
 
     if ($constructor= $this->type->constructor()) {
-      $section++ && $out->writeLine();
-      $out->writeLine('  ', $constructor->toString());
+      $section++ && $out->line();
+      $this->member($out, $constructor);
     }
 
     if ($methods['class']) {
-      $section++ && $out->writeLine();
+      $section++ && $out->line();
       foreach ($methods['class'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
     }
 
     if ($methods['instance']) {
-      $section++ && $out->writeLine();
+      $section++ && $out->line();
       foreach ($methods['instance'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
     }
 
-    $out->writeLine('}');
+    $out->line('}');
   }
 }

@@ -1,8 +1,9 @@
 <?php namespace xp\reflection;
 
-use io\streams\Writer;
+use util\Objects;
 
-class WithHighlighting extends Writer {
+class WithHighlighting {
+  private $stream;
   private $patterns= [];
   private $replacements= [];
 
@@ -13,20 +14,38 @@ class WithHighlighting extends Writer {
    * @param  [:var] $replace
    */
   public function __construct($out, $replace= []) {
-    parent::__construct($out->stream());
+    $this->stream= $out->stream();
     foreach ($replace as $pattern => $replacement) {
       $this->patterns[]= $pattern;
       $this->replacements[]= $replacement;
     }
   }
 
-  /**
-   * Writes text
-   *
-   * @param  string $text
-   * @return int
-   */
-  protected function write0($text) {
-    $this->stream->write(preg_replace($this->patterns, $this->replacements, $text));
+  public function format($format, ... $args) {
+    $this->stream->write(preg_replace($this->patterns, $this->replacements, vsprintf($format, $args))."\n");
+  }
+
+  public function line(... $args) {
+    $line= '';
+    foreach ($args as $arg) {
+      if (is_string($arg)) {
+        $line.= $arg;
+      } else {
+        $line.= Objects::stringOf($arg);
+      }
+    }
+    $this->stream->write(preg_replace($this->patterns, $this->replacements, $line)."\n");
+  }
+
+  public function documentation($text, $indent= '') {
+    $code= false;
+    foreach (explode("\n", $text) as $line) {
+      if (0 === strncmp($line, '```', 3)) $code= !$code;
+      if ($code) {
+        $this->stream->write("$indent\e[1;32m// \e[0m".preg_replace($this->patterns, $this->replacements, $line)."\n");
+      } else {
+        $this->stream->write("$indent\e[1;32m// $line\e[0m\n");
+      }
+    }
   }
 }
