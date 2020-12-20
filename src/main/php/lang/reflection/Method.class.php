@@ -19,10 +19,20 @@ class Method extends Routine {
    */
   public function closure($instance= null) {
     try {
-      return $this->reflect->getClosure($instance);
+      $closure= $this->reflect->getClosure($instance);
     } catch (\Throwable $e) {
       throw new IllegalArgumentException($e->getMessage());
     }
+
+    // PHP 7.x generates warnings and returns NULL instead of throwing an
+    // exception from ReflectionMethod::getClosure()
+    if (null === $closure) {
+      $e= new IllegalArgumentException('Cannot get closure');
+      \xp::gc(__FILE__);
+      throw $e;
+    }
+
+    return $closure;
   }
 
   /**
