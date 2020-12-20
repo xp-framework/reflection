@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException};
+use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException, IllegalArgumentException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Expect, Test, Action, Values};
 
@@ -259,6 +259,16 @@ class MethodsTest {
       public function fixture() { }
     }');
     Assert::equals("Returns the fixture\nor NULL.", $t->method('fixture')->comment());
+  }
+
+  #[Test, Expect(IllegalArgumentException::class)]
+  public function closure_with_missing_instance() {
+    $this->declare('{ public function fixture() { } }')->method('fixture')->closure(null);
+  }
+
+  #[Test, Expect(IllegalArgumentException::class)]
+  public function closure_with_incorrect_instance() {
+    $this->declare('{ public function fixture() { } }')->method('fixture')->closure($this);
   }
 
   #[Test]

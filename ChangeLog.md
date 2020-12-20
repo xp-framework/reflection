@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Wrapped exceptions from `closure()` in `lang.IllegalArgumentException`
+  (@thekid)
 * Fixed method string representation when using PHP 8 native union types
   (@thekid)
 * Included type in `lang.reflection.Property`'s string representation

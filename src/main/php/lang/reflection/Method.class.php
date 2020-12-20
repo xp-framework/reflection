@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, TypeUnion, Type, XPClass};
+use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 class Method extends Routine {
 
@@ -11,7 +11,11 @@ class Method extends Routine {
    * @return \Closure
    */
   public function closure($instance= null) {
-    return $this->reflect->getClosure($instance);
+    try {
+      return $this->reflect->getClosure($instance);
+    } catch (\Throwable $e) {
+      throw new IllegalArgumentException($e->getMessage());
+    }
   }
 
   /**
