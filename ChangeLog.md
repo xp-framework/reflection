@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 0.8.0 / 2020-12-20
+
 * Added `lang.reflection.Types::traits()` to enumerate used traits.
   (@thekid)
 * Added `lang.reflection.Types::interfaces()` to enumerate implemented
