@@ -3,11 +3,12 @@
 use lang\{ClassLoader, Reflection};
 
 class PackageInformation {
-  private $package;
+  private $package, $flags;
 
   /** @param string $package */
-  public function __construct($package) {
+  public function __construct($package, $flags) {
     $this->package= rtrim($package, '.');
+    $this->flags= $flags;
   }
 
   /** @return iterable */
@@ -50,6 +51,19 @@ class PackageInformation {
       usort($types, function($a, $b) { return $a->name() <=> $b->name(); });
       $i= 0;
       foreach ($types as $type) {
+        if ($this->flags & Information::DOC && ($comment= $type->comment())) {
+          $out->line();
+          $p= strpos($comment, "\n\n");
+          $s= min(strpos($comment, '. ') ?: $p, strpos($comment, ".\n") ?: $p);
+
+          if (false === $s || $s > $p) {
+            $purpose= false === $p ? trim($comment) : substr($comment, 0, $p);
+          } else {
+            $purpose= substr($comment, 0, $s);
+          }
+          $out->documentation(str_replace(["\n", '  '], [' ', ' '], trim($purpose)), '  ');
+        }
+
         $out->line('  ', $type->modifiers()->names(true).' '.$type->kind()->name().' '.$type->name());
         $i++;
       }
