@@ -44,7 +44,7 @@ class Property extends Member {
       }
       return new Constraint(new TypeUnion($union));
     } else {
-      $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
+      $name= $t->getName();
 
       // Check array and self for more specific types, e.g. `string[]`,
       // `static` or `function(): string` in api documentation
