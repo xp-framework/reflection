@@ -19,7 +19,7 @@ class PackageInformation {
   public function display($out) {
     $out->format('package %s {', $this->package->name());
     $i= 0;
-    foreach ($this->package->packages() as $package) {
+    foreach ($this->package->children() as $package) {
       $out->line('  package '.$package->name());
       $i++;
     }
