@@ -43,7 +43,7 @@ class Package {
    *
    * @return iterable
    */
-  public function packages() {
+  public function children() {
     $base= $this->name.'.';
     $loader= ClassLoader::getDefault();
     foreach ($loader->packageContents($this->name) as $entry) {

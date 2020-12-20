@@ -145,6 +145,6 @@ $package= Reflection::of('org.example');
 $package->name();          // org.example
 $package->literal();       // 'org\example'
 $package->types();         // iterable with Type instances
-$package->packages();      // iterable with Package instances
+$package->children();      // iterable with Package instances
 $package->classLoaders();  // iterable with lang.ClassLoader instances
 ```

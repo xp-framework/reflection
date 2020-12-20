@@ -24,7 +24,7 @@ class PackageTest {
   public function child_packages() {
     Assert::equals(
       [new Package('lang.reflection.unittest')],
-      iterator_to_array((new Package('lang.reflection'))->packages())
+      iterator_to_array((new Package('lang.reflection'))->children())
     );
   }
 
