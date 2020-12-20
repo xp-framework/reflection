@@ -2,7 +2,7 @@
 
 use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException};
 use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Expect, Test, Values};
+use unittest\{Assert, Expect, Test, Action, Values};
 
 class MethodsTest {
   use TypeDefinition;
@@ -276,6 +276,15 @@ class MethodsTest {
     );
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function string_representation_with_union_typed_parameter() {
+    $t= $this->declare('{ public function fixture(string|int $s): string { } }');
+    Assert::equals(
+      'public function fixture(string|int $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
   #[Test]
   public function string_representation_with_apidoc_parameter() {
     $t= $this->declare('{
@@ -302,6 +311,15 @@ class MethodsTest {
     $t= $this->declare('{ public function fixture(): string { } }');
     Assert::equals(
       'public function fixture(): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function string_representation_with_union_typed_return() {
+    $t= $this->declare('{ public function fixture(): string|int { } }');
+    Assert::equals(
+      'public function fixture(): string|int',
       $t->method('fixture')->toString()
     );
   }

@@ -3,7 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-* Included property type in string representation - @thekid
+* Fixed method string representation when using PHP 8 native union types
+  (@thekid)
+* Included type in `lang.reflection.Property`'s string representation
+  (@thekid)
 * Added support for showing type documentation and members' purpose (its
   documentation's first sentence) by passing the `-d` / `--doc` flag to
   the `xp reflect` subcommand.
