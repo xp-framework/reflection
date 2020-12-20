@@ -28,6 +28,16 @@ class PropertiesTest {
   }
 
   #[Test]
+  public function no_comment() {
+    Assert::null($this->declare('{ private $fixture; }')->property('fixture')->comment());
+  }
+
+  #[Test]
+  public function with_comment() {
+    Assert::equals('Test', $this->declare('{ /** Test */ private $fixture; }')->property('fixture')->comment());
+  }
+
+  #[Test]
   public function declaredIn() {
     $t= $this->declare('{ private $fixture; }');
     Assert::equals($t, $t->property('fixture')->declaredIn());
