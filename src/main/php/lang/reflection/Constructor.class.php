@@ -13,28 +13,10 @@ class Constructor extends Routine {
 
   /** @return string */
   public function toString() {
-    $params= Reflection::meta()->methodParameterTypes($this->reflect);
-
-    // Compile signature
-    $sig= '';
-    foreach ($this->reflect->getParameters() as $i => $parameter) {
-      $t= $parameter->getType();
-      if (null === $t) {
-        $type= $params[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
-      } else if ($t instanceof \ReflectionUnionType) {
-        $name= '';
-        foreach ($t->getTypes() as $component) {
-          $name.= '|'.$component->getName();
-        }
-        $type= substr($name, 1);
-      } else {
-        $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
-        $parameter->isVariadic() && $type.= '...';
-      }
-      $sig.= ', '.$type.' $'.$parameter->name;
-    }
-
-    return Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).' function __construct('.substr($sig, 2).')';
+    return
+      Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
+      ' function __construct('.$this->signature(Reflection::meta()).')'
+    ;
   }
 
   /**

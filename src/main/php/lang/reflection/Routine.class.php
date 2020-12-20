@@ -8,6 +8,34 @@ abstract class Routine extends Member {
   protected function meta() { return Reflection::meta()->methodAnnotations($this->reflect); }
 
   /**
+   * Compiles signature
+   *
+   * @param  lang.meta.MetaInformation $meta
+   * @return string
+   */
+  protected function signature($meta) {
+    $types= $meta->methodParameterTypes($this->reflect);
+    $r= '';
+    foreach ($this->reflect->getParameters() as $i => $parameter) {
+      $t= $parameter->getType();
+      if (null === $t) {
+        $type= $types[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
+      } else if ($t instanceof \ReflectionUnionType) {
+        $name= '';
+        foreach ($t->getTypes() as $component) {
+          $name.= '|'.$component->getName();
+        }
+        $type= substr($name, 1);
+      } else {
+        $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
+        $parameter->isVariadic() && $type.= '...';
+      }
+      $r.= ', '.$type.' $'.$parameter->name;
+    }
+    return substr($r, 2);
+  }
+
+  /**
    * Returns this routines's doc comment, or NULL if there is none.
    *
    * @return ?string

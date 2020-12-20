@@ -81,44 +81,24 @@ class Method extends Routine {
   /** @return string */
   public function toString() {
     $meta= Reflection::meta();
-    $params= $meta->methodParameterTypes($this->reflect);
-
-    // Compile signature
-    $sig= '';
-    foreach ($this->reflect->getParameters() as $i => $parameter) {
-      $t= $parameter->getType();
-      if (null === $t) {
-        $type= $params[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
-      } else if ($t instanceof \ReflectionUnionType) {
-        $name= '';
-        foreach ($t->getTypes() as $component) {
-          $name.= '|'.$component->getName();
-        }
-        $type= substr($name, 1);
-      } else {
-        $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
-        $parameter->isVariadic() && $type.= '...';
-      }
-      $sig.= ', '.$type.' $'.$parameter->name;
-    }
 
     // Put together return type
     $t= $this->reflect->getReturnType();
-    if ($t instanceof \ReflectionUnionType) {
+    if (null === $t) {
+      $returns= $meta->methodReturns($this->reflect) ?? 'var';
+    } else if ($t instanceof \ReflectionUnionType) {
       $name= '';
       foreach ($t->getTypes() as $component) {
         $name.= '|'.$component->getName();
       }
       $returns= substr($name, 1);
-    } else if ($t) {
-      $returns= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
     } else {
-      $returns= $meta->methodReturns($this->reflect) ?? 'var';
+      $returns= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
     }
 
     return 
       Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
-      ' function '.$this->reflect->name.'('.substr($sig, 2).'): '.
+      ' function '.$this->reflect->name.'('.$this->signature($meta).'): '.
       $returns
     ;
   }
