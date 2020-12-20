@@ -13,7 +13,7 @@ class PackageTest {
 
   #[Test]
   public function create_via_components() {
-    Assert::equals('lang.reflection.unittest', (new Package(['lang', 'reflection', 'unittest']))->name());
+    Assert::equals('lang.reflection.unittest', (new Package('lang', 'reflection', 'unittest'))->name());
   }
 
   #[Test]

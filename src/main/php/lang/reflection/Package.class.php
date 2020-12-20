@@ -2,7 +2,11 @@
 
 use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException};
 
-/** Represents a namespace, which may exist in various class loaders */
+/**
+ * Represents a namespace, which may exist in various class loaders
+ *
+ * @test lang.reflection.unittest.PackageTest
+ */
 class Package {
   private $name;
 
@@ -11,14 +15,10 @@ class Package {
    * Optionally, a class loader instance can be passed - if omitted,
    * the default, composite class loader is used.
    *
-   * @param  string|string[] $arg
+   * @param  string... $components
    */
-  public function __construct($arg) {
-    if (is_array($arg)) {
-      $this->name= rtrim(strtr(implode('.', $arg), '\\', '.'), '.');
-    } else {
-      $this->name= rtrim(strtr((string)$arg, '\\', '.'), '.');
-    }
+  public function __construct(... $components) {
+    $this->name= rtrim(strtr(implode('.', $components), '\\', '.'), '.');
   }
 
   /** Returns this package's name (in dotted form) */
