@@ -4,6 +4,17 @@ use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\Type;
 use lang\{ClassLoader, ClassNotFoundException};
 
+/**
+ * Factory for reflection instances.
+ *
+ * ```php
+ * $type= Reflection::of(Runnable::class);
+ * $type= Reflection::of($instance);
+ * $type= Reflection::of(XPClass::forName('lang.Value'));
+ * ```
+ *
+ * @test lang.reflection.unittest.ReflectionTest
+ */
 abstract class Reflection {
   private static $meta= null;
 
