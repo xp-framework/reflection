@@ -8,7 +8,19 @@ XP Reflection
 [![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/reflection/version.png)](https://packagist.org/packages/xp-framework/reflection)
 
-Reflection library
+This library provides a replacement for the XP Framework's reflection API.
+
+Features
+--------
+**Concise**: This library aims at reducing code noise of the form `if (hasX(...)) { getX() }` by simply returning NULL from its accessor methods. Null handling has improved with the introduction of the null-coalesce operator `??` in PHP 7 and the null-safe invocation operator `?->` in PHP 8 (and in [XP Compiler](https://github.com/xp-framework/compiler)).
+
+**PHP 7 & 8**: This library handles PHP 8 attributes in both PHP 7 (*using the compiler's AST library*) and PHP 8 (*using its native reflection API*).
+
+**Subcommand**: This library provides an [RFC #0303 integration](https://github.com/xp-framework/rfc/issues/303) and offers a "reflect" subcommand for the new XP runners. See `xp help reflect` on how to use it.
+
+API
+---
+The entry point class is the `lang.Reflection` class. It can be constructed by passing either objects, type literals (e.g. `Date::class`), fully qualified class names (e.g. `util.Date`) or `lang.XPClass` or PHP's `ReflectionClass` instances.
 
 ```php
 use lang\Reflection;
