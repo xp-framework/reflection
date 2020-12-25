@@ -48,7 +48,7 @@ class ReflectRunner {
         Console::$err->writeLine('Error: unknown argument "'.$arg.'"');
         return 1;
       } else {
-        $name= $arg;
+        $name= strtr($arg, '\\', '.');
       }
     }
 

@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.0.1 / 2020-12-25
+
+* Fixed issue #4: Class loader is null when using backslashes - @thekid
+
 ## 1.0.0 / 2020-12-21
 
 * Merged PR #3: Add reflection on packages (a.k.a. namespaces) - @thekid
