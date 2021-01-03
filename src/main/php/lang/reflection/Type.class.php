@@ -140,13 +140,54 @@ class Type {
     return null; // Internal class, e.g.
   }
 
-  /** @return ?lang.reflection.Constructor */
+  /**
+   * Returns whether this type is instantiable via `new`. Only takes constructor
+   * modifiers into account if `true` is passed as argument.
+   */
+  public function instantiable(bool $direct= false): bool {
+    return $this->reflect->isSubclassOf(Enum::class) ? false : ($direct
+      ? $this->reflect->isInstantiable()
+      : !($this->reflect->isAbstract() || $this->reflect->isInterface() || $this->reflect->isTrait())
+    );
+  }
+
+  /**
+   * Returns an instantiation from a given initializer function
+   *
+   * @param  ?string|?Closure $function
+   * @return ?lang.reflection.Initializer
+   */
+  public function initializer($function) {
+    if (!$this->instantiable()) return null;
+
+    if (null === $function) {
+      return new Initializer($this->reflect, new \ReflectionFunction(function() { }));
+    } else if ($function instanceof \Closure) {
+      $reflect= new \ReflectionFunction($function);
+      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($function) {
+        return $function->call($instance, ...$args);
+      });
+    } else if ($this->reflect->hasMethod($function)) {
+      $reflect= $this->reflect->getMethod($function);
+      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($reflect) {
+        if ($context && !$reflect->isPublic() && Reflection::of($context)->isInstance($instance)) {
+          $reflect->setAccessible(true);
+        }
+        return $reflect->invokeArgs($instance, $args);
+      });
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns this type's constructor, if present
+   *
+   * @return ?lang.reflection.Constructor
+   */
   public function constructor() {
     return $this->reflect->hasMethod('__construct') ? new Constructor($this->reflect) : null;
   }
-
-  /** Returns whether this type is instantiable via `new` */
-  public function instantiable(): bool { return $this->reflect->isInstantiable(); }
 
   /**
    * Instantiates a new instance of the underlying type. If the type does not

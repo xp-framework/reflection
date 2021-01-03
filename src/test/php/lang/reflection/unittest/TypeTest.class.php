@@ -258,6 +258,18 @@ class TypeTest {
   }
 
   #[Test]
+  public function instantiable_with_private_constructor() {
+    $t= $this->declare('P_CTOR', [], '{ private function __construct() { } }');
+    Assert::true($t->instantiable());
+  }
+
+  #[Test]
+  public function not_instantiable_directly_with_private_constructor() {
+    $t= $this->declare('P_CTOR', [], '{ private function __construct() { } }');
+    Assert::false($t->instantiable(true));
+  }
+
+  #[Test]
   public function interfaces_are_not_instantiable() {
     $t= $this->declare('K_I', ['kind' => 'interface']);
     Assert::false($t->instantiable());

@@ -82,6 +82,24 @@ if ($constructor= $type->constructor()) {
 }
 ```
 
+Type instantiation can be controlled by using `initializer()`. It accepts either closures or named references to instance methods.
+
+```php
+// Instantiates type without invoking a constructor
+// Any passed arguments are discarded silently
+$instance= $type->initializer(null)->newInstance();
+
+// Instantiates type by providing a constructor, regardless of whether one exists or not
+// Arguments are passed on to the initializer function, which has access to $this
+$instance= $type->initializer(function($name) { $this->name= $name; })->newInstance(['Test']);
+
+// Instantiates type by selecting an instance method as an initializer
+// The unserialize callback is invoked with ['name' => 'Test']
+if ($unserialize= $type->initializer('__unserialize')) {
+  $instance= $unserialize->newInstance([['name' => 'Test']]);
+}
+```
+
 All members (constants, properties and methods) can be accessed by iterating or by a shorthand lookup by name. Members provide accessors for modifiers and annotations, as well as their declaring type.
 
 ```php
