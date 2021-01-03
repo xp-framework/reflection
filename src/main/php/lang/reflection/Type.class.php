@@ -145,7 +145,7 @@ class Type {
    * modifiers into account if `true` is passed as argument.
    */
   public function instantiable(bool $direct= false): bool {
-    return !$this->reflect->isSubclassOf(Enum::class) && ($direct
+    return $this->reflect->isSubclassOf(Enum::class) ? false : ($direct
       ? $this->reflect->isInstantiable()
       : !($this->reflect->isAbstract() || $this->reflect->isInterface() || $this->reflect->isTrait())
     );
