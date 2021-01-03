@@ -8,7 +8,7 @@ use lang\Reflection;
  * @test lang.reflection.unittest.ConstructorTest
  * @test lang.reflection.unittest.InstantiationTest
  */
-class Constructor extends Routine {
+class Constructor extends Routine implements Instantiation {
   private $class;
 
   /** @param ReflectionClass $reflect */

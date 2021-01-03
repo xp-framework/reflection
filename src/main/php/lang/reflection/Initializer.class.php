@@ -7,7 +7,7 @@ use lang\Reflection;
  *
  * @test lang.reflection.unittest.InstantiationTest
  */
-class Initializer extends Routine {
+class Initializer extends Routine implements Instantiation {
   private $class, $function;
 
   /**
