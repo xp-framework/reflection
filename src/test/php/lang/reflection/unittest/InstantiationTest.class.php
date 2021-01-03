@@ -145,7 +145,7 @@ class InstantiationTest {
     }');
 
     $instantiation= $t->instantiation('__construct');
-    Assert::equals('Test', $instantiation->newInstance(['Test'])->name());
+    Assert::equals('Test', $instantiation->newInstance(['Test'], $t)->name());
   }
 
   #[Test]

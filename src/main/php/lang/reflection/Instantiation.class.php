@@ -49,7 +49,7 @@ class Instantiation extends Routine {
 
     if (null === $this->initializer) return $instance;
     try {
-      $this->initializer->__invoke($instance, $args);
+      $this->initializer->__invoke($instance, $args, $context);
       return $instance;
     } catch (\Throwable $e) {
       throw new InvocationFailed($this, $e);

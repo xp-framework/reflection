@@ -164,13 +164,15 @@ class Type {
       return new Instantiation($this->reflect, new \ReflectionFunction(function() { }));
     } else if ($initializer instanceof \Closure) {
       $reflect= new \ReflectionFunction($initializer);
-      return new Instantiation($this->reflect, $reflect, function($instance, $args) use($initializer) {
+      return new Instantiation($this->reflect, $reflect, function($instance, $args, $context) use($initializer) {
         return $initializer->call($instance, ...$args);
       });
     } else if ($this->reflect->hasMethod($initializer)) {
       $reflect= $this->reflect->getMethod($initializer);
-      $reflect->setAccessible(true);
-      return new Instantiation($this->reflect, $reflect, function($instance, $args) use($reflect) {
+      return new Instantiation($this->reflect, $reflect, function($instance, $args, $context) use($reflect) {
+        if ($context && !$reflect->isPublic() && Reflection::of($context)->isInstance($instance)) {
+          $reflect->setAccessible(true);
+        }
         return $reflect->invokeArgs($instance, $args);
       });
     }
