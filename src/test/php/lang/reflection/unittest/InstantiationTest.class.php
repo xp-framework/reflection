@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Runnable, CommandLine, IllegalAccessException};
+use lang\{Reflection, Runnable, CommandLine, IllegalAccessException, IllegalArgumentException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
 
@@ -93,5 +93,55 @@ class InstantiationTest {
   #[Test, Expect(CannotInstantiate::class)]
   public function abstract_classes_cannot_be_instantiated() {
     Reflection::of(CommandLine::class)->newInstance();
+  }
+
+  #[Test]
+  public function instantiate_constructorless() {
+    $t= $this->declare('{}');
+    Assert::instance($t->class(), $t->instantiation(function() { })->newInstance());
+  }
+
+  #[Test]
+  public function instantiate_without_invoking_constructor() {
+    $t= $this->declare('{
+      public function __construct() { throw new \lang\IllegalAccessException("Should not be called"); }
+    }');
+    Assert::instance($t->class(), $t->instantiation(function() { })->newInstance());
+  }
+
+  #[Test]
+  public function instantiate_setting_property() {
+    $t= $this->declare('{
+      private $name;
+      public function name() { return $this->name; }
+    }');
+
+    $instantiation= $t->instantiation(function($name) { $this->name= $name; });
+    Assert::equals('Test', $instantiation->newInstance(['Test'])->name());
+  }
+
+  #[Test]
+  public function instantiate_from_unserialize() {
+    $t= $this->declare('{
+      private $name;
+      public function name() { return $this->name; }
+
+      public function __unserialize($data) {
+        $this->name= $data["name"];
+      }
+    }');
+
+    $instantiation= $t->instantiation('__unserialize');
+    Assert::equals('Test', $instantiation->newInstance([['name' => 'Test']])->name());
+  }
+
+  #[Test]
+  public function instantiate_on_interface() {
+    Assert::null(Reflection::of('lang.Runnable')->instantiation(function() { }));
+  }
+
+  #[Test]
+  public function instantiate_with_non_existant_method_reference() {
+    Assert::null($this->declare('{}')->instantiation('__unserialize'));
   }
 }

@@ -140,13 +140,41 @@ class Type {
     return null; // Internal class, e.g.
   }
 
-  /** @return ?lang.reflection.Constructor */
+  /** Returns whether this type is instantiable via `new` */
+  public function instantiable(): bool { return $this->reflect->isInstantiable(); }
+
+  /**
+   * Returns an instantiation from a given initializer function
+   *
+   * @param  string|function(?): var $initializer
+   * @return ?lang.reflection.Instantiation
+   */
+  public function instantiation($initializer) {
+    if (!$this->reflect->isInstantiable()) return null;
+
+    if ($initializer instanceof \Closure) {
+      $reflect= new \ReflectionFunction($initializer);
+      return new Instantiation($this->reflect, $reflect, function($instance, $args) use($initializer) {
+        return $initializer->call($instance, ...$args);
+      });
+    } else if ($this->reflect->hasMethod($initializer)) {
+      $reflect= $this->reflect->getMethod($initializer);
+      return new Instantiation($this->reflect, $reflect, function($instance, $args) use($reflect) {
+        return $reflect->invokeArgs($instance, $args);
+      });
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns this type's constructor, if present
+   *
+   * @return ?lang.reflection.Constructor
+   */
   public function constructor() {
     return $this->reflect->hasMethod('__construct') ? new Constructor($this->reflect) : null;
   }
-
-  /** Returns whether this type is instantiable via `new` */
-  public function instantiable(): bool { return $this->reflect->isInstantiable(); }
 
   /**
    * Instantiates a new instance of the underlying type. If the type does not
