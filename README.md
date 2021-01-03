@@ -46,7 +46,7 @@ if ($type->instantiable()) {
 }
 
 if ($unserialize= $type->initializer('__unserialize')) {
-  $instance= $type->newInstance([['name' => 'Test']]);
+  $instance= $unserialize->newInstance([['name' => 'Test']]);
 }
 
 $type->isInstance($instance); // true
