@@ -34,7 +34,7 @@ class Constructor extends Routine {
    * @throws lang.reflection.InvocationFailed
    * @throws lang.reflection.CannotInstantiate
    */
-  public function newInstance($args= [], $context= null) {
+  public function newInstance(array $args= [], $context= null) {
     try {
 
       // Workaround for non-public constructors: Set accessible, then manually
