@@ -146,13 +146,15 @@ class Type {
   /**
    * Returns an instantiation from a given initializer function
    *
-   * @param  string|function(?): var $initializer
+   * @param  ?string|?Closure $initializer
    * @return ?lang.reflection.Instantiation
    */
   public function instantiation($initializer) {
     if (!$this->reflect->isInstantiable()) return null;
 
-    if ($initializer instanceof \Closure) {
+    if (null === $initializer) {
+      return new Instantiation($this->reflect, new \ReflectionFunction(function() { }));
+    } else if ($initializer instanceof \Closure) {
       $reflect= new \ReflectionFunction($initializer);
       return new Instantiation($this->reflect, $reflect, function($instance, $args) use($initializer) {
         return $initializer->call($instance, ...$args);

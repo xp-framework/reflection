@@ -98,7 +98,7 @@ class InstantiationTest {
   #[Test]
   public function instantiate_constructorless() {
     $t= $this->declare('{}');
-    Assert::instance($t->class(), $t->instantiation(function() { })->newInstance());
+    Assert::instance($t->class(), $t->instantiation(null)->newInstance());
   }
 
   #[Test]
@@ -106,7 +106,7 @@ class InstantiationTest {
     $t= $this->declare('{
       public function __construct() { throw new \lang\IllegalAccessException("Should not be called"); }
     }');
-    Assert::instance($t->class(), $t->instantiation(function() { })->newInstance());
+    Assert::instance($t->class(), $t->instantiation(null)->newInstance());
   }
 
   #[Test]
@@ -137,7 +137,7 @@ class InstantiationTest {
 
   #[Test]
   public function instantiate_on_interface() {
-    Assert::null(Reflection::of('lang.Runnable')->instantiation(function() { }));
+    Assert::null(Reflection::of('lang.Runnable')->instantiation(null));
   }
 
   #[Test]

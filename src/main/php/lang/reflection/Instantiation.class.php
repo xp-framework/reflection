@@ -15,9 +15,9 @@ class Instantiation extends Routine {
    *
    * @param  ReflectionClass $class
    * @param  ReflectionFunctionAbstract $reflect 
-   * @param  Closure $initializer
+   * @param  ?Closure $initializer
    */
-  public function __construct($class, $reflect, $initializer) {
+  public function __construct($class, $reflect, $initializer= null) {
     parent::__construct($reflect);
     $this->class= $class;
     $this->initializer= $initializer;
@@ -40,7 +40,7 @@ class Instantiation extends Routine {
   public function newInstance(array $args= [], $context= null) {
     try {
       $instance= $this->class->newInstanceWithoutConstructor();
-      $this->initializer->__invoke($instance, $args);
+      $this->initializer && $this->initializer->__invoke($instance, $args);
       return $instance;
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
