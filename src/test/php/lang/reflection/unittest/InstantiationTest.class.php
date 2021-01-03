@@ -136,15 +136,15 @@ class InstantiationTest {
   }
 
   #[Test]
-  public function instantiate_from_private() {
+  public function instantiate_from_private_constructor() {
     $t= $this->declare('{
       private $name;
       public function name() { return $this->name; }
 
-      private function rename($name) { $this->name= $name; }
+      private function __construct($name) { $this->name= $name; }
     }');
 
-    $instantiation= $t->instantiation('rename');
+    $instantiation= $t->instantiation('__construct');
     Assert::equals('Test', $instantiation->newInstance(['Test'])->name());
   }
 

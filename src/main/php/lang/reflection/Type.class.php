@@ -140,8 +140,16 @@ class Type {
     return null; // Internal class, e.g.
   }
 
-  /** Returns whether this type is instantiable via `new` */
-  public function instantiable(): bool { return $this->reflect->isInstantiable(); }
+  /**
+   * Returns whether this type is instantiable via `new`. Only takes constructor
+   * modifiers into account if `true` is passed as argument.
+   */
+  public function instantiable(bool $direct= false): bool {
+    return !$this->reflect->isSubclassOf(Enum::class) && ($direct
+      ? $this->reflect->isInstantiable()
+      : !($this->reflect->isAbstract() || $this->reflect->isInterface() || $this->reflect->isTrait())
+    );
+  }
 
   /**
    * Returns an instantiation from a given initializer function
@@ -150,7 +158,7 @@ class Type {
    * @return ?lang.reflection.Instantiation
    */
   public function instantiation($initializer) {
-    if (!$this->reflect->isInstantiable()) return null;
+    if (!$this->instantiable()) return null;
 
     if (null === $initializer) {
       return new Instantiation($this->reflect, new \ReflectionFunction(function() { }));
