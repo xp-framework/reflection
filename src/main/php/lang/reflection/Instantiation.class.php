@@ -28,6 +28,9 @@ class Instantiation extends Routine {
     return 'public function __construct('.$this->signature(Reflection::meta()).')';
   }
 
+  /** Returns a compound name consisting of `[CLASS]::[NAME]()`  */
+  public function compoundName(): string { return strtr($this->class->name, '\\', '.').'::__construct()'; }
+
   /**
    * Creates a new instance of the type this constructor belongs to
    *
@@ -40,10 +43,14 @@ class Instantiation extends Routine {
   public function newInstance(array $args= [], $context= null) {
     try {
       $instance= $this->class->newInstanceWithoutConstructor();
-      $this->initializer && $this->initializer->__invoke($instance, $args);
-      return $instance;
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
+    }
+
+    if (null === $this->initializer) return $instance;
+    try {
+      $this->initializer->__invoke($instance, $args);
+      return $instance;
     } catch (\Throwable $e) {
       throw new InvocationFailed($this, $e);
     }

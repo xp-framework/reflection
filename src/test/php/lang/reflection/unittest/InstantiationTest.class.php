@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Runnable, CommandLine, IllegalAccessException, IllegalArgumentException};
+use lang\{Reflection, Runnable, CommandLine, IllegalAccessException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
 
@@ -136,12 +136,39 @@ class InstantiationTest {
   }
 
   #[Test]
+  public function instantiate_from_private() {
+    $t= $this->declare('{
+      private $name;
+      public function name() { return $this->name; }
+
+      private function rename($name) { $this->name= $name; }
+    }');
+
+    $instantiation= $t->instantiation('rename');
+    Assert::equals('Test', $instantiation->newInstance(['Test'])->name());
+  }
+
+  #[Test]
   public function instantiate_on_interface() {
-    Assert::null(Reflection::of('lang.Runnable')->instantiation(null));
+    Assert::null(Reflection::of(Runnable::class)->instantiation(null));
   }
 
   #[Test]
   public function instantiate_with_non_existant_method_reference() {
     Assert::null($this->declare('{}')->instantiation('__unserialize'));
+  }
+
+  #[Test, Expect(InvocationFailed::class)]
+  public function exceptions_from_initializer_functions_are_wrapped() {
+    $t= $this->declare('{}');
+    $t->instantiation(function() { throw new IllegalAccessException('Test'); })->newInstance();
+  }
+
+  #[Test, Expect(InvocationFailed::class)]
+  public function exceptions_from_instantiation_methods_are_wrapped() {
+    $t= $this->declare('{
+      public function raise() { throw new \lang\IllegalAccessException("Test"); }
+    }');
+    $t->instantiation('raise')->newInstance();
   }
 }

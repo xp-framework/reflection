@@ -161,6 +161,7 @@ class Type {
       });
     } else if ($this->reflect->hasMethod($initializer)) {
       $reflect= $this->reflect->getMethod($initializer);
+      $reflect->setAccessible(true);
       return new Instantiation($this->reflect, $reflect, function($instance, $args) use($reflect) {
         return $reflect->invokeArgs($instance, $args);
       });
