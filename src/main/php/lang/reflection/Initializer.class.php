@@ -3,24 +3,24 @@
 use lang\Reflection;
 
 /**
- * Reflection for a type instantation from an initializer function
+ * Reflection for a type initializer function
  *
  * @test lang.reflection.unittest.InstantiationTest
  */
-class Instantiation extends Routine {
-  private $class, $initializer;
+class Initializer extends Routine {
+  private $class, $function;
 
   /**
    * Creates a new instantiation function
    *
    * @param  ReflectionClass $class
    * @param  ReflectionFunctionAbstract $reflect 
-   * @param  ?Closure $initializer
+   * @param  ?Closure $function
    */
-  public function __construct($class, $reflect, $initializer= null) {
+  public function __construct($class, $reflect, $function= null) {
     parent::__construct($reflect);
     $this->class= $class;
-    $this->initializer= $initializer;
+    $this->function= $function;
   }
 
   /** @return string */
@@ -47,9 +47,9 @@ class Instantiation extends Routine {
       throw new CannotInstantiate($this->class->name, $e);
     }
 
-    if (null === $this->initializer) return $instance;
+    if (null === $this->function) return $instance;
     try {
-      $this->initializer->__invoke($instance, $args, $context);
+      $this->function->__invoke($instance, $args, $context);
       return $instance;
     } catch (\Throwable $e) {
       throw new InvocationFailed($this, $e);

@@ -154,22 +154,22 @@ class Type {
   /**
    * Returns an instantiation from a given initializer function
    *
-   * @param  ?string|?Closure $initializer
-   * @return ?lang.reflection.Instantiation
+   * @param  ?string|?Closure $function
+   * @return ?lang.reflection.Initializer
    */
-  public function instantiation($initializer) {
+  public function initializer($function) {
     if (!$this->instantiable()) return null;
 
-    if (null === $initializer) {
-      return new Instantiation($this->reflect, new \ReflectionFunction(function() { }));
-    } else if ($initializer instanceof \Closure) {
-      $reflect= new \ReflectionFunction($initializer);
-      return new Instantiation($this->reflect, $reflect, function($instance, $args, $context) use($initializer) {
-        return $initializer->call($instance, ...$args);
+    if (null === $function) {
+      return new Initializer($this->reflect, new \ReflectionFunction(function() { }));
+    } else if ($function instanceof \Closure) {
+      $reflect= new \ReflectionFunction($function);
+      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($function) {
+        return $function->call($instance, ...$args);
       });
-    } else if ($this->reflect->hasMethod($initializer)) {
-      $reflect= $this->reflect->getMethod($initializer);
-      return new Instantiation($this->reflect, $reflect, function($instance, $args, $context) use($reflect) {
+    } else if ($this->reflect->hasMethod($function)) {
+      $reflect= $this->reflect->getMethod($function);
+      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($reflect) {
         if ($context && !$reflect->isPublic() && Reflection::of($context)->isInstance($instance)) {
           $reflect->setAccessible(true);
         }

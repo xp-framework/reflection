@@ -98,7 +98,7 @@ class InstantiationTest {
   #[Test]
   public function instantiate_constructorless() {
     $t= $this->declare('{}');
-    Assert::instance($t->class(), $t->instantiation(null)->newInstance());
+    Assert::instance($t->class(), $t->initializer(null)->newInstance());
   }
 
   #[Test]
@@ -106,7 +106,7 @@ class InstantiationTest {
     $t= $this->declare('{
       public function __construct() { throw new \lang\IllegalAccessException("Should not be called"); }
     }');
-    Assert::instance($t->class(), $t->instantiation(null)->newInstance());
+    Assert::instance($t->class(), $t->initializer(null)->newInstance());
   }
 
   #[Test]
@@ -116,8 +116,8 @@ class InstantiationTest {
       public function name() { return $this->name; }
     }');
 
-    $instantiation= $t->instantiation(function($name) { $this->name= $name; });
-    Assert::equals('Test', $instantiation->newInstance(['Test'])->name());
+    $initializer= $t->initializer(function($name) { $this->name= $name; });
+    Assert::equals('Test', $initializer->newInstance(['Test'])->name());
   }
 
   #[Test]
@@ -131,8 +131,8 @@ class InstantiationTest {
       }
     }');
 
-    $instantiation= $t->instantiation('__unserialize');
-    Assert::equals('Test', $instantiation->newInstance([['name' => 'Test']])->name());
+    $initializer= $t->initializer('__unserialize');
+    Assert::equals('Test', $initializer->newInstance([['name' => 'Test']])->name());
   }
 
   #[Test]
@@ -144,31 +144,31 @@ class InstantiationTest {
       private function __construct($name) { $this->name= $name; }
     }');
 
-    $instantiation= $t->instantiation('__construct');
-    Assert::equals('Test', $instantiation->newInstance(['Test'], $t)->name());
+    $initializer= $t->initializer('__construct');
+    Assert::equals('Test', $initializer->newInstance(['Test'], $t)->name());
   }
 
   #[Test]
   public function instantiate_on_interface() {
-    Assert::null(Reflection::of(Runnable::class)->instantiation(null));
+    Assert::null(Reflection::of(Runnable::class)->initializer(null));
   }
 
   #[Test]
   public function instantiate_with_non_existant_method_reference() {
-    Assert::null($this->declare('{}')->instantiation('__unserialize'));
+    Assert::null($this->declare('{}')->initializer('__unserialize'));
   }
 
   #[Test, Expect(InvocationFailed::class)]
   public function exceptions_from_initializer_functions_are_wrapped() {
     $t= $this->declare('{}');
-    $t->instantiation(function() { throw new IllegalAccessException('Test'); })->newInstance();
+    $t->initializer(function() { throw new IllegalAccessException('Test'); })->newInstance();
   }
 
   #[Test, Expect(InvocationFailed::class)]
-  public function exceptions_from_instantiation_methods_are_wrapped() {
+  public function exceptions_from_initializer_methods_are_wrapped() {
     $t= $this->declare('{
       public function raise() { throw new \lang\IllegalAccessException("Test"); }
     }');
-    $t->instantiation('raise')->newInstance();
+    $t->initializer('raise')->newInstance();
   }
 }
