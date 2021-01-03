@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.1.0 / 2021-01-03
+
+* Merged PR #6: Implement Type::initializer() for custom instantiation,
+  implementing usecases suggested in #5
+  (@thekid)
+
 ## 1.0.1 / 2020-12-25
 
 * Fixed issue #4: Class loader is null when using backslashes - @thekid
