@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #7: Add Parameters::at() and Parameters::named() - @thekid
+
 ## 1.1.0 / 2021-01-03
 
 * Merged PR #6: Implement Type::initializer() for custom instantiation,
