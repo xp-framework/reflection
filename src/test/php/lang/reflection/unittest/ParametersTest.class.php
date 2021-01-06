@@ -59,9 +59,33 @@ class ParametersTest {
   }
 
   #[Test]
-  public function without_first_parameter() {
+  public function no_first_parameter() {
     $method= $this->declare('{ function fixture() { } }')->method('fixture');
     Assert::equals(null, $method->parameters()->first());
+  }
+
+  #[Test]
+  public function parameter_at() {
+    $method= $this->declare('{ function fixture($arg) { } }')->method('fixture');
+    Assert::equals($method->parameter(0), $method->parameters()->at(0));
+  }
+
+  #[Test]
+  public function no_parameter_at() {
+    $method= $this->declare('{ function fixture() { } }')->method('fixture');
+    Assert::null($method->parameters()->at(0));
+  }
+
+  #[Test]
+  public function parameter_named() {
+    $method= $this->declare('{ function fixture($arg) { } }')->method('fixture');
+    Assert::equals($method->parameter(0), $method->parameters()->named('arg'));
+  }
+
+  #[Test]
+  public function no_parameter_named() {
+    $method= $this->declare('{ function fixture() { } }')->method('fixture');
+    Assert::null($method->parameters()->named('arg'));
   }
 
   #[Test]
