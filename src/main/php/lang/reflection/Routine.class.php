@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\Reflection;
+use lang\{Reflection, Type, TypeUnion};
 
 /** Base class for methods and constructors */
 abstract class Routine extends Member {
@@ -71,7 +71,44 @@ abstract class Routine extends Member {
    *
    * @return lang.reflection.Parameters
    */
-  public function parameters() {
+  public function parameters(): Parameters {
     return new Parameters($this->reflect);
+  }
+
+  /** Returns whether a method accepts a given argument list */
+  public function accepts(array $arguments): bool {
+    $types= Reflection::meta()->methodParameterTypes($this->reflect);
+    foreach ($this->reflect->getParameters() as $i => $parameter) {
+
+      // If a given value is missing check whether parameter is optional
+      if (!isset($arguments[$i])) return $parameter->isOptional();
+
+      // A value is present for this parameter, now:
+      $t= $parameter->getType();
+      if (null === $t) {
+        if (!isset($types[$i])) continue;
+        $type= Type::resolve($types[$i], $this->resolver());
+      } else if ($t instanceof \ReflectionUnionType) {
+        $union= [];
+        foreach ($t->getTypes() as $component) {
+          $union[]= Type::resolve($component->getName(), $this->resolver());
+        }
+        $type= new TypeUnion($union);
+      } else {
+        $type= Type::resolve(strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.'), $this->resolver());
+      }
+
+      // For variadic parameters, verify rest of arguments
+      if ($parameter->isVariadic()) {
+        for ($s= sizeof($arguments); $i < $s; $i++) {
+          if (!$type->isInstance($arguments[$i])) return false;
+        }
+        return true;
+      }
+
+      // ...otherwise, verify this arguments and continue to next
+      if (!$type->isInstance($arguments[$i])) return false;
+    }
+    return true;
   }
 }
