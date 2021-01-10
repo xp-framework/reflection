@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added support for `@var` for properties (*and kept `@type` for BC*),
+  see https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/var.html
+  (@thekid)
 * Merged PR #7: Add Parameters::at() and Parameters::named() - @thekid
 
 ## 1.1.0 / 2021-01-03

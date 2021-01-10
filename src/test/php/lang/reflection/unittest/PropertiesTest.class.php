@@ -139,9 +139,9 @@ class PropertiesTest {
     );
   }
 
-  #[Test]
-  public function type_from_apidoc() {
-    $type= $this->declare('{ /** @type string */ public $fixture; }');
+  #[Test, Values(['/** @var string */', '/** @type string */'])]
+  public function type_from_apidoc($comment) {
+    $type= $this->declare('{ '.$comment.' public $fixture; }');
     Assert::equals(new Constraint(Primitive::$STRING, false), $type->property('fixture')->constraint());
   }
 
