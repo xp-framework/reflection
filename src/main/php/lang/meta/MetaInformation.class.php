@@ -132,7 +132,8 @@ class MetaInformation {
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
       return $meta[DETAIL_RETURNS];
     } else {
-      return $this->tags($reflect)['type'][0] ?? null;
+      $tags= $this->tags($reflect);
+      return $tags['var'][0] ?? $tags['type'][0] ?? null;
     }
   }
 
