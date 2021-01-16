@@ -95,7 +95,12 @@ abstract class Routine extends Member {
         }
         $type= new TypeUnion($union);
       } else {
-        $type= Type::resolve(strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.'), $this->resolver());
+        $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
+        if ('array' === $name || 'callable' === $name || 'self' === $name) {
+          $type= Type::resolve($types[$i] ?? $name, $this->resolver());
+        } else {
+          $type= Type::resolve(strtr($name, '\\', '.'), $this->resolver());
+        }
       }
 
       // For variadic parameters, verify rest of arguments
