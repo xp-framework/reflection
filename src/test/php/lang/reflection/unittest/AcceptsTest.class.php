@@ -51,6 +51,12 @@ class AcceptsTest {
     yield [$t, [null], false];
     yield [$t, [$t->newInstance()], true];
 
+    $t= $this->type('<T>(self $arg= null)');
+    yield [$t, [], true];
+    yield [$t, [null], true];
+    yield [$t, ['test'], false];
+    yield [$t, [$t->newInstance()], true];
+
     $t= $this->type('<T>(self... $instances)');
     yield [$t, [], true];
     yield [$t, [null], false];
@@ -69,9 +75,21 @@ class AcceptsTest {
     yield [$t, ['test'], true];
     yield [$t, [$this], false];
 
+    $t= $this->type('/** @param ?(string|int) $arg */ <T>($arg)');
+    yield [$t, [1], true];
+    yield [$t, ['test'], true];
+    yield [$t, [null], true];
+    yield [$t, [$this], false];
+
     $t= $this->type('/** @param self $arg */ <T>($arg)');
     yield [$t, [], false];
     yield [$t, [null], false];
+    yield [$t, [$t->newInstance()], true];
+
+    $t= $this->type('/** @param ?self $arg */ <T>($arg)');
+    yield [$t, [], false];
+    yield [$t, [null], true];
+    yield [$t, ['test'], false];
     yield [$t, [$t->newInstance()], true];
 
     $t= $this->type('/** @param string[] $name */ <T>(array $name)');
@@ -90,6 +108,7 @@ class AcceptsTest {
 
     if (PHP_VERSION_ID >= 70100) {
       $t= $this->type('<T>(?string $arg)');
+      yield [$t, [], false];
       yield [$t, [null], true];
       yield [$t, ['test'], true];
       yield [$t, [$this], false];
@@ -101,8 +120,20 @@ class AcceptsTest {
       yield [$t, ['test'], true];
       yield [$t, [$this], false];
 
+      $t= $this->type('<T>(string|int|null $arg)');
+      yield [$t, [1], true];
+      yield [$t, ['test'], true];
+      yield [$t, [null], true];
+      yield [$t, [$this], false];
+
       $t= $this->type('<T>(string|int... $arg)');
       yield [$t, ['test'], true];
+      yield [$t, ['test', 1], true];
+      yield [$t, ['test', $this], false];
+
+      $t= $this->type('<T>(string|int|null... $arg)');
+      yield [$t, ['test'], true];
+      yield [$t, [null], true];
       yield [$t, ['test', 1], true];
       yield [$t, ['test', $this], false];
     }

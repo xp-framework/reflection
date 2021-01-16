@@ -87,15 +87,22 @@ abstract class Routine extends Member {
       $t= $parameter->getType();
       if (null === $t) {
         if (!isset($types[$i])) continue;
+        $nullable= '?' === $types[$i][0];
         $type= Type::resolve($types[$i], $this->resolver());
       } else if ($t instanceof \ReflectionUnionType) {
+        $nullable= false;
         $union= [];
         foreach ($t->getTypes() as $component) {
-          $union[]= Type::resolve($component->getName(), $this->resolver());
+          $name= $component->getName();
+          if ('null' === $name) {
+            $nullable= true;
+          } else {
+            $union[]= Type::resolve($name, $this->resolver());
+          }
         }
         $type= new TypeUnion($union);
       } else {
-        if (null === $arguments[$i] && $t->allowsNull()) continue;
+        $nullable= $t->allowsNull();
         $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
         if ('array' === $name || 'callable' === $name || 'self' === $name) {
           $type= Type::resolve($types[$i] ?? $name, $this->resolver());
@@ -107,13 +114,13 @@ abstract class Routine extends Member {
       // For variadic parameters, verify rest of arguments
       if ($parameter->isVariadic()) {
         for ($s= sizeof($arguments); $i < $s; $i++) {
-          if (!$type->isInstance($arguments[$i])) return false;
+          if (!(null === $arguments[$i] && $nullable) && !$type->isInstance($arguments[$i])) return false;
         }
         return true;
       }
 
       // ...otherwise, verify this arguments and continue to next
-      if (!$type->isInstance($arguments[$i])) return false;
+      if (!(null === $arguments[$i] && $nullable) && !$type->isInstance($arguments[$i])) return false;
     }
     return true;
   }
