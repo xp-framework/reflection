@@ -5,62 +5,97 @@ use unittest\{Assert, Test, Values};
 class AcceptsTest {
   use TypeDefinition;
 
+  /**
+   * Declares a type with a given method declaration
+   *
+   * @param  string $declaration
+   * @return lang.reflection.Type
+   */
+  private function type($declaration) {
+    return $this->declare('{ '.str_replace('<T>', 'public function fixture', $declaration).' { } }');
+  }
+
   /** @return iterable */
-  private function fixtures() {
-    yield ['<T>()', [], true];
-    yield ['<T>()', ['test'], true];
+  private function values() {
+    $t= $this->type('<T>()');
+    yield [$t, [], true];
+    yield [$t, ['test'], true];
 
-    yield ['<T>($name)', ['test'], true];
-    yield ['<T>($name)', [], false];
+    $t= $this->type('<T>($name)');
+    yield [$t, ['test'], true];
+    yield [$t, [], false];
 
-    yield ['<T>(string $name)', ['test'], true];
-    yield ['<T>(string $name)', [1], false];
-    yield ['<T>(string $name, int $age)', ['test'], false];
-    yield ['<T>(string $name, int $age)', ['test', 'fails'], false];
-    yield ['<T>(string $name, int $age)', ['test', 1], true];
+    $t= $this->type('<T>(string $name)');
+    yield [$t, ['test'], true];
+    yield [$t, [1], false];
 
-    yield ['<T>(string $name, int $age= 0)', ['test'], true];
-    yield ['<T>(string $name, int $age= 0)', ['test', 'fails'], false];
-    yield ['<T>(string $name, int $age= 0)', ['test', 1], true];
+    $t= $this->type('<T>(string $name, int $age)');
+    yield [$t, ['test'], false];
+    yield [$t, ['test', 'fails'], false];
+    yield [$t, ['test', 1], true];
 
-    yield ['<T>(string... $args)', [], true];
-    yield ['<T>(string... $args)', ['test'], true];
-    yield ['<T>(string... $args)', ['test', 'works'], true];
-    yield ['<T>(string... $args)', [1], false];
-    yield ['<T>(string... $args)', ['test', 1], false];
+    $t= $this->type('<T>(string $name, int $age= 0)');
+    yield [$t, ['test'], true];
+    yield [$t, ['test', 'fails'], false];
+    yield [$t, ['test', 1], true];
 
-    yield ['/** @param string $name */ <T>($name)', ['test'], true];
-    yield ['/** @param string $name */ <T>($name)', [1], false];
-    yield ['/** @param string[] $name */ <T>($name)', [['test', 'works']], true];
-    yield ['/** @param string[] $name */ <T>($name)', [['test', 1]], false];
+    $t= $this->type('<T>(string... $args)');
+    yield [$t, [], true];
+    yield [$t, ['test'], true];
+    yield [$t, ['test', 'works'], true];
+    yield [$t, [1], false];
+    yield [$t, ['test', 1], false];
 
-    yield ['/** @param string|int $arg */ <T>($arg)', [1], true];
-    yield ['/** @param string|int $arg */ <T>($arg)', ['test'], true];
-    yield ['/** @param string|int $arg */ <T>($arg)', [$this], false];
+    $t= $this->type('<T>(self $arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$t->newInstance()], true];
 
-    yield ['/** @param string[] $name */ <T>(array $name)', [['test', 1]], false];
-    yield ['/** @param function(): string $func */ <T>(callable $func)', [function(string $arg): int { }], false];
+    $t= $this->type('/** @param string $name */ <T>($name)');
+    yield [$t, ['test'], true];
+    yield [$t, [1], false];
+
+    $t= $this->type('/** @param string[] $name */ <T>($name)');
+    yield [$t, [['test', 'works']], true];
+    yield [$t, [['test', 1]], false];
+
+    $t= $this->type('/** @param string|int $arg */ <T>($arg)');
+    yield [$t, [1], true];
+    yield [$t, ['test'], true];
+    yield [$t, [$this], false];
+
+    $t= $this->type('/** @param self $arg */ <T>($arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$t->newInstance()], true];
+
+    $t= $this->type('/** @param string[] $name */ <T>(array $name)');
+    yield [$t, [['test', 1]], false];
+    yield [$t, [['test', 'works']], true];
+
+    $t= $this->type('/** @param self[] $name */ <T>(array $name)');
+    yield [$t, [[$t->newInstance(), null]], false];
+    yield [$t, [[$t->newInstance()]], true];
+
+    $t= $this->type('/** @param function(): string $func */ <T>(callable $func)');
+    yield [$t, [function(): int { }], false];
+    yield [$t, [function(): string { }], true];
 
     if (PHP_VERSION_ID >= 80000) {
-      yield ['<T>(string|int $arg)', [1], true];
-      yield ['<T>(string|int $arg)', ['test'], true];
-      yield ['<T>(string|int $arg)', [$this], false];
+      $t= $this->type('<T>(string|int $arg)');
+      yield [$t, [1], true];
+      yield [$t, ['test'], true];
+      yield [$t, [$this], false];
 
-      yield ['<T>(string|int... $arg)', ['test'], true];
-      yield ['<T>(string|int... $arg)', ['test', 1], true];
-      yield ['<T>(string|int... $arg)', ['test', $this], false];
+      $t= $this->type('<T>(string|int... $arg)');
+      yield [$t, ['test'], true];
+      yield [$t, ['test', 1], true];
+      yield [$t, ['test', $this], false];
     }
   }
 
-  #[Test, Values('fixtures')]
-  public function accepts($fixture, $values, $expected) {
-    $t= $this->declare('{ '.str_replace('<T>', 'public function fixture', $fixture).' { } }');
+  #[Test, Values('values')]
+  public function accepts($t, $values, $expected) {
     Assert::equals($expected, $t->method('fixture')->accepts($values));
-  }
-
-  #[Test, Values(['/** @param self $arg */ <T>($arg)', '<T>(self $arg)'])]
-  public function accepts_self($fixture) {
-    $t= $this->declare('{ '.str_replace('<T>', 'public function fixture', $fixture).' { } }');
-    Assert::true($t->method('fixture')->accepts([$t->newInstance()]));
   }
 }
