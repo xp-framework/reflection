@@ -58,9 +58,9 @@ class AcceptsTest {
     Assert::equals($expected, $t->method('fixture')->accepts($values));
   }
 
-  #[Test]
-  public function accepts_self() {
-    $t= $this->declare('{ public function fixture(self $arg) { } }');
+  #[Test, Values(['/** @param self $arg */ <T>($arg)', '<T>(self $arg)'])]
+  public function accepts_self($fixture) {
+    $t= $this->declare('{ '.str_replace('<T>', 'public function fixture', $fixture).' { } }');
     Assert::true($t->method('fixture')->accepts([$t->newInstance()]));
   }
 }
