@@ -51,6 +51,11 @@ class AcceptsTest {
     yield [$t, [null], false];
     yield [$t, [$t->newInstance()], true];
 
+    $t= $this->type('<T>(self... $instances)');
+    yield [$t, [], true];
+    yield [$t, [null], false];
+    yield [$t, [$t->newInstance()], true];
+
     $t= $this->type('/** @param string $name */ <T>($name)');
     yield [$t, ['test'], true];
     yield [$t, [1], false];

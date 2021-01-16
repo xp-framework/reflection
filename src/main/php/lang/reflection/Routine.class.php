@@ -81,7 +81,7 @@ abstract class Routine extends Member {
     foreach ($this->reflect->getParameters() as $i => $parameter) {
 
       // If a given value is missing check whether parameter is optional
-      if (!isset($arguments[$i])) return $parameter->isOptional();
+      if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
 
       // A value is present for this parameter, now:
       $t= $parameter->getType();
