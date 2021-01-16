@@ -88,6 +88,13 @@ class AcceptsTest {
     yield [$t, [function(): int { }], false];
     yield [$t, [function(): string { }], true];
 
+    if (PHP_VERSION_ID >= 70100) {
+      $t= $this->type('<T>(?string $arg)');
+      yield [$t, [null], true];
+      yield [$t, ['test'], true];
+      yield [$t, [$this], false];
+    }
+
     if (PHP_VERSION_ID >= 80000) {
       $t= $this->type('<T>(string|int $arg)');
       yield [$t, [1], true];

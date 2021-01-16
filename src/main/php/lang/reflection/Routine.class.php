@@ -95,6 +95,7 @@ abstract class Routine extends Member {
         }
         $type= new TypeUnion($union);
       } else {
+        if (null === $arguments[$i] && $t->allowsNull()) continue;
         $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
         if ('array' === $name || 'callable' === $name || 'self' === $name) {
           $type= Type::resolve($types[$i] ?? $name, $this->resolver());
