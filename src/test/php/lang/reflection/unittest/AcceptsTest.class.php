@@ -16,7 +16,7 @@ class AcceptsTest {
   }
 
   /** @return iterable */
-  private function values() {
+  private function fixtures() {
     $t= $this->type('<T>()');
     yield [$t, [], true];
     yield [$t, ['test'], true];
@@ -45,6 +45,11 @@ class AcceptsTest {
     yield [$t, ['test', 'works'], true];
     yield [$t, [1], false];
     yield [$t, ['test', 1], false];
+
+    $t= $this->type('<T>(\lang\reflection\unittest\AcceptsTest $arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$this], true];
 
     $t= $this->type('<T>(self $arg)');
     yield [$t, [], false];
@@ -80,6 +85,16 @@ class AcceptsTest {
     yield [$t, ['test'], true];
     yield [$t, [null], true];
     yield [$t, [$this], false];
+
+    $t= $this->type('/** @param \lang\reflection\unittest\AcceptsTest $arg */ <T>($arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$this], true];
+
+    $t= $this->type('/** @param lang.reflection.unittest.AcceptsTest $arg */ <T>($arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$this], true];
 
     $t= $this->type('/** @param self $arg */ <T>($arg)');
     yield [$t, [], false];
@@ -139,7 +154,7 @@ class AcceptsTest {
     }
   }
 
-  #[Test, Values('values')]
+  #[Test, Values('fixtures')]
   public function accepts($t, $values, $expected) {
     Assert::equals($expected, $t->method('fixture')->accepts($values));
   }

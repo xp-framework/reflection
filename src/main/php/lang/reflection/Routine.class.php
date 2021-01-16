@@ -107,7 +107,7 @@ abstract class Routine extends Member {
         if ('array' === $name || 'callable' === $name || 'self' === $name) {
           $type= Type::resolve($types[$i] ?? $name, $this->resolver());
         } else {
-          $type= Type::resolve(strtr($name, '\\', '.'), $this->resolver());
+          $type= Type::resolve($name, $this->resolver());
         }
       }
 
