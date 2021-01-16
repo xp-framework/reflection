@@ -75,12 +75,14 @@ class AcceptsTest {
     yield [$t, [$t->newInstance()], true];
 
     $t= $this->type('/** @param string[] $name */ <T>(array $name)');
-    yield [$t, [['test', 1]], false];
+    yield [$t, [[]], true];
     yield [$t, [['test', 'works']], true];
+    yield [$t, [['test', 1]], false];
 
     $t= $this->type('/** @param self[] $name */ <T>(array $name)');
-    yield [$t, [[$t->newInstance(), null]], false];
+    yield [$t, [[]], true];
     yield [$t, [[$t->newInstance()]], true];
+    yield [$t, [[$t->newInstance(), null]], false];
 
     $t= $this->type('/** @param function(): string $func */ <T>(callable $func)');
     yield [$t, [function(): int { }], false];
