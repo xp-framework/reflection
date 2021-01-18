@@ -9,14 +9,15 @@ trait TypeDefinition {
    *
    * @param  var $declaration
    * @param  var $annotations
+   * @param  [:string] $imports
    * @return lang.reflection.Type
    */
-  private function declare($declaration, $annotations= null) {
+  private function declare($declaration, $annotations= null, $imports= []) {
     static $u= 0;
 
     return Reflection::of(ClassLoader::defineType(
       ($annotations ? $annotations.' ' : '').self::class.'Parent'.($u++),
-      ['kind' => 'class', 'extends' => null, 'implements' => [], 'use' => []],
+      ['kind' => 'class', 'extends' => null, 'implements' => [], 'use' => [], 'imports' => $imports],
       $declaration
     ));
   }

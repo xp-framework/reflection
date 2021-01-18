@@ -28,6 +28,11 @@ abstract class Member implements Value {
       'static' => function() { return new XPClass($this->reflect->class); },
       'self'   => function() { return new XPClass($this->reflect->getDeclaringClass()); },
       'parent' => function() { return new XPClass($this->reflect->getDeclaringClass()->getParentClass()); },
+      '*'      => function($type) {
+        $reflect= $this->reflect->getDeclaringClass();
+        $imports= Reflection::meta()->scopeImports($reflect);
+        return XPClass::forName($imports[$type] ?? $reflect->getNamespaceName().'\\'.$type);
+      },
     ];
   }
 
@@ -45,8 +50,7 @@ abstract class Member implements Value {
     $this->annotations ?? $this->annotations= $this->meta();
 
     $t= strtr($type, '.', '\\');
-    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null
-    ;
+    return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
   }
 
   /** Returns this member's name */

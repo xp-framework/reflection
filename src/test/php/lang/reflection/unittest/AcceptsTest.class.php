@@ -1,6 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use unittest\{Assert, Test, Values};
+use util\Date;
 
 class AcceptsTest {
   use TypeDefinition;
@@ -9,10 +10,15 @@ class AcceptsTest {
    * Declares a type with a given method declaration
    *
    * @param  string $declaration
+   * @param  [:string] $imports
    * @return lang.reflection.Type
    */
-  private function type($declaration) {
-    return $this->declare('{ '.str_replace('<T>', 'public function fixture', $declaration).' { } }');
+  private function type($declaration, $imports= []) {
+    return $this->declare(
+      '{ '.str_replace('<T>', 'public function fixture', $declaration).' { } }',
+      null,
+      $imports
+    );
   }
 
   /** @return iterable */
@@ -45,6 +51,16 @@ class AcceptsTest {
     yield [$t, ['test', 'works'], true];
     yield [$t, [1], false];
     yield [$t, ['test', 1], false];
+
+    $t= $this->type('<T>(Date $arg)', ['util.Date' => null]);
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [new Date()], true];
+
+    $t= $this->type('<T>(AcceptsTest $arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$this], true];
 
     $t= $this->type('<T>(\lang\reflection\unittest\AcceptsTest $arg)');
     yield [$t, [], false];
@@ -86,6 +102,16 @@ class AcceptsTest {
     yield [$t, [null], true];
     yield [$t, [$this], false];
 
+    $t= $this->type('/** @param Date $arg */ <T>($arg)', ['util.Date' => null]);
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [new Date()], true];
+
+    $t= $this->type('/** @param AcceptsTest $arg */ <T>($arg)');
+    yield [$t, [], false];
+    yield [$t, [null], false];
+    yield [$t, [$this], true];
+
     $t= $this->type('/** @param \lang\reflection\unittest\AcceptsTest $arg */ <T>($arg)');
     yield [$t, [], false];
     yield [$t, [null], false];
@@ -120,6 +146,12 @@ class AcceptsTest {
     $t= $this->type('/** @param function(): string $func */ <T>(callable $func)');
     yield [$t, [function(): int { }], false];
     yield [$t, [function(): string { }], true];
+
+    $t= $this->type("/**\n * @param string \$a\n * @param string \$b\n*/ <T>(\$a, \$b)");
+    yield [$t, [], false];
+    yield [$t, ['test'], false];
+    yield [$t, ['test', 1], false];
+    yield [$t, ['test', 'works'], true];
 
     if (PHP_VERSION_ID >= 70100) {
       $t= $this->type('<T>(?string $arg)');

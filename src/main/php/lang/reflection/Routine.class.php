@@ -19,19 +19,25 @@ abstract class Routine extends Member {
     $r= '';
     foreach ($this->reflect->getParameters() as $i => $parameter) {
       $t= $parameter->getType();
+      $nullable= '';
       if (null === $t) {
         $type= $types[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
       } else if ($t instanceof \ReflectionUnionType) {
         $name= '';
         foreach ($t->getTypes() as $component) {
-          $name.= '|'.$component->getName();
+          if ('null' === ($c= $component->getName())) {
+            $nullable= '?';
+          } else {
+            $name.= '|'.$c;
+          }
         }
         $type= substr($name, 1);
       } else {
         $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
         $parameter->isVariadic() && $type.= '...';
+        $t->allowsNull() && $nullable= '?';
       }
-      $r.= ', '.$type.' $'.$parameter->name;
+      $r.= ', '.$nullable.$type.' $'.$parameter->name;
     }
     return substr($r, 2);
   }
@@ -77,50 +83,32 @@ abstract class Routine extends Member {
 
   /** Returns whether a method accepts a given argument list */
   public function accepts(array $arguments): bool {
-    $types= Reflection::meta()->methodParameterTypes($this->reflect);
+
+    // Only fetch api doc types if necessary
+    $api= function() use(&$i, &$types) {
+      $types ?? $types= Reflection::meta()->methodParameterTypes($this->reflect);
+      return $types[$i] ?? null;
+    };
+
+    $context= $this->resolver();
     foreach ($this->reflect->getParameters() as $i => $parameter) {
 
       // If a given value is missing check whether parameter is optional
       if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
 
-      // A value is present for this parameter, now:
-      $t= $parameter->getType();
-      if (null === $t) {
-        if (!isset($types[$i])) continue;
-        $nullable= '?' === $types[$i][0];
-        $type= Type::resolve($types[$i], $this->resolver());
-      } else if ($t instanceof \ReflectionUnionType) {
-        $nullable= false;
-        $union= [];
-        foreach ($t->getTypes() as $component) {
-          $name= $component->getName();
-          if ('null' === $name) {
-            $nullable= true;
-          } else {
-            $union[]= Type::resolve($name, $this->resolver());
-          }
-        }
-        $type= new TypeUnion($union);
-      } else {
-        $nullable= $t->allowsNull();
-        $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
-        if ('array' === $name || 'callable' === $name || 'self' === $name) {
-          $type= Type::resolve($types[$i] ?? $name, $this->resolver());
-        } else {
-          $type= Type::resolve($name, $this->resolver());
-        }
-      }
+      // A value is present for this parameter, now check type
+      if (null === ($type= Type::forReflect($parameter->getType(), $api, $context))) continue;
 
       // For variadic parameters, verify rest of arguments
       if ($parameter->isVariadic()) {
         for ($s= sizeof($arguments); $i < $s; $i++) {
-          if (!(null === $arguments[$i] && $nullable) && !$type->isInstance($arguments[$i])) return false;
+          if (!$type->isInstance($arguments[$i])) return false;
         }
         return true;
       }
 
-      // ...otherwise, verify this arguments and continue to next
-      if (!(null === $arguments[$i] && $nullable) && !$type->isInstance($arguments[$i])) return false;
+      // ...otherwise, verify this argument and continue to next
+      if (!$type->isInstance($arguments[$i])) return false;
     }
     return true;
   }

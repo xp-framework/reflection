@@ -180,6 +180,15 @@ class MethodsTest {
     );
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function string_representation_with_nullable_union_typed_parameter() {
+    $t= $this->declare('{ public function fixture(string|int|null $s): string { } }');
+    Assert::equals(
+      'public function fixture(?string|int $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
   #[Test]
   public function string_representation_with_apidoc_parameter() {
     $t= $this->declare('{
