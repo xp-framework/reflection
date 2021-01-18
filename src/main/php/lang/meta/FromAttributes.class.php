@@ -47,6 +47,12 @@ class FromAttributes {
     return $this->annotations($reflect, $method->getDeclaringClass());
   }
 
+  /**
+   * Returns imports used in the class file the given class was declared in
+   *
+   * @param  \ReflectionClass $reflect
+   * @return [:string]
+   */
   public function imports($reflect) {
     static $break= [T_CLASS => true, T_INTERFACE => true, T_TRAIT => true];
 
@@ -67,11 +73,11 @@ class FromAttributes {
         $group= '';
         for ($i+= 1; $i < $s; $i++) {
           if (44 === $tokens[$i]->id) {
-            $imports[$alias ? $alias : $group]= $type.$group;
+            $imports[$alias ?? $group]= $type.$group;
             $alias= null;
             $group= '';
           } else if (125 === $tokens[$i]->id) {
-            $imports[$alias ? $alias : $group]= $type.$group;
+            $imports[$alias ?? $group]= $type.$group;
             break;
           } else if (T_AS === $tokens[$i]->id) {
             $i+= 2;
