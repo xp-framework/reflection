@@ -65,7 +65,8 @@ class Parameter {
       return $names[$this->reflect->getPosition()] ?? null;
     };
 
-    $t= Type::forReflect($this->reflect->getType(), $api, [
+    // Resolve type references against declaring class
+    $resolve= [
       'static' => function() { return new XPClass($this->method->class); },
       'self'   => function() { return new XPClass($this->method->getDeclaringClass()); },
       'parent' => function() { return new XPClass($this->method->getDeclaringClass()->getParentClass()); },
@@ -74,7 +75,8 @@ class Parameter {
         $imports= Reflection::meta()->scopeImports($reflect);
         return XPClass::forName($imports[$type] ?? $reflect->getNamespaceName().'\\'.$type);
       },
-    ]);
-    return new Constraint($t ?? Type::$VAR, $present);
+    ];
+
+    return new Constraint(Type::resolve($this->reflect->getType(), $resolve, $api) ?? Type::$VAR, $present);
   }
 }

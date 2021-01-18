@@ -97,7 +97,7 @@ abstract class Routine extends Member {
       if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
 
       // A value is present for this parameter, now check type
-      if (null === ($type= Type::forReflect($parameter->getType(), $api, $context))) continue;
+      if (null === ($type= Type::resolve($parameter->getType(), $context, $api))) continue;
 
       // For variadic parameters, verify rest of arguments
       if ($parameter->isVariadic()) {

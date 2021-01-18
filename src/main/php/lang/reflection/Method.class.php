@@ -76,7 +76,7 @@ class Method extends Routine {
       return Reflection::meta()->methodReturns($this->reflect);
     };
 
-    $t= Type::forReflect($this->reflect->getReturnType(), $api, $this->resolver());
+    $t= Type::resolve($this->reflect->getReturnType(), $this->resolver(), $api);
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
