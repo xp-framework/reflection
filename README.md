@@ -153,7 +153,11 @@ Method and constructor parameters can be retrieved by iterating via `parameters(
 $method->parameter(0);                     // Parameter or NULL
 $method->parameter('arg');                 // Parameter or NULL
 
-foreach ($method->parameters() as $name => $parameter) {
+$parameters= $method->parameters();        // Parameters instance
+$parameters->at(0);                        // Parameter or NULL
+$parameters->named('arg');                 // Parameter or NULL
+
+foreach ($parameters as $name => $parameter) {
   $parameter->position();                 // 0
   $parameter->name();                     // 'arg'
   $parameter->variadic();                 // false
