@@ -1,5 +1,7 @@
 <?php namespace lang\reflection;
 
+use lang\{Reflection, Type};
+
 /**
  * Method or constructor parameters enumeration and lookup
  *
@@ -58,5 +60,45 @@ class Parameters implements \IteratorAggregate {
     foreach ($this->method->getParameters() as $parameter) {
       yield $parameter->name => new Parameter($parameter, $this->method);
     }
+  }
+
+  /**
+   * Returns whether a method accepts a given argument list
+   *
+   * @param  var[] $args
+   * @param  ?int $size
+   * @return bool
+   */
+  public function accept(array $arguments, $size= null): bool {
+    $parameters= $this->method->getParameters();
+    if (null !== $size && $size !== sizeof($parameters)) return false;
+
+    // Only fetch api doc types if necessary
+    $api= function() use(&$i, &$types) {
+      $types ?? $types= Reflection::meta()->methodParameterTypes($this->method);
+      return $types[$i] ?? null;
+    };
+
+    $context= Member::resolve($this->method);
+    foreach ($parameters as $i => $parameter) {
+
+      // If a given value is missing check whether parameter is optional
+      if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
+
+      // A value is present for this parameter, now check type
+      if (null === ($type= Type::resolve($parameter->getType(), $context, $api))) continue;
+
+      // For variadic parameters, verify rest of arguments
+      if ($parameter->isVariadic()) {
+        for ($s= sizeof($arguments); $i < $s; $i++) {
+          if (!$type->isInstance($arguments[$i])) return false;
+        }
+        return true;
+      }
+
+      // ...otherwise, verify this argument and continue to next
+      if (!$type->isInstance($arguments[$i])) return false;
+    }
+    return true;
   }
 }

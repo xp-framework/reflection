@@ -157,6 +157,11 @@ $parameters= $method->parameters();        // Parameters instance
 $parameters->at(0);                        // Parameter or NULL
 $parameters->named('arg');                 // Parameter or NULL
 
+$args= ['test'];
+if ($parameters->accept($args)) {
+  $method->invoke(null, $args);
+}
+
 foreach ($parameters as $name => $parameter) {
   $parameter->position();                 // 0
   $parameter->name();                     // 'arg'

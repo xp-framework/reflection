@@ -187,7 +187,7 @@ class AcceptsTest {
   }
 
   #[Test, Values('fixtures')]
-  public function accepts($t, $values, $expected) {
-    Assert::equals($expected, $t->method('fixture')->accepts($values));
+  public function accept($t, $values, $expected) {
+    Assert::equals($expected, $t->method('fixture')->parameters()->accept($values));
   }
 }

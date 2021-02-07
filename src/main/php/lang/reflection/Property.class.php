@@ -31,7 +31,7 @@ class Property extends Member {
       return Reflection::meta()->propertyType($this->reflect);
     };
 
-    $t= Type::resolve(PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null, $this->resolver(), $api);
+    $t= Type::resolve(PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null, Member::resolve($this->reflect), $api);
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
