@@ -63,15 +63,17 @@ class Parameters implements \IteratorAggregate {
   }
 
   /**
-   * Returns whether a method accepts a given argument list
+   * Returns whether these parameters accepts a given argument list. Optionally,
+   * the argument count can be passed, testing for an *exact match* with the number
+   * of parameters, e.g. to find "zero-arg getters" and "one-arg constructors".
    *
    * @param  var[] $args
-   * @param  ?int $size
+   * @param  ?int $count
    * @return bool
    */
-  public function accept(array $arguments, $size= null): bool {
+  public function accept(array $arguments, $count= null): bool {
     $parameters= $this->method->getParameters();
-    if (null !== $size && $size !== sizeof($parameters)) return false;
+    if (null !== $count && $count !== sizeof($parameters)) return false;
 
     // Only fetch api doc types if necessary
     $api= function() use(&$i, &$types) {
