@@ -10,7 +10,7 @@ abstract class Member implements Value {
    * Creates a new member from a PHP reflection class, optionally passing
    * pre-parsed meta information.
    *
-   * @param  ReflectionClass|ReflectionProperty|ReflectionClassConstant $reflect
+   * @param  ReflectionMethod|ReflectionProperty|ReflectionClassConstant $reflect
    * @param  ?[:var] $annotations If present, will not be re-parsed
    */
   public function __construct($reflect, $annotations= null) {
@@ -19,19 +19,20 @@ abstract class Member implements Value {
   }
 
   /**
-   * Resolver handling `static`, `self` and `parent`.
+   * Returns context for `Type::resolve()`
    *
-   * @return [:(function(string): lang.Type)]
+   * @param  ReflectionMethod|ReflectionProperty|ReflectionClassConstant $reflect
+   * @return [:function(?string): Type]
    */
-  protected function resolver() {
+  public static function resolve($reflect) {
     return [
-      'static' => function() { return new XPClass($this->reflect->class); },
-      'self'   => function() { return new XPClass($this->reflect->getDeclaringClass()); },
-      'parent' => function() { return new XPClass($this->reflect->getDeclaringClass()->getParentClass()); },
-      '*'      => function($type) {
-        $reflect= $this->reflect->getDeclaringClass();
-        $imports= Reflection::meta()->scopeImports($reflect);
-        return XPClass::forName($imports[$type] ?? $reflect->getNamespaceName().'\\'.$type);
+      'static' => function() use($reflect) { return new XPClass($reflect->class); },
+      'self'   => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()); },
+      'parent' => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()->getParentClass()); },
+      '*'      => function($type) use($reflect) {
+        $declared= $reflect->getDeclaringClass();
+        $imports= Reflection::meta()->scopeImports($declared);
+        return XPClass::forName($imports[$type] ?? $declared->getNamespaceName().'\\'.$type);
       },
     ];
   }

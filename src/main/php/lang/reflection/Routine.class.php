@@ -80,36 +80,4 @@ abstract class Routine extends Member {
   public function parameters(): Parameters {
     return new Parameters($this->reflect);
   }
-
-  /** Returns whether a method accepts a given argument list */
-  public function accepts(array $arguments): bool {
-
-    // Only fetch api doc types if necessary
-    $api= function() use(&$i, &$types) {
-      $types ?? $types= Reflection::meta()->methodParameterTypes($this->reflect);
-      return $types[$i] ?? null;
-    };
-
-    $context= $this->resolver();
-    foreach ($this->reflect->getParameters() as $i => $parameter) {
-
-      // If a given value is missing check whether parameter is optional
-      if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
-
-      // A value is present for this parameter, now check type
-      if (null === ($type= Type::resolve($parameter->getType(), $context, $api))) continue;
-
-      // For variadic parameters, verify rest of arguments
-      if ($parameter->isVariadic()) {
-        for ($s= sizeof($arguments); $i < $s; $i++) {
-          if (!$type->isInstance($arguments[$i])) return false;
-        }
-        return true;
-      }
-
-      // ...otherwise, verify this argument and continue to next
-      if (!$type->isInstance($arguments[$i])) return false;
-    }
-    return true;
-  }
 }

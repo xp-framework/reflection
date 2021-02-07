@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Type, XPClass, IllegalStateException};
+use lang\{Reflection, Type, IllegalStateException};
 
 /**
  * Reflection for a method's or constructor's parameter
@@ -65,18 +65,9 @@ class Parameter {
       return $names[$this->reflect->getPosition()] ?? null;
     };
 
-    // Resolve type references against declaring class
-    $resolve= [
-      'static' => function() { return new XPClass($this->method->class); },
-      'self'   => function() { return new XPClass($this->method->getDeclaringClass()); },
-      'parent' => function() { return new XPClass($this->method->getDeclaringClass()->getParentClass()); },
-      '*'      => function($type) {
-        $reflect= $this->method->getDeclaringClass();
-        $imports= Reflection::meta()->scopeImports($reflect);
-        return XPClass::forName($imports[$type] ?? $reflect->getNamespaceName().'\\'.$type);
-      },
-    ];
-
-    return new Constraint(Type::resolve($this->reflect->getType(), $resolve, $api) ?? Type::$VAR, $present);
+    return new Constraint(
+      Type::resolve($this->reflect->getType(), Member::resolve($this->reflect), $api) ?? Type::$VAR,
+      $present
+    );
   }
 }
