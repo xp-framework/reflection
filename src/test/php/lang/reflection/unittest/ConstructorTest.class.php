@@ -1,10 +1,21 @@
 <?php namespace lang\reflection\unittest;
 
+use lang\reflection\Constructor;
 use unittest\actions\RuntimeVersion;
 use unittest\{Action, Assert, Test};
 
 class ConstructorTest {
   use TypeDefinition;
+
+  #[Test]
+  public function absent() {
+    Assert::null($this->declare('{ }')->constructor());
+  }
+
+  #[Test]
+  public function present() {
+    Assert::instance(Constructor::class, $this->declare('{ public function __construct() { } }')->constructor());
+  }
 
   #[Test]
   public function name() {
