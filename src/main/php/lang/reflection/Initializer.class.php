@@ -8,17 +8,22 @@ use lang\Reflection;
  * @test lang.reflection.unittest.InstantiationTest
  */
 class Initializer extends Routine implements Instantiation {
+  private static $NOOP;
   private $class, $function;
+
+  static function __static() {
+    self::$NOOP= new \ReflectionFunction(function() { });
+  }
 
   /**
    * Creates a new instantiation function
    *
    * @param  ReflectionClass $class
-   * @param  ReflectionFunctionAbstract $reflect 
+   * @param  ?ReflectionFunctionAbstract $reflect
    * @param  ?Closure $function
    */
-  public function __construct($class, $reflect, $function= null) {
-    parent::__construct($reflect);
+  public function __construct($class, $reflect= null, $function= null) {
+    parent::__construct($reflect ?? self::$NOOP);
     $this->class= $class;
     $this->function= $function;
   }

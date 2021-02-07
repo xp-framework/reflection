@@ -161,7 +161,7 @@ class Type {
     if (!$this->instantiable()) return null;
 
     if (null === $function) {
-      return new Initializer($this->reflect, new \ReflectionFunction(function() { }));
+      return new Initializer($this->reflect);
     } else if ($function instanceof \Closure) {
       $reflect= new \ReflectionFunction($function);
       return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($function) {
