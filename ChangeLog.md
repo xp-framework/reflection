@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.2.0 / 2021-02-07
+
+* Merged PR #8: Add Routine::accepts() to check whether given arguments
+  would be accepted
+  (@thekid)
 * Added support for `@var` for properties (*and kept `@type` for BC*),
   see https://docs.phpdoc.org/3.0/guide/references/phpdoc/tags/var.html
   (@thekid)
