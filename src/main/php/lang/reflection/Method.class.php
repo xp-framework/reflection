@@ -68,38 +68,16 @@ class Method extends Routine {
 
   /** @return lang.reflection.Constraint */
   public function returns() {
-    $t= $this->reflect->getReturnType();
-    if (null === $t) {
-      $present= false;
+    $present= true;
 
-      // Check for type in meta information, defaulting to `var`
-      $t= Type::$VAR;
-    } else if ($t instanceof \ReflectionUnionType) {
-      $union= [];
-      foreach ($t->getTypes() as $component) {
-        $union[]= Type::resolve($component->getName(), $this->resolver());
-      }
-      return new Constraint(new TypeUnion($union));
-    } else {
-      $name= PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString();
+    // Only use meta information if necessary
+    $api= function($set) use(&$present) {
+      $present= $set;
+      return Reflection::meta()->methodReturns($this->reflect);
+    };
 
-      // Check array, self and callable for more specific types, e.g. `string[]`,
-      // `static` or `function(): string` in meta information
-      if ('array' === $name) {
-        $t= Type::$ARRAY;
-      } else if ('callable' === $name) {
-        $t= Type::$CALLABLE;
-      } else if ('self' === $name) {
-        $t= new XPClass($this->reflect->getDeclaringClass());
-      } else {
-        return new Constraint(Type::resolve($name, $this->resolver()));
-      }
-      $present= true;
-    }
-
-    // Use meta information
-    $name= Reflection::meta()->methodReturns($this->reflect);
-    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
+    $t= Type::resolve($this->reflect->getReturnType(), $this->resolver(), $api);
+    return new Constraint($t ?? Type::$VAR, $present);
   }
 
   /** @return string */
@@ -108,22 +86,28 @@ class Method extends Routine {
 
     // Put together return type
     $t= $this->reflect->getReturnType();
+    $nullable= '';
     if (null === $t) {
       $returns= $meta->methodReturns($this->reflect) ?? 'var';
     } else if ($t instanceof \ReflectionUnionType) {
       $name= '';
       foreach ($t->getTypes() as $component) {
-        $name.= '|'.$component->getName();
+        if ('null' === ($c= $component->getName())) {
+          $nullable= '?';
+        } else {
+          $name.= '|'.$c;
+        }
       }
       $returns= substr($name, 1);
     } else {
       $returns= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
+      $t->allowsNull() && $nullable= '?';
     }
 
     return 
       Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
       ' function '.$this->reflect->name.'('.$this->signature($meta).'): '.
-      $returns
+      $nullable.$returns
     ;
   }
 }

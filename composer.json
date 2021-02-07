@@ -6,7 +6,7 @@
   "description" : "Reflection",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^10.0",
+    "xp-framework/core": "^10.6",
     "xp-framework/ast": "^7.0",
     "php" : ">=7.0.0"
   },

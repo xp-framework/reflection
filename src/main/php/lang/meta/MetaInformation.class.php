@@ -32,7 +32,7 @@ class MetaInformation {
   /**
    * Parses tags from API documentation
    *
-   * @param  ReflectionClass|ReflectionConstant|ReflectionProperty|ReflectionMethod $reflect
+   * @param  \ReflectionClass|\ReflectionConstant|\ReflectionProperty|\ReflectionMethod $reflect
    * @return [:var]
    */
   private function tags($reflect) {
@@ -45,9 +45,20 @@ class MetaInformation {
   }
 
   /**
+   * Returns a list of imports from the scope the given class was declared in
+   *
+   * @param  \ReflectionClass $reflect
+   * @return [:string]
+   */
+  public function scopeImports($reflect) {
+    $meta= &\xp::$meta[strtr($reflect->name, '\\', '.')];
+    return $meta['use'] ?? $meta['use']= $this->annotations->imports($reflect);
+  }
+
+  /**
    * Returns annotation map (type => arguments) for a given type
    *
-   * @param  ReflectionClass $reflect
+   * @param  \ReflectionClass $reflect
    * @return [:var[]]
    */
   public function typeAnnotations($reflect) {
@@ -61,7 +72,7 @@ class MetaInformation {
   /**
    * Returns API doc comment for a given type
    *
-   * @param  ReflectionClass $reflect
+   * @param  \ReflectionClass $reflect
    * @return ?string
    */
   public function typeComment($reflect) {
@@ -77,7 +88,7 @@ class MetaInformation {
   /**
    * Returns annotation map (type => arguments) for a given constant
    *
-   * @param  ReflectionClassConstant $reflect
+   * @param  \ReflectionClassConstant $reflect
    * @return [:var[]]
    */
   public function constantAnnotations($reflect) {
@@ -92,7 +103,7 @@ class MetaInformation {
   /**
    * Returns comment for a given constant
    *
-   * @param  ReflectionClassConstant $reflect
+   * @param  \ReflectionClassConstant $reflect
    * @return ?string
    */
   public function constantComment($reflect) {
@@ -109,7 +120,7 @@ class MetaInformation {
   /**
    * Returns annotation map (type => arguments) for a given property
    *
-   * @param  ReflectionProperty $reflect
+   * @param  \ReflectionProperty $reflect
    * @return [:var[]]
    */
   public function propertyAnnotations($reflect) {
@@ -124,7 +135,7 @@ class MetaInformation {
   /**
    * Returns type for a given property
    *
-   * @param  ReflectionProperty $reflect
+   * @param  \ReflectionProperty $reflect
    * @return ?string
    */
   public function propertyType($reflect) {
@@ -140,7 +151,7 @@ class MetaInformation {
   /**
    * Returns comment for a given property
    *
-   * @param  ReflectionProperty $reflect
+   * @param  \ReflectionProperty $reflect
    * @return ?string
    */
   public function propertyComment($reflect) {
@@ -157,7 +168,7 @@ class MetaInformation {
   /**
    * Returns annotation map (type => arguments) for a given method
    *
-   * @param  ReflectionMethod $reflect
+   * @param  \ReflectionMethod $reflect
    * @return [:var[]]
    */
   public function methodAnnotations($reflect) {
@@ -172,7 +183,7 @@ class MetaInformation {
   /**
    * Returns return type for a given method
    *
-   * @param  ReflectionMethod $reflect
+   * @param  \ReflectionMethod $reflect
    * @return ?string
    */
   public function methodReturns($reflect) {
@@ -187,7 +198,7 @@ class MetaInformation {
   /**
    * Returns comment for a given method
    *
-   * @param  ReflectionMethod $reflect
+   * @param  \ReflectionMethod $reflect
    * @return ?string
    */
   public function methodComment($reflect) {
@@ -204,7 +215,7 @@ class MetaInformation {
   /**
    * Returns parameter types for a given method
    *
-   * @param  ReflectionMethod $method
+   * @param  \ReflectionMethod $method
    * @return string[]
    */
   public function methodParameterTypes($method) {
@@ -221,8 +232,8 @@ class MetaInformation {
   /**
    * Returns annotation map (type => arguments) for a given method
    *
-   * @param  ReflectionMethod $method
-   * @param  ReflectionParameter $reflect
+   * @param  \ReflectionMethod $method
+   * @param  \ReflectionParameter $reflect
    * @return [:var[]]
    */
   public function parameterAnnotations($method, $reflect) {

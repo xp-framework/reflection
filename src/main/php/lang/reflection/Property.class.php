@@ -21,50 +21,18 @@ class Property extends Member {
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }
 
-  /**
-   * Resolver handling `static`, `self` and `parent`.
-   *
-   * @return [:(function(string): lang.Type)]
-   */
-  protected function resolver() {
-    return [
-      'static' => function() { return new XPClass($this->reflect->class); },
-      'self'   => function() { return new XPClass($this->reflect->getDeclaringClass()); },
-      'parent' => function() { return new XPClass($this->reflect->getDeclaringClass()->getParentClass()); },
-    ];
-  }
-
   /** @return lang.reflection.Constraint */
   public function constraint() {
-    $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
-    if (null === $t) {
-      $present= false;
+    $present= true;
 
-      // Check for type in api documentation, defaulting to `var`
-      $t= Type::$VAR;
-    } else if ($t instanceof \ReflectionUnionType) {
-      $union= [];
-      foreach ($t->getTypes() as $component) {
-        $union[]= Type::resolve($component->getName(), $this->resolver());
-      }
-      return new Constraint(new TypeUnion($union));
-    } else {
-      $name= $t->getName();
+    // Only use meta information if necessary
+    $api= function($set) use(&$present) {
+      $present= $set;
+      return Reflection::meta()->propertyType($this->reflect);
+    };
 
-      // Check array and self for more specific types, e.g. `string[]`,
-      // `static` or `function(): string` in api documentation
-      if ('array' === $name) {
-        $t= Type::$ARRAY;
-      } else if ('self' === $name) {
-        $t= new XPClass($this->reflect->getDeclaringClass());
-      } else {
-        return new Constraint(Type::resolve($name, $this->resolver()));
-      }
-      $present= true;
-    }
-
-    $name= Reflection::meta()->propertyType($this->reflect);
-    return new Constraint($name ? Type::resolve($name, $this->resolver()) : $t, $present);
+    $t= Type::resolve(PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null, $this->resolver(), $api);
+    return new Constraint($t ?? Type::$VAR, $present);
   }
 
   /**

@@ -111,6 +111,15 @@ class FromSyntaxTree {
     return $r;
   }
 
+  public function imports($reflect) {
+    $resolver= $this->tree($reflect->name)->resolver();
+    $imports= [];
+    foreach ($resolver->imports as $alias => $type) {
+      $imports[$alias]= ltrim($type, '\\');
+    }
+    return $imports;
+  }
+
   /** @return iterable */
   public function ofType($reflect) {
     $tree= $this->tree($reflect->name);
