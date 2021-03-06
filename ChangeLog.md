@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.3.0 / 2021-03-06
+
+* Added support for reflective access to non-constant expressions for
+  parameter defaults, see xp-framework/compiler#104
+  (@thekid)
+
 ## 1.2.0 / 2021-02-07
 
 * Merged PR #8 and PR #9, adding `Parameters::accept()` to check whether
