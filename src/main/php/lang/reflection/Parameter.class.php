@@ -29,13 +29,21 @@ class Parameter {
   public function optional() { return $this->reflect->isOptional(); }
 
   /** 
-   * Returns an optional parameter's default value
+   * Returns an optional parameter's default value. Additionally checks `default`
+   * parameter annotation in XP meta information if available.
    * 
    * @return var
    * @throws lang.IllegalStateException if not default value is available
    */
   public function default() {
-    if ($this->reflect->isDefaultValueAvailable()) return $this->reflect->getDefaultValue();
+    if ($this->reflect->isDefaultValueAvailable()) {
+      $value= $this->reflect->getDefaultValue();
+      if (null === $value) {
+        $class= strtr($this->reflect->getDeclaringClass()->name, '\\', '.');
+        return \xp::$meta[$class][1][$this->method->name][DETAIL_TARGET_ANNO]['$'.$this->reflect->name]['default'] ?? null;
+      }
+      return $value;
+    }
 
     throw new IllegalStateException('No default value avaible for parameter $'.$this->reflect->name);
   }
