@@ -11,6 +11,12 @@ class Parameter {
   private $reflect, $method;
   private $annotations= null;
 
+  /**
+   * Creates a new parameter
+   *
+   * @param  ReflectionParameter $reflect
+   * @param  ReflectionMethod $method
+   */
   public function __construct($reflect, $method= null) {
     $this->reflect= $reflect;
     $this->method= $method ?? $reflect->getDeclaringFunction();
