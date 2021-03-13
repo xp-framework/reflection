@@ -10,11 +10,6 @@ use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
 class Type {
   private $reflect;
   private $annotations= null;
-  private static $ENUMS;
-
-  static function __static() {
-    self::$ENUMS= interface_exists(\UnitEnum::class, false);
-  }
 
   /** @param ReflectionClass $reflect */
   public function __construct($reflect) {
@@ -58,7 +53,7 @@ class Type {
       return Kind::$INTERFACE;
     } else if ($this->reflect->isTrait()) {
       return Kind::$TRAIT;
-    } else if ($this->reflect->isSubclassOf(Enum::class) || (self::$ENUMS && $this->reflect->isSubclassOf(\UnitEnum::class))) {
+    } else if ($this->reflect->isSubclassOf(Enum::class) || $this->reflect->isSubclassOf(\UnitEnum::class)) {
       return Kind::$ENUM;
     } else {
       return Kind::$CLASS;
