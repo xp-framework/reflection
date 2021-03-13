@@ -53,7 +53,7 @@ class Type {
       return Kind::$INTERFACE;
     } else if ($this->reflect->isTrait()) {
       return Kind::$TRAIT;
-    } else if ($this->reflect->isSubclassOf(Enum::class)) {
+    } else if ($this->reflect->isSubclassOf(Enum::class) || $this->reflect->isSubclassOf(\UnitEnum::class)) {
       return Kind::$ENUM;
     } else {
       return Kind::$CLASS;
