@@ -2,7 +2,8 @@
 
 use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods, Package};
 use lang\{ElementNotFoundException, Reflection, Enum, Runnable, XPClass, ClassLoader};
-use unittest\{Assert, Before, Test};
+use unittest\actions\VerifyThat;
+use unittest\{Action, Assert, Before, Test};
 
 class TypeTest {
   private $fixture;
@@ -91,8 +92,20 @@ class TypeTest {
   }
 
   #[Test]
-  public function enum_kind() {
-    $t= $this->declare('K_E', ['kind' => 'class', 'extends' => [Enum::class]], '{ public static $M; }');
+  public function enum_kind_for_xpenums() {
+    $t= $this->declare('K_XE', ['kind' => 'class', 'extends' => [Enum::class]], '{ public static $M; }');
+    Assert::equals(Kind::$ENUM, $t->kind());
+  }
+
+  #[Test, Action(eval: 'new VerifyThat(fn() => !class_exists(\ReflectionEnum::class, false) && interface_exists(\UnitEnum::class, false))')]
+  public function enum_kind_for_enum_lookalikes() {
+    $t= $this->declare('K_LE', ['kind' => 'class', 'implements' => [\UnitEnum::class]], '{ public static $M; }');
+    Assert::equals(Kind::$ENUM, $t->kind());
+  }
+
+  #[Test, Action(eval: 'new VerifyThat(fn() => class_exists(\ReflectionEnum::class, false))')]
+  public function enum_kind_for_native_enums() {
+    $t= $this->declare('K_NE', ['kind' => 'enum'], '{ case M; }');
     Assert::equals(Kind::$ENUM, $t->kind());
   }
 
