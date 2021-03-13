@@ -102,7 +102,7 @@ class TypeTest {
     Assert::equals(Kind::$ENUM, $t->kind());
   }
 
-  #[Test, Action(eval: 'new VerifyThat(fn() => !self::$ENUMS && interface_exists(\UnitEnum::class, false))')]
+  #[Test, Action(eval: 'new VerifyThat(fn() => !self::$ENUMS)')]
   public function enum_kind_for_enum_lookalikes() {
     $t= $this->declare('K_LE', ['kind' => 'class', 'implements' => [\UnitEnum::class]], '{ public static $M; }');
     Assert::equals(Kind::$ENUM, $t->kind());
