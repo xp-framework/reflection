@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.4.0 / 2021-03-13
+
+* Merged PR #10: Support PHP 8.1 native enums - @thekid
+
 ## 1.3.0 / 2021-03-06
 
 * Added support for reflective access to non-constant expressions for
