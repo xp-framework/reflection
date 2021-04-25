@@ -110,7 +110,7 @@ class MethodsTest {
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
   }
 
-  #[Test]
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
   public function return_never_more_specific_than_void() {
     $t= $this->declare('{ /** @return never */ function fixture(): void { exit(); } }');
     Assert::equals(Type::$NEVER, $t->method('fixture')->returns()->type());
