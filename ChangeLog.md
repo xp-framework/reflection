@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.5.0 / 2021-04-25
+
+* Merged PR #11: Add support for `never` return type - @thekid
+
 ## 1.4.0 / 2021-03-13
 
 * Merged PR #10: Support PHP 8.1 native enums - @thekid
