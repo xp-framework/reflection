@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException, IllegalArgumentException};
+use lang\{Type, ArrayType, MapType, FunctionType, TypeUnion, Primitive, IllegalStateException, IllegalArgumentException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Expect, Test, Action, Values};
 
@@ -86,16 +86,52 @@ class MethodsTest {
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  public function returns_void() {
+    $returns= $this->declare('{ function fixture(): void { } }')->method('fixture')->returns();
+    Assert::equals(Type::$VOID, $returns->type());
+  }
+
   #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
   public function returns_type_union() {
     $returns= $this->declare('{ function fixture(): string|int { } }')->method('fixture')->returns();
     Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $returns->type());
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function returns_never() {
+    $returns= $this->declare('{ function fixture(): never { exit(); } }')->method('fixture')->returns();
+    Assert::equals(Type::$NEVER, $returns->type());
+  }
+
   #[Test]
   public function returns_self() {
     $type= $this->declare('{ function fixture(): self { } }');
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  public function return_never_more_specific_than_void() {
+    $t= $this->declare('{ /** @return never */ function fixture(): void { exit(); } }');
+    Assert::equals(Type::$NEVER, $t->method('fixture')->returns()->type());
+  }
+
+  #[Test]
+  public function return_string_array_more_specific_than_array() {
+    $t= $this->declare('{ /** @return string[] */ function fixture(): array { exit(); } }');
+    Assert::equals(new ArrayType(Primitive::$STRING), $t->method('fixture')->returns()->type());
+  }
+
+  #[Test]
+  public function return_string_map_more_specific_than_array() {
+    $t= $this->declare('{ /** @return [:string] */ function fixture(): array { exit(); } }');
+    Assert::equals(new MapType(Primitive::$STRING), $t->method('fixture')->returns()->type());
+  }
+
+  #[Test]
+  public function return_function_more_specific_than_calable() {
+    $t= $this->declare('{ /** @return function(): int */ function fixture(): callable { exit(); } }');
+    Assert::equals(new FunctionType([], Primitive::$INT), $t->method('fixture')->returns()->type());
   }
 
   #[Test]
