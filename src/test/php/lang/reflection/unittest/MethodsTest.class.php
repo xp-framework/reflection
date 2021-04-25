@@ -86,10 +86,22 @@ class MethodsTest {
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  public function returns_void() {
+    $returns= $this->declare('{ function fixture(): void { } }')->method('fixture')->returns();
+    Assert::equals(Type::$VOID, $returns->type());
+  }
+
   #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
   public function returns_type_union() {
     $returns= $this->declare('{ function fixture(): string|int { } }')->method('fixture')->returns();
     Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $returns->type());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function returns_never() {
+    $returns= $this->declare('{ function fixture(): never { exit(); } }')->method('fixture')->returns();
+    Assert::equals(Type::$NEVER, $returns->type());
   }
 
   #[Test]
