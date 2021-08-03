@@ -1,5 +1,7 @@
 <?php namespace lang\reflection;
 
+use Traversable;
+
 /**
  * Type constants enumeration and lookup
  *
@@ -12,7 +14,7 @@ class Constants extends Members {
    *
    * @return iterable
    */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     if (PHP_VERSION_ID >= 70100) {
       foreach ($this->reflect->getReflectionConstants() as $constant) {
         if (0 !== strncmp($constant->name, '__', 2)) {

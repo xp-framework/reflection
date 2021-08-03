@@ -1,11 +1,13 @@
 <?php namespace lang\reflection;
 
+use IteratorAggregate, Traversable;
+
 /**
  * Type and member annotations enumeration and lookup
  *
  * @test lang.reflection.unittest.AnnotationTest
  */
-class Annotations implements \IteratorAggregate {
+class Annotations implements IteratorAggregate {
   private $annotations;
 
   public function __construct($annotations) {
@@ -13,7 +15,7 @@ class Annotations implements \IteratorAggregate {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->annotations as $type => $arguments) {
       yield $type => new Annotation($type, $arguments);
     }

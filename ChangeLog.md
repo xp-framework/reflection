@@ -5,6 +5,9 @@ XP Reflection ChangeLog
 
 ## 1.6.0 / 2021-08-03
 
+* Fixed warnings in PHP 8.1 about `getIterator()` compatibility, see
+  https://wiki.php.net/rfc/internal_method_return_types
+  (@thekid)
 * Added support for reflection on native types, e.g. the `Countable`
   interface or the `DOMDocument` class
   (@thekid)

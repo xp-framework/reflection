@@ -1,7 +1,9 @@
 <?php namespace lang\reflection;
 
+use IteratorAggregate;
+
 /** Base class for constants, properties and methods enumerations */
-abstract class Members implements \IteratorAggregate {
+abstract class Members implements IteratorAggregate {
   protected $reflect;
 
   /** @param ReflectionClassConstant|ReflectionProperty|ReflectionMethod $reflect */

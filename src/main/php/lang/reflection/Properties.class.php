@@ -1,5 +1,7 @@
 <?php namespace lang\reflection;
 
+use Traversable;
+
 /**
  * Type properties enumeration and lookup
  *
@@ -12,7 +14,7 @@ class Properties extends Members {
    *
    * @return iterable
    */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->reflect->getProperties() as $property) {
       if (0 !== strncmp($property->name, '__', 2)) {
         yield $property->name => new Property($property);

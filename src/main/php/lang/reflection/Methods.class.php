@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use Traversable;
 use lang\Reflection;
 
 /**
@@ -14,7 +15,7 @@ class Methods extends Members {
    *
    * @return iterable
    */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->reflect->getMethods() as $method) {
       if (0 !== strncmp($method->name, '__', 2)) yield $method->name => new Method($method);
     }

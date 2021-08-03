@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use Traversable;
 use lang\{Reflection, Type};
 
 /**
@@ -56,7 +57,7 @@ class Parameters implements \IteratorAggregate {
   }
 
   /** @return iterable */
-  public function getIterator() {
+  public function getIterator(): Traversable {
     foreach ($this->method->getParameters() as $parameter) {
       yield $parameter->name => new Parameter($parameter, $this->method);
     }
