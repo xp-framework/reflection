@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ReflectionException, ReflectionUnionType, Throwable;
 use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 /**
@@ -50,18 +51,20 @@ class Method extends Routine {
    */
   public function invoke($instance, $args= [], $context= null) {
 
-    // Success oriented: Let PHP's reflection API raise the exceptions for us
-    if ($context && !$this->reflect->isPublic()) {
-      if (Reflection::of($context)->is($this->reflect->class)) {
+    // Only allow invoking non-public methods when given a compatible context
+    if (!$this->reflect->isPublic()) {
+      if ($context && Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
+      } else {
+        throw new CannotInvoke($this, new ReflectionException('Trying to invoke non-public method'));
       }
     }
 
     try {
       return $this->reflect->invokeArgs($instance, $args);
-    } catch (\ReflectionException $e) {
+    } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new InvocationFailed($this, $e);
     }
   }
@@ -89,7 +92,7 @@ class Method extends Routine {
     $nullable= '';
     if (null === $t) {
       $returns= $meta->methodReturns($this->reflect) ?? 'var';
-    } else if ($t instanceof \ReflectionUnionType) {
+    } else if ($t instanceof ReflectionUnionType) {
       $name= '';
       foreach ($t->getTypes() as $component) {
         if ('null' === ($c= $component->getName())) {
