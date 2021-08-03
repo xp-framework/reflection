@@ -1,6 +1,6 @@
 <?php namespace xp\reflection;
 
-use lang\{Reflect, Enum, ClassLoader};
+use lang\{Reflect, Enum, ClassLoader, XPClass};
 use util\cmd\Console;
 
 /**
@@ -27,6 +27,22 @@ use util\cmd\Console;
  * Pass the `-a` flag to include private and protected members.
  */
 class ReflectRunner {
+
+  /**
+   * Returns an XPClass instance for a given type literal
+   *
+   * @param  string $literal
+   * @return ?lang.XPClass
+   */
+  private static function classNamed($literal) {
+    $exists= (
+      class_exists($literal) ||
+      interface_exists($literal) ||
+      trait_exists($literal) ||
+      function_exists('enum_exists') && enum_exists($literal)
+    );
+    return $exists ? new XPClass($literal) : null;
+  }
 
   /** 
    * Display information about files, directories, packages or types
@@ -61,6 +77,8 @@ class ReflectRunner {
       $information= Information::forClass($cl->loadClass($name), $flags);
     } else if ($cl->providesPackage($name)) {
       $information= Information::forPackage($name, $flags);
+    } else if ($class= self::classNamed(strtr($name, '.', '\\'))) {
+      $information= Information::forClass($class, $flags);
     } else {
       Console::$err->writeLine('Error: "'.$name.'" neither refers to an existing class or package');
       return 2;

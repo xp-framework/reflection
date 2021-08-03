@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.6.0 / 2021-08-03
+
+* Added support for reflection on native types, e.g. the `Countable`
+  interface or the `DOMDocument` class
+  (@thekid)
+
 ## 1.5.0 / 2021-04-25
 
 * Merged PR #11: Add support for `never` return type - @thekid
