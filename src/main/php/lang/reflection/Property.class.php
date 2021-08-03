@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ReflectionException, ReflectionUnionType, Throwable;
 use lang\{Reflection, XPClass, Type, TypeUnion};
 
 /**
@@ -45,16 +46,18 @@ class Property extends Member {
    */
   public function get($instance, $context= null) {
 
-    // Success oriented: Let PHP's reflection API raise the exceptions for us
-    if ($context && !$this->reflect->isPublic()) {
-      if (Reflection::of($context)->is($this->reflect->class)) {
+    // Only allow reading non-public properties when given a compatible context
+    if (!$this->reflect->isPublic()) {
+      if ($context && Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
+      } else {
+        throw new CannotAccess($this, new ReflectionException('Trying to read non-public property'));
       }
     }
 
     try {
       return $this->reflect->getValue($instance);
-    } catch (\ReflectionException $e) {
+    } catch (ReflectionException $e) {
       throw new CannotAccess($this, $e);
     }
   }
@@ -71,19 +74,21 @@ class Property extends Member {
    */
   public function set($instance, $value, $context= null) {
 
-    // Success oriented: Let PHP's reflection API raise the exceptions for us
-    if ($context && !$this->reflect->isPublic()) {
-      if (Reflection::of($context)->is($this->reflect->class)) {
+    // Only allow reading non-public properties when given a compatible context
+    if (!$this->reflect->isPublic()) {
+      if ($context && Reflection::of($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
+      } else {
+        throw new CannotAccess($this, new ReflectionException('Trying to write non-public property'));
       }
     }
 
     try {
       $this->reflect->setValue($instance, $value);
       return $value;
-    } catch (\ReflectionException $e) {
+    } catch (ReflectionException $e) {
       throw new CannotAccess($this, $e);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new AccessingFailed($this, $e);
     }
   }
@@ -95,7 +100,7 @@ class Property extends Member {
     $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
     if (null === $t) {
       $name= Reflection::meta()->propertyType($this->reflect) ?? 'var';
-    } else if ($t instanceof \ReflectionUnionType) {
+    } else if ($t instanceof ReflectionUnionType) {
       $name= '';
       foreach ($t->getTypes() as $component) {
         $name.= '|'.$component->getName();

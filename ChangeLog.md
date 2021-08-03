@@ -5,6 +5,10 @@ XP Reflection ChangeLog
 
 ## 1.6.0 / 2021-08-03
 
+* Fixed `Method::invoke()`, `Property::get()` and `Property::set()` not
+  raising exceptions in PHP 8.1, an incompatibility created by the RFC
+  https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
+  (@thekid)
 * Fixed warnings in PHP 8.1 about `getIterator()` compatibility, see
   https://wiki.php.net/rfc/internal_method_return_types
   (@thekid)
