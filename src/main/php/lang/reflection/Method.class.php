@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionUnionType, Throwable;
+use ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable;
 use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 /**
@@ -100,6 +100,12 @@ class Method extends Routine {
         } else {
           $name.= '|'.$c;
         }
+      }
+      $returns= substr($name, 1);
+    } else if ($t instanceof ReflectionIntersectionType) {
+      $name= '';
+      foreach ($t->getTypes() as $component) {
+        $name.= '&'.$component->getName();
       }
       $returns= substr($name, 1);
     } else {

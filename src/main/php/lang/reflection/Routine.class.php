@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ReflectionUnionType, ReflectionIntersectionType;
 use lang\{Reflection, Type, TypeUnion};
 
 /** Base class for methods and constructors */
@@ -22,7 +23,7 @@ abstract class Routine extends Member {
       $nullable= '';
       if (null === $t) {
         $type= $types[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
-      } else if ($t instanceof \ReflectionUnionType) {
+      } else if ($t instanceof ReflectionUnionType) {
         $name= '';
         foreach ($t->getTypes() as $component) {
           if ('null' === ($c= $component->getName())) {
@@ -30,6 +31,12 @@ abstract class Routine extends Member {
           } else {
             $name.= '|'.$c;
           }
+        }
+        $type= substr($name, 1);
+      } else if ($t instanceof ReflectionIntersectionType) {
+        $name= '';
+        foreach ($t->getTypes() as $component) {
+          $name.= '&'.$component->getName();
         }
         $type= substr($name, 1);
       } else {

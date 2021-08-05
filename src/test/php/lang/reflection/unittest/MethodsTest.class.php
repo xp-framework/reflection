@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\{Type, ArrayType, MapType, FunctionType, TypeUnion, Primitive, IllegalStateException, IllegalArgumentException};
+use lang\{Type, ArrayType, MapType, FunctionType, TypeUnion, TypeIntersection, Primitive, XPClass, IllegalStateException, IllegalArgumentException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Expect, Test, Action, Values};
 
@@ -102,6 +102,12 @@ class MethodsTest {
   public function returns_never() {
     $returns= $this->declare('{ function fixture(): never { exit(); } }')->method('fixture')->returns();
     Assert::equals(Type::$NEVER, $returns->type());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function returns_type_intersection() {
+    $returns= $this->declare('{ function fixture(): \Countable&\Traversable { } }')->method('fixture')->returns();
+    Assert::equals(new TypeIntersection([new XPClass('Countable'), new XPClass('Traversable')]), $returns->type());
   }
 
   #[Test]
@@ -225,6 +231,15 @@ class MethodsTest {
     );
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function string_representation_with_intersection_typed_parameter() {
+    $t= $this->declare('{ public function fixture(\Countable&\Traversable $s): string { } }');
+    Assert::equals(
+      'public function fixture(Countable&Traversable $s): string',
+      $t->method('fixture')->toString()
+    );
+  }
+
   #[Test]
   public function string_representation_with_apidoc_parameter() {
     $t= $this->declare('{
@@ -260,6 +275,15 @@ class MethodsTest {
     $t= $this->declare('{ public function fixture(): string|int { } }');
     Assert::equals(
       'public function fixture(): string|int',
+      $t->method('fixture')->toString()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function string_representation_with_intersection_typed_return() {
+    $t= $this->declare('{ public function fixture(): \Countable&\Traversable { } }');
+    Assert::equals(
+      'public function fixture(): Countable&Traversable',
       $t->method('fixture')->toString()
     );
   }

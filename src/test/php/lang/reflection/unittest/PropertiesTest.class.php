@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{Modifiers, CannotAccess, AccessingFailed, Constraint};
-use lang\{Type, Primitive, TypeUnion};
+use lang\{Type, Primitive, TypeUnion, TypeIntersection, XPClass};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
 
@@ -177,6 +177,15 @@ class PropertiesTest {
     $type= $this->declare('{ public string|int $fixture; }');
     Assert::equals(
       new Constraint(new TypeUnion([Primitive::$STRING, Primitive::$INT]), true),
+      $type->property('fixture')->constraint()
+    );
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  public function type_from_intersection_declaration() {
+    $type= $this->declare('{ public \Countable&\Traversable $fixture; }');
+    Assert::equals(
+      new Constraint(new TypeIntersection([new XPClass('Countable'), new XPClass('Traversable')]), true),
       $type->property('fixture')->constraint()
     );
   }
