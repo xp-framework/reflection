@@ -141,6 +141,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function returns_type_intersection_via_apidoc() {
+    $returns= $this->declare('{ /** @return \Countable&\Traversable */ function fixture() { } }')->method('fixture')->returns();
+    Assert::equals(new TypeIntersection([new XPClass('Countable'), new XPClass('Traversable')]), $returns->type());
+  }
+
+  #[Test]
   public function annotations() {
     $t= $this->declare('{
       #[Author("Test")]

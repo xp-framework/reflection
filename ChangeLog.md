@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.7.0 / 2021-08-05
+
+* Added support for PHP 8.1 intersection types, implementing #12. See
+  https://wiki.php.net/rfc/pure-intersection-types
+  (@thekid)
+
 ## 1.6.0 / 2021-08-03
 
 * Fixed `Method::invoke()`, `Property::get()` and `Property::set()` not
