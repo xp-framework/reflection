@@ -30,15 +30,6 @@ abstract class Member implements Value {
       'self'   => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()); },
       'parent' => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()->getParentClass()); },
       '*'      => function($type) use($reflect) {
-
-        // Support for builtin types w/o namespace should be handled by lang.Type, really
-        if (
-          class_exists($type) ||
-          interface_exists($type) ||
-          trait_exists($type) ||
-          function_exists('enun_exists') && enum_exists($type)
-        ) return new XPClass($type);
-
         $declared= $reflect->getDeclaringClass();
         $imports= Reflection::meta()->scopeImports($declared);
         return XPClass::forName($imports[$type] ?? $declared->getNamespaceName().'\\'.$type);
