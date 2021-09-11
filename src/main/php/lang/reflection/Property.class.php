@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
 use ReflectionException, ReflectionUnionType, Throwable;
-use lang\{Reflection, XPClass, Type, TypeUnion};
+use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion};
 
 /**
  * Reflection for a single property
@@ -20,7 +20,9 @@ class Property extends Member {
   public function comment() { return Reflection::meta()->propertyComment($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
-  public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->name; }
+  public function compoundName(): string {
+    return strtr($this->reflect->getDeclaringClass()->name , '\\', '.').'::$'.$this->reflect->getName();
+  }
 
   /** @return lang.reflection.Constraint */
   public function constraint() {
@@ -32,7 +34,11 @@ class Property extends Member {
       return Reflection::meta()->propertyType($this->reflect);
     };
 
-    $t= Type::resolve(PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null, Member::resolve($this->reflect), $api);
+    $t= Type::resolve(
+      PHP_VERSION_ID >= 70400 || '' === $this->reflect->name ? $this->reflect->getType() : null,
+      Member::resolve($this->reflect),
+      $api
+    );
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
@@ -97,7 +103,7 @@ class Property extends Member {
   public function toString() {
 
     // Compile property type
-    $t= PHP_VERSION_ID >= 70400 ? $this->reflect->getType() : null;
+    $t= PHP_VERSION_ID >= 70400 || '' === $this->reflect->name ? $this->reflect->getType() : null;
     if (null === $t) {
       $name= Reflection::meta()->propertyType($this->reflect) ?? 'var';
     } else if ($t instanceof ReflectionUnionType) {
@@ -110,6 +116,19 @@ class Property extends Member {
       $name= $t->getName();
     }
 
-    return Modifiers::namesOf($this->reflect->getModifiers()).' '.$name.' $'.$this->reflect->name;
+    return Modifiers::namesOf($this->reflect->getModifiers()).' '.$name.' $'.$this->reflect->getName();
+  }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? VirtualProperty::compare($this->reflect, $value->reflect)
+      : 1
+    ;
   }
 }

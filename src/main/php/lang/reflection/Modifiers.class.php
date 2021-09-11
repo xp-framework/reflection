@@ -14,6 +14,7 @@ class Modifiers implements Value {
   const IS_PUBLIC    = MODIFIER_PUBLIC;
   const IS_PROTECTED = MODIFIER_PROTECTED;
   const IS_PRIVATE   = MODIFIER_PRIVATE;
+  const IS_READONLY  = 0x0080; // XP 10.13: MODIFIER_READONLY
   const IS_NATIVE    = 0xF000;
 
   private static $names= [
@@ -23,7 +24,8 @@ class Modifiers implements Value {
     'static'    => self::IS_STATIC,
     'final'     => self::IS_FINAL,
     'abstract'  => self::IS_ABSTRACT,
-    'native'    => self::IS_NATIVE
+    'native'    => self::IS_NATIVE,
+    'readonly'  => self::IS_READONLY,
   ];
   private $bits;
 
@@ -111,6 +113,9 @@ class Modifiers implements Value {
 
   /** @return bool */
   public function isNative() { return 0 !== ($this->bits & self::IS_NATIVE); }
+
+  /** @return bool */
+  public function isReadonly() { return 0 !== ($this->bits & self::IS_READONLY); }
 
   /**
    * Compares a given value to this modifiers instance

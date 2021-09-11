@@ -1,6 +1,7 @@
 <?php namespace lang\reflection;
 
 use Traversable;
+use lang\{VirtualProperty, Reflection};
 
 /**
  * Type properties enumeration and lookup
@@ -20,6 +21,9 @@ class Properties extends Members {
         yield $property->name => new Property($property);
       }
     }
+    foreach (Reflection::meta()->virtualProperties($this->reflect) as $name => $virtual) {
+      yield $name => new Property(new VirtualProperty($this->reflect, $name, $virtual));
+    }
   }
 
   /**
@@ -29,9 +33,11 @@ class Properties extends Members {
    * @return ?lang.reflection.Property
    */
   public function named($name) {
-    return $this->reflect->hasProperty($name)
-      ? new Property($this->reflect->getProperty($name))
-      : null
-    ;
+    if ($this->reflect->hasProperty($name)) {
+      return new Property($this->reflect->getProperty($name));
+    } else if ($virtual= Reflection::meta()->virtualProperties($this->reflect)[$name] ?? null) {
+      return new Property(new VirtualProperty($this->reflect, $name, $virtual));
+    }
+    return null;
   }
 }

@@ -1,13 +1,13 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
+use lang\{Reflection, Enum, XPClass, Value, VirtualProperty, IllegalArgumentException};
 
 /**
  * Reflection for a value type: classes, interfaces, traits and enums
  *
  * @test lang.reflection.unittest.TypeTest
  */
-class Type {
+class Type implements Value {
   private $reflect;
   private $annotations= null;
 
@@ -248,10 +248,12 @@ class Type {
 
   /** @return ?lang.reflection.Property */
   public function property(string $name) {
-    return $this->reflect->hasProperty($name)
-      ? new Property($this->reflect->getProperty($name))
-      : null
-    ;
+    if ($this->reflect->hasProperty($name)) {
+      return new Property($this->reflect->getProperty($name));
+    } else if ($virtual= Reflection::meta()->virtualProperties($this->reflect)[$name] ?? null) {
+      return new Property(new VirtualProperty($this->reflect, $name, $virtual));
+    }
+    return null;
   }
 
   /** @return lang.reflection.Properties */
@@ -285,6 +287,25 @@ class Type {
    */
   public function evaluate($expression) {
     return Reflection::meta()->evaluate($this->reflect, $expression);
+  }
+
+  /** @return string */
+  public function hashCode() { return md5($this->reflect->name); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'<'.$this->name().'>'; }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? $this->reflect->name <=> $value->reflect->name
+      : 1
+    ;
   }
 
   /** @return string */
