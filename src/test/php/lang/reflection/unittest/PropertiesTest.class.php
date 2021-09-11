@@ -269,4 +269,19 @@ class PropertiesTest {
     $t= Reflection::of(WithReadonly::class);
     Assert::equals('public readonly string $fixture', $t->property('fixture')->toString());
   }
+
+  #[Test]
+  public function virtual_property_included_in_list() {
+    $t= Reflection::of(WithReadonly::class);
+    Assert::equals(
+      ['fixture' => 'public readonly'],
+      array_map(function($p) { return $p->modifiers()->names(); }, iterator_to_array($t->properties()))
+    );
+  }
+
+  #[Test]
+  public function named_virtual() {
+    $type= Reflection::of(WithReadonly::class);
+    Assert::equals($type->property('fixture'), $type->properties()->named('fixture'));
+  }
 }
