@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{Modifiers, CannotAccess, AccessingFailed, Constraint};
-use lang\{Type, Primitive, TypeUnion, TypeIntersection, Reflection, XPClass};
+use lang\{Type, Primitive, TypeUnion, TypeIntersection, XPClass};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
 
@@ -246,42 +246,5 @@ class PropertiesTest {
     } catch (CannotAccess $expected) {
       Assert::equals($t->property('fixture'), $expected->target());
     }
-  }
-
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
-  public function native_readonly() {
-    $t= $this->declare('{ public readonly string $fixture; }');
-    Assert::equals('public readonly string $fixture', $t->property('fixture')->toString());
-  }
-
-  #[Test]
-  public function meta_readonly() {
-    $t= $this->declare('{ }');
-    \xp::$meta[$t->name()][0]['fixture']= [
-      DETAIL_RETURNS   => 'string',
-      DETAIL_ARGUMENTS => [Modifiers::IS_PUBLIC | Modifiers::IS_READONLY]
-    ];
-    Assert::equals('public readonly string $fixture', $t->property('fixture')->toString());
-  }
-
-  #[Test]
-  public function property_doccoment_readonly() {
-    $t= Reflection::of(WithReadonly::class);
-    Assert::equals('public readonly string $fixture', $t->property('fixture')->toString());
-  }
-
-  #[Test]
-  public function virtual_property_included_in_list() {
-    $t= Reflection::of(WithReadonly::class);
-    Assert::equals(
-      ['fixture' => 'public readonly'],
-      array_map(function($p) { return $p->modifiers()->names(); }, iterator_to_array($t->properties()))
-    );
-  }
-
-  #[Test]
-  public function named_virtual() {
-    $type= Reflection::of(WithReadonly::class);
-    Assert::equals($type->property('fixture'), $type->properties()->named('fixture'));
   }
 }
