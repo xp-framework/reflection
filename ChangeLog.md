@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.8.0 / 2021-09-12
+
+* Merged PR #14: Implement PHP 8.1 readonly properties - @thekid
+
 ## 1.7.0 / 2021-08-05
 
 * Added support for PHP 8.1 intersection types, implementing #12. See
