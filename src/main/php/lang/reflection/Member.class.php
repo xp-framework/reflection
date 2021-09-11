@@ -55,7 +55,7 @@ abstract class Member implements Value {
   }
 
   /** Returns this member's name */
-  public function name(): string { return $this->reflect->name; }
+  public function name(): string { return $this->reflect->getName(); }
 
   /** Returns a compound name   */
   public abstract function compoundName(): string;

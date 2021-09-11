@@ -22,6 +22,8 @@ module xp-framework/reflect {
           $this->reflect= new \ReflectionClass($class);
         }
 
+        public function getName() { return $this->name; }
+
         public function getModifiers() { return MODIFIER_PUBLIC; }
 
         public function getValue() { return $this->reflect->getConstant($this->name); }

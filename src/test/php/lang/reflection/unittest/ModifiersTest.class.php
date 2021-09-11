@@ -14,6 +14,7 @@ class ModifiersTest {
     yield [Modifiers::IS_PROTECTED, 'protected'];
     yield [Modifiers::IS_PRIVATE, 'private'];
     yield [Modifiers::IS_NATIVE, 'native'];
+    yield [Modifiers::IS_READONLY, 'readonly'];
     yield [Modifiers::IS_FINAL | Modifiers::IS_PUBLIC, 'public final'];
     yield [Modifiers::IS_ABSTRACT | Modifiers::IS_PUBLIC, 'public abstract'];
     yield [Modifiers::IS_ABSTRACT | Modifiers::IS_PROTECTED, 'protected abstract'];
@@ -75,6 +76,11 @@ class ModifiersTest {
   #[Test, Values([['native', true], ['public', false]])]
   public function isNative($input, $expected) {
     Assert::equals($expected, (new Modifiers($input))->isNative());
+  }
+
+  #[Test, Values([['readonly', true], ['public', false]])]
+  public function isReadonly($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isReadonly());
   }
 
   #[Test]

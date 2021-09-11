@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Enum, XPClass, IllegalArgumentException};
+use lang\{Reflection, Enum, XPClass, VirtualProperty, IllegalArgumentException};
 
 /**
  * Reflection for a value type: classes, interfaces, traits and enums
@@ -248,10 +248,12 @@ class Type {
 
   /** @return ?lang.reflection.Property */
   public function property(string $name) {
-    return $this->reflect->hasProperty($name)
-      ? new Property($this->reflect->getProperty($name))
-      : null
-    ;
+    if ($this->reflect->hasProperty($name)) {
+      return new Property($this->reflect->getProperty($name));
+    } else if ($virtual= Reflection::meta()->virtualProperties($this->reflect)[$name] ?? null) {
+      return new Property(new VirtualProperty($this->reflect, $name, $virtual));
+    }
+    return null;
   }
 
   /** @return lang.reflection.Properties */

@@ -1,5 +1,7 @@
 <?php namespace lang\meta;
 
+Use lang\reflection\Modifiers;
+
 /**
  * Returns annotations from `xp::$meta` if it present there, delegating
  * it to another source otherwise.
@@ -248,5 +250,40 @@ class MetaInformation {
       }
     }
     return $this->annotations->ofParameter($method, $reflect);
+  }
+
+  /**
+   * Returns virtual properties for a given type
+   *
+   * @param  \ReflectionClass $reflect
+   * @param  bool $parents
+   * @return [:var[]]
+   */
+  public function virtualProperties($reflect, $parents= true) {
+    $r= [];
+    do {
+
+      // If meta information is already loaded, use property arguments
+      if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')][0] ?? null) {
+        foreach ($meta as $name => $property) {
+          if ($arg= $property[DETAIL_ARGUMENTS] ?? null) {
+            $r[$name]= [$arg[0], $property[DETAIL_RETURNS]];
+          }
+        }
+        continue;
+      }
+
+      // Parse doc comment
+      $comment= $reflect->getDocComment();
+      if (null === $comment) continue;
+
+      preg_match_all('/@property(\-read|\-write)? ([^ ]+) \$([^ ]+)/', $comment, $matches, PREG_SET_ORDER);
+      $r= [];
+      foreach ($matches as $match) {
+        $r[$match[3]]= [Modifiers::IS_PUBLIC | ('-read' === $match[1] ? Modifiers::IS_READONLY : 0), $match[2]];
+      }
+    } while ($reflect= $reflect->getParentclass());
+
+    return $r;
   }
 }
