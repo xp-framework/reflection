@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
 use ReflectionException, ReflectionUnionType, Throwable;
-use lang\{Reflection, XPClass, Type, TypeUnion};
+use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion};
 
 /**
  * Reflection for a single property
@@ -20,7 +20,9 @@ class Property extends Member {
   public function comment() { return Reflection::meta()->propertyComment($this->reflect); }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
-  public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::$'.$this->reflect->getName(); }
+  public function compoundName(): string {
+    return strtr($this->reflect->getDeclaringClass()->name , '\\', '.').'::$'.$this->reflect->getName();
+  }
 
   /** @return lang.reflection.Constraint */
   public function constraint() {
@@ -115,5 +117,18 @@ class Property extends Member {
     }
 
     return Modifiers::namesOf($this->reflect->getModifiers()).' '.$name.' $'.$this->reflect->getName();
+  }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? VirtualProperty::compare($this->reflect, $value->reflect)
+      : 1
+    ;
   }
 }
