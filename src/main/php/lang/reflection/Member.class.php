@@ -114,7 +114,7 @@ abstract class Member implements Value {
    * @return int
    */
   public function compareTo($value) {
-    if ($value instanceof self) {
+    if ($value instanceof static) {
       $r= $this->reflect->class <=> $value->reflect->class;
       return 0 === $r ? $this->reflect->name <=> $value->reflect->name : $r;
     }
