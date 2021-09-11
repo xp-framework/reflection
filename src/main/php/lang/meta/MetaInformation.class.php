@@ -256,10 +256,9 @@ class MetaInformation {
    * Returns virtual properties for a given type
    *
    * @param  \ReflectionClass $reflect
-   * @param  bool $parents
    * @return [:var[]]
    */
-  public function virtualProperties($reflect, $parents= true) {
+  public function virtualProperties($reflect) {
     $r= [];
     do {
 
