@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.8.1 / 2021-10-21
+
+* Made library compatible with XP 11 - @thekid
+
 ## 1.8.0 / 2021-09-12
 
 * Merged PR #14: Implement PHP 8.1 readonly properties - @thekid
