@@ -171,4 +171,22 @@ class InstantiationTest {
     }');
     $t->initializer('raise')->newInstance();
   }
+
+  #[Test]
+  public function supports_named_arguments() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2, 'a' => 1])->values);
+  }
+
+  #[Test]
+  public function supports_optional_named_arguments() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a= 1, $b= 2) { $this->values= [$a, $b]; }
+    }');
+    Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2])->values);
+  }
 }

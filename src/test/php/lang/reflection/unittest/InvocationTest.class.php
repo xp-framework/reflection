@@ -146,4 +146,20 @@ class InvocationTest {
       Assert::equals($t->method('fixture'), $expected->target());
     }
   }
+
+  #[Test]
+  public function supports_named_arguments() {
+    $t= $this->declare('{
+      public static function fixture($a, $b) { return [$a, $b]; }
+    }');
+    Assert::equals([1, 2], $t->method('fixture')->invoke(null, ['b' => 2, 'a' => 1]));
+  }
+
+  #[Test]
+  public function supports_optional_named_arguments() {
+    $t= $this->declare('{
+      public static function fixture($a= 1, $b= 2) { return [$a, $b]; }
+    }');
+    Assert::equals([1, 2], $t->method('fixture')->invoke(null, ['b' => 2]));
+  }
 }
