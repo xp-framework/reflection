@@ -48,6 +48,15 @@ class Constructor extends Routine implements Instantiation {
         }
       }
 
+      // Support named arguments for PHP 7
+      if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
+        $pass= [];
+        foreach ($this->reflect->getParameters() as $param) {
+          $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+        }
+        return $this->class->newInstanceArgs($pass);
+      }
+
       return $this->class->newInstanceArgs($args);
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);

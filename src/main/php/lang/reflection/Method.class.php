@@ -61,6 +61,16 @@ class Method extends Routine {
     }
 
     try {
+
+      // Support named arguments for PHP 7
+      if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
+        $pass= [];
+        foreach ($this->reflect->getParameters() as $param) {
+          $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+        }
+        return $this->reflect->invokeArgs($instance, $pass);
+      }
+
       return $this->reflect->invokeArgs($instance, $args);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
