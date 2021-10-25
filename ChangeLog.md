@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.9.0 / 2021-10-25
+
+* Merged PR #16: Add support for named arguments in PHP 7 - @thekid
+
 ## 1.8.1 / 2021-10-21
 
 * Made library compatible with XP 11 - @thekid
