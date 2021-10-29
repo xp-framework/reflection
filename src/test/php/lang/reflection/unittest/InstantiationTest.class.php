@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Runnable, CommandLine, IllegalAccessException};
+use lang\{Reflection, Runnable, CommandLine, Error, IllegalAccessException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
 
@@ -49,6 +49,19 @@ class InstantiationTest {
       throw new AssertionFailedError('No exception was raised');
     } catch (InvocationFailed $expected) {
       Assert::instance(IllegalAccessException::class, $expected->getCause());
+    }
+  }
+
+  #[Test, Values('invocations')]
+  public function type_errors_are_wrapped($invocation) {
+    $t= $this->declare('{
+      public function __construct(\util\Date $date) { }
+    }');
+    try {
+      $invocation($t, [null]);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (InvocationFailed $expected) {
+      Assert::instance(Error::class, $expected->getCause());
     }
   }
 
