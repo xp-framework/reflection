@@ -162,4 +162,12 @@ class InvocationTest {
     }');
     Assert::equals([1, 2], $t->method('fixture')->invoke(null, ['b' => 2]));
   }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function excess_named_arguments_raise_error() {
+    $t= $this->declare('{
+      public static function fixture($a, $b) { return [$a, $b]; }
+    }');
+    $t->method('fixture')->invoke(null, ['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
 }

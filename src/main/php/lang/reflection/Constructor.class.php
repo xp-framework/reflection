@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\Reflection;
+use lang\{Reflection, Error};
 
 /**
  * Reflection for a type's constructor
@@ -35,6 +35,21 @@ class Constructor extends Routine implements Instantiation {
    * @throws lang.reflection.CannotInstantiate
    */
   public function newInstance(array $args= [], $context= null) {
+
+    // Support named arguments for PHP 7.
+    if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
+      $pass= [];
+      foreach ($this->reflect->getParameters() as $param) {
+        $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+        unset($args[$param->name]);
+      }
+      if ($args) {
+        throw new InvocationFailed($this, new Error('Unknown named parameter $'.key($args)));
+      }
+    } else {
+      $pass= $args;
+    }
+
     try {
 
       // Workaround for non-public constructors: Set accessible, then manually
@@ -43,21 +58,12 @@ class Constructor extends Routine implements Instantiation {
         if (Reflection::of($context)->is($this->class->name)) {
           $instance= $this->class->newInstanceWithoutConstructor();
           $this->reflect->setAccessible(true);
-          $this->reflect->invokeArgs($instance, $args);
+          $this->reflect->invokeArgs($instance, $pass);
           return $instance;
         }
       }
 
-      // Support named arguments for PHP 7
-      if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-        $pass= [];
-        foreach ($this->reflect->getParameters() as $param) {
-          $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
-        }
-        return $this->class->newInstanceArgs($pass);
-      }
-
-      return $this->class->newInstanceArgs($args);
+      return $this->class->newInstanceArgs($pass);
     } catch (\ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
     } catch (\Throwable $e) {

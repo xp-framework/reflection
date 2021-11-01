@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
 use ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable;
-use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
+use lang\{Reflection, TypeUnion, Type, XPClass, Error, IllegalArgumentException};
 
 /**
  * Reflection for a single method
@@ -67,6 +67,10 @@ class Method extends Routine {
         $pass= [];
         foreach ($this->reflect->getParameters() as $param) {
           $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+          unset($args[$param->name]);
+        }
+        if ($args) {
+          throw new ReflectionException('Unknown named parameter $'.key($args));
         }
         return $this->reflect->invokeArgs($instance, $pass);
       }

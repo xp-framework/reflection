@@ -202,4 +202,13 @@ class InstantiationTest {
     }');
     Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2])->values);
   }
+
+  #[Test, Expect(InvocationFailed::class)]
+  public function excess_named_arguments_raise_error() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->constructor()->newInstance(['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
 }

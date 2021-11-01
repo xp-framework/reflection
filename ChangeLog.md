@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed excess named arguments not raising exceptions in PHP 7 - @thekid
+
 ## 1.9.0 / 2021-10-25
 
 * Merged PR #16: Add support for named arguments in PHP 7 - @thekid
