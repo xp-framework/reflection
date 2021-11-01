@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.9.1 / 2021-11-01
+
 * Fixed excess named arguments not raising exceptions in PHP 7 - @thekid
 
 ## 1.9.0 / 2021-10-25
