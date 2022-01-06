@@ -120,12 +120,12 @@ class ParametersTest {
 
   #[Test]
   public function default_value_via_default_annotation() {
-    $type= $this->declare('{ function fixture($arg= null) { } }');
+    $type= $this->declare('{ function fixture(
+      #[\Default("test")]
+      $arg= null
+    ) { } }');
 
-    // Modify meta information directly for the purpose of this test.
-    \xp::$meta[$type->name()][1]['fixture'][DETAIL_TARGET_ANNO]['$arg']['default']= $this;
-
-    Assert::equals($this, $type->method('fixture')->parameter(0)->default());
+    Assert::equals('test', $type->method('fixture')->parameter(0)->default());
   }
 
   #[Test, Expect(IllegalStateException::class)]
@@ -161,5 +161,4 @@ class ParametersTest {
       iterator_to_array($parameter->annotations())
     );
   }
-
 }

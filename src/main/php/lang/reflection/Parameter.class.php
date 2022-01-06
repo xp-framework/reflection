@@ -45,8 +45,8 @@ class Parameter {
     if ($this->reflect->isDefaultValueAvailable()) {
       $value= $this->reflect->getDefaultValue();
       if (null === $value) {
-        $class= strtr($this->reflect->getDeclaringClass()->name, '\\', '.');
-        return \xp::$meta[$class][1][$this->method->name][DETAIL_TARGET_ANNO]['$'.$this->reflect->name]['default'] ?? null;
+        $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
+        return $this->annotations['Default'][0] ?? null;
       }
       return $value;
     }

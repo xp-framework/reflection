@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 1.9.2 / 2022-??-??
+
+* Fixed `lang.reflection.Parameter::default()` to parse parameter
+  annotations correctly
+  (@thekid)
+
 ## 1.9.1 / 2021-11-01
 
 * Fixed excess named arguments not raising exceptions in PHP 7 - @thekid
