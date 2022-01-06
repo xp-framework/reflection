@@ -5,6 +5,8 @@ XP Reflection ChangeLog
 
 ## 1.9.2 / 2022-??-??
 
+* Made this library compatible with `xp-framework/ast` version 8.0
+  (@thekid)
 * Fixed `lang.reflection.Parameter::default()` to parse parameter
   annotations correctly
   (@thekid)
