@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable;
-use lang\{Reflection, TypeUnion, Type, XPClass, Error, IllegalArgumentException};
+use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError;
+use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 /**
  * Reflection for a single method
@@ -46,7 +46,7 @@ class Method extends Routine {
    * @param  var[] $args
    * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return var
-   * @throws lang.reflection.CannotInvoke
+   * @throws lang.reflection.CannotInvoke if prerequisites to the invocation fail
    * @throws lang.reflection.InvocationFailed if invocation raises an exception
    */
   public function invoke($instance, $args= [], $context= null) {
@@ -66,19 +66,43 @@ class Method extends Routine {
       if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
         $pass= [];
         foreach ($this->reflect->getParameters() as $param) {
-          $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+          if (isset($args[$param->name])) {
+            $pass[]= $args[$param->name];
+          } else if ($param->isOptional()) {
+            $pass[]= $param->getDefaultValue();
+          } else {
+            throw new ReflectionException('Missing parameter $'.$param->name);
+          }
           unset($args[$param->name]);
         }
+
+        // Check for excess arguments
         if ($args) {
           throw new ReflectionException('Unknown named parameter $'.key($args));
         }
+
         return $this->reflect->invokeArgs($instance, $pass);
+      }
+
+      // PHP 7.0 still had warnings for arguments
+      if (PHP_VERSION_ID < 70100 && sizeof($args) < $this->reflect->getNumberOfRequiredParameters()) {
+        throw new ReflectionException('Too few arguments');
       }
 
       return $this->reflect->invokeArgs($instance, $args);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
+    } catch (ArgumentCountError $e) {
+      throw new CannotInvoke($this, $e);
+    } catch (TypeError $e) {
+      throw new CannotInvoke($this, $e);
     } catch (Throwable $e) {
+
+      // This really should be an ArgumentCountError...
+      if (PHP_VERSION_ID >= 80200 && 0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+        throw new CannotInvoke($this, $e);
+      }
+
       throw new InvocationFailed($this, $e);
     }
   }

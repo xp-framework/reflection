@@ -91,13 +91,13 @@ class InvocationTest {
     Assert::equals($arguments, $t->method('fixture')->invoke($t->newInstance(), $arguments));
   }
 
-  #[Test, Expect(InvocationFailed::class)]
+  #[Test, Expect(CannotInvoke::class)]
   public function missing_required_argument() {
     $t= $this->declare('{ public function fixture($arg) { } }');
     $t->method('fixture')->invoke($t->newInstance(), []);
   }
 
-  #[Test, Expect(InvocationFailed::class)]
+  #[Test, Expect(CannotInvoke::class)]
   public function incorrectly_typed_argument() {
     $t= $this->declare('{ public function fixture(array $arg) { } }');
     $t->method('fixture')->invoke($t->newInstance(), [1]);
@@ -169,5 +169,13 @@ class InvocationTest {
       public static function fixture($a, $b) { return [$a, $b]; }
     }');
     $t->method('fixture')->invoke(null, ['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
+
+  #[Test, Expect(CannotInvoke::class)]
+  public function missing_named_arguments_raise_error() {
+    $t= $this->declare('{
+      public static function fixture($a, $b) { return [$a, $b]; }
+    }');
+    $t->method('fixture')->invoke(null, ['a' => 1]);
   }
 }

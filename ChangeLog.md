@@ -3,8 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 1.9.2 / 2022-01-09
+## 2.0.0 / 2022-01-09
 
+* Changed (named) argument handling to be consistent during method
+  invocations. Missing or incorrectly typed arguments now raise
+  `lang.reflection.CannotInvoke` in all PHP versions 7.0...8.2
+  (@thekid)
 * Made this library compatible with `xp-framework/ast` version 8.0
   (@thekid)
 * Fixed `lang.reflection.Parameter::default()` to parse parameter
