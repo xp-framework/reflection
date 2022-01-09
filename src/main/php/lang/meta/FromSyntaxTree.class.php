@@ -95,8 +95,10 @@ class FromSyntaxTree {
    * @return [:var]
    */
   private function annotations($tree, $annotated) {
+    if (null === $annotated->annotations) return [];
+
     $r= [];
-    foreach ((array)$annotated->annotations as $type => $arguments) {
+    foreach ($annotated->annotations as $type => $arguments) {
       if ('eval' === key($arguments)) {
         $parsed= self::$lang->parse(new Tokens($arguments['eval']->visit($tree).';', '(evaluated)'), $tree->resolver());
         $r[$type]= [$parsed->tree()->children()[0]->visit($tree)];
