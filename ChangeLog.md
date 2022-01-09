@@ -3,7 +3,7 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 1.9.2 / 2022-??-??
+## 1.9.2 / 2022-01-09
 
 * Made this library compatible with `xp-framework/ast` version 8.0
   (@thekid)
