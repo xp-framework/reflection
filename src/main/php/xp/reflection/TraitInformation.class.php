@@ -5,7 +5,7 @@ class TraitInformation extends TypeInformation {
   public function sources() { return [$this->type->classLoader()]; }
  
   public function display($out) {
-    $out->writeLinef(
+    $out->format(
       '%s trait %s%s {',
       $this->type->modifiers(),
       $this->type->name(),
@@ -14,39 +14,40 @@ class TraitInformation extends TypeInformation {
     $properties= $this->partition($this->type->properties());
     $methods= $this->partition($this->type->methods());
 
+    $section= 0;
     if ($properties['class']) {
+      $section++ && $out->line();
       foreach ($properties['class'] as $property) {
-        $out->writeLine('  ', $property->toString());
+        $this->member($out, $property);
       }
-      $out->writeLine();
     }
 
     if ($properties['instance']) {
+      $section++ && $out->line();
       foreach ($properties['instance'] as $property) {
-        $out->writeLine('  ', $property->toString());
+        $this->member($out, $property);
       }
-      $out->writeLine();
     }
 
     if ($constructor= $this->type->constructor()) {
-      $out->writeLine('  ', $constructor->toString());
-      $out->writeLine();
+      $section++ && $out->line();
+      $this->member($out, $constructor);
     }
 
     if ($methods['class']) {
+      $section++ && $out->line();
       foreach ($methods['class'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
-      $out->writeLine();
     }
 
     if ($methods['instance']) {
+      $section++ && $out->line();
       foreach ($methods['instance'] as $method) {
-        $out->writeLine('  ', $method->toString());
+        $this->member($out, $method);
       }
-      $out->writeLine();
     }
 
-    $out->writeLine('}');
+    $out->line('}');
   }
 }

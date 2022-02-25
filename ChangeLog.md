@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed #17: Call to undefined method WithHighlighting::writeLinef()
+  (@thekid)
+
 ## 2.0.0 / 2022-01-09
 
 * Changed (named) argument handling to be consistent during method
