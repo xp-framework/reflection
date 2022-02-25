@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.0.1 / 2022-02-25
+
 * Fixed #17: Call to undefined method WithHighlighting::writeLinef()
   (@thekid)
 
