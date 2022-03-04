@@ -41,16 +41,6 @@ class DirectoryInformation {
   }
 
   /** @return iterable */
-  private function children() {
-    $base= null === $this->base ? '' : $this->base.'.';
-    foreach ($this->loader->packageContents($this->base) as $entry) {
-      if ('/' === $entry[strlen($entry) - 1]) {
-        yield $base.substr($entry, 0, -1);
-      }
-    }
-  }
-
-  /** @return iterable */
   private function types() {
     $base= null === $this->base ? '' : $this->base.'.';
     $ext= strlen(\xp::CLASS_FILE_EXT);
@@ -62,11 +52,20 @@ class DirectoryInformation {
   }
 
   public function display($out) {
-    $this->base ? $out->format('package %s {', $this->base) : $out->format('package {');
+    if (null === $this->base) {
+      $out->format('package {');
+      $base= '';
+    } else {
+      $out->format('package %s {', $this->base);
+      $base= $this->base.'.';
+    }
+
     $i= 0;
-    foreach ($this->children() as $package) {
-      $out->line('  package '.$package);
-      $i++;
+    foreach ($this->loader->packageContents($this->base) as $entry) {
+      if ('/' === $entry[strlen($entry) - 1]) {
+        $out->line('  package '.$base.substr($entry, 0, -1));
+        $i++;
+      }
     }
 
     // Compile types into a custom order
