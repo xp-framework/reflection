@@ -2,10 +2,10 @@
 
 use lang\{ClassLoader, FileSystemClassLoader, Reflection, IllegalArgumentException};
 
-class DirectoryInformation {
+class DirectoryInformation extends TypeListing {
   const PRIMARY = 0;
 
-  private $base, $flags;
+  private $base;
   private $loaders= [self::PRIMARY => null];
 
   /**
@@ -74,39 +74,7 @@ class DirectoryInformation {
       }
     }
 
-    // Compile types into a custom order
-    $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
-    foreach ($this->typesIn($base) as $type) {
-      $order[$type->kind()->name()][$type->name()]= $type;
-    }
-
-    foreach ($order as $type => $types) {
-      if (empty($types)) continue;
-      $separator= $out->separator($i);
-
-      ksort($types);
-      $i= 0;
-      foreach ($types as $type) {
-        if ($this->flags & Information::DOC) {
-          $out->separator(!$separator) || $separator= false;
-
-          $comment= $type->comment() ?? '(Undocumented)';
-          $p= strpos($comment, "\n\n");
-          $s= min(strpos($comment, '. ') ?: $p, strpos($comment, ".\n") ?: $p);
-
-          if (false === $s || $s > $p) {
-            $purpose= false === $p ? trim($comment) : substr($comment, 0, $p);
-          } else {
-            $purpose= substr($comment, 0, $s);
-          }
-          $out->documentation(str_replace(["\n", '  '], [' ', ' '], trim($purpose)), '  ');
-        }
-
-        $out->line('  ', $type->modifiers()->names(true).' '.$type->kind()->name().' '.$type->name());
-        $i++;
-      }
-    }
-
+    $this->list($out, $i, $this->typesIn($base));
     $out->line('}');
   }
 }
