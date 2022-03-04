@@ -1,6 +1,6 @@
 <?php namespace xp\reflection;
 
-use lang\{ClassLoader, Reflection, IllegalArgumentException};
+use lang\{ClassLoader, FileSystemClassLoader, Reflection, IllegalArgumentException};
 
 class DirectoryInformation {
   private $loader, $base, $flags;
@@ -17,6 +17,8 @@ class DirectoryInformation {
 
     // Locate directory in class path
     foreach (ClassLoader::getLoaders() as $loader) {
+      if (!($loader instanceof FileSystemClassLoader)) continue;
+
       $l= strlen($loader->path);
       if (0 === strncasecmp($target, $loader->path, $l)) {
         $this->loader= $loader;
