@@ -40,17 +40,6 @@ class DirectoryInformation {
     yield $this->loader;
   }
 
-  /** @return iterable */
-  private function types() {
-    $base= null === $this->base ? '' : $this->base.'.';
-    $ext= strlen(\xp::CLASS_FILE_EXT);
-    foreach ($this->loader->packageContents($this->base) as $entry) {
-      if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
-        yield Reflection::of($this->loader->loadClass0($base.substr($entry, 0, -$ext)));
-      }
-    }
-  }
-
   public function display($out) {
     if (null === $this->base) {
       $out->format('package {');
@@ -70,9 +59,14 @@ class DirectoryInformation {
 
     // Compile types into a custom order
     $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
-    foreach ($this->types() as $type) {
-      $order[$type->kind()->name()][$type->name()]= $type;
+    $ext= strlen(\xp::CLASS_FILE_EXT);
+    foreach ($this->loader->packageContents($this->base) as $entry) {
+      if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
+        $type= Reflection::of($this->loader->loadClass0($base.substr($entry, 0, -$ext)));
+        $order[$type->kind()->name()][$type->name()]= $type;
+      }
     }
+
     foreach ($order as $type => $types) {
       if (empty($types)) continue;
       if ($i) $out->line();
