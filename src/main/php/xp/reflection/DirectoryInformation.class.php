@@ -13,6 +13,7 @@ class DirectoryInformation {
    *
    * @param  string $dir
    * @param  int $flags
+   * @throws lang.IllegalArgumentException if directory is not in class path
    */
   public function __construct($dir, $flags) {
     $target= rtrim(realpath($dir), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
@@ -39,7 +40,8 @@ class DirectoryInformation {
   }
 
   /**
-   * Returns types in a given base package
+   * Returns types in a given base package. Asks the primary class loader,
+   * then all the others.
    * 
    * @param  string $base
    * @return iterable
