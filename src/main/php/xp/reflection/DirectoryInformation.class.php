@@ -3,7 +3,10 @@
 use lang\{ClassLoader, FileSystemClassLoader, Reflection, IllegalArgumentException};
 
 class DirectoryInformation {
-  private $loader, $base, $flags;
+  const PRIMARY = 0;
+
+  private $base, $flags;
+  private $loaders= [self::PRIMARY => null];
 
   /**
    * Creates a new directory information instance
@@ -17,27 +20,39 @@ class DirectoryInformation {
 
     // Locate directory in class path
     foreach (ClassLoader::getLoaders() as $loader) {
-      if (!($loader instanceof FileSystemClassLoader)) continue;
-
-      $l= strlen($loader->path);
-      if (0 === strncasecmp($target, $loader->path, $l)) {
-        $this->loader= $loader;
-
-        if ($l === strlen($target)) {
-          $this->base= null;
-        } else {
-          $this->base= strtr(substr($target, $l, -1), [DIRECTORY_SEPARATOR => '.']);
-        }
-        return;
+      if (!($loader instanceof FileSystemClassLoader)) {
+        $this->loaders[]= $loader;
+      } else if (!$this->loaders[self::PRIMARY] && 0 === strncasecmp($target, $loader->path, $l= strlen($loader->path))) {
+        $this->loaders[self::PRIMARY]= $loader;
+        $this->base= $l === strlen($target) ? null : strtr(substr($target, $l, -1), [DIRECTORY_SEPARATOR => '.']);
       }
     }
 
-    throw new IllegalArgumentException('Directory '.$dir.' is not in class path');
+    if (!$this->loaders[self::PRIMARY]) {
+      throw new IllegalArgumentException('Directory '.$dir.' is not in class path');
+    }
   }
 
   /** @return iterable */
   public function sources() {
-    yield $this->loader;
+    yield $this->loaders[self::PRIMARY];
+  }
+
+  /**
+   * Returns types in a given base package
+   * 
+   * @param  string $base
+   * @return iterable
+   */
+  private function typesIn($base) {
+    $ext= strlen(\xp::CLASS_FILE_EXT);
+    foreach ($this->loaders as $loader) {
+      foreach ($loader->packageContents($base) as $entry) {
+        if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
+          yield Reflection::of($loader->loadClass0($base.substr($entry, 0, -$ext)));
+        }
+      }
+    }
   }
 
   public function display($out) {
@@ -50,7 +65,7 @@ class DirectoryInformation {
     }
 
     $i= 0;
-    foreach ($this->loader->packageContents($this->base) as $entry) {
+    foreach ($this->loaders[self::PRIMARY]->packageContents($this->base) as $entry) {
       if ('/' === $entry[strlen($entry) - 1]) {
         $out->line('  package '.$base.substr($entry, 0, -1));
         $i++;
@@ -59,12 +74,8 @@ class DirectoryInformation {
 
     // Compile types into a custom order
     $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
-    $ext= strlen(\xp::CLASS_FILE_EXT);
-    foreach ($this->loader->packageContents($this->base) as $entry) {
-      if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
-        $type= Reflection::of($this->loader->loadClass0($base.substr($entry, 0, -$ext)));
-        $order[$type->kind()->name()][$type->name()]= $type;
-      }
+    foreach ($this->typesIn($base) as $type) {
+      $order[$type->kind()->name()][$type->name()]= $type;
     }
 
     foreach ($order as $type => $types) {
