@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.1.0 / 2022-03-04
+
+* Merged PR #18: Also accept directories on command line - @thekid
+
 ## 2.0.1 / 2022-02-25
 
 * Fixed #17: Call to undefined method WithHighlighting::writeLinef()
