@@ -2,8 +2,8 @@
 
 use lang\{ClassLoader, Reflection};
 
-class PackageInformation {
-  private $package, $flags;
+class PackageInformation extends TypeListing {
+  private $package;
 
   /** @param string $package */
   public function __construct($package, $flags) {
@@ -24,36 +24,7 @@ class PackageInformation {
       $i++;
     }
 
-    // Compile types into a custom order
-    $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
-    foreach ($this->package->types() as $type) {
-      $order[$type->kind()->name()][$type->name()]= $type;
-    }
-    foreach ($order as $type => $types) {
-      if (empty($types)) continue;
-      if ($i) $out->line();
-
-      ksort($types);
-      $i= 0;
-      foreach ($types as $type) {
-        if ($this->flags & Information::DOC && ($comment= $type->comment())) {
-          $out->line();
-          $p= strpos($comment, "\n\n");
-          $s= min(strpos($comment, '. ') ?: $p, strpos($comment, ".\n") ?: $p);
-
-          if (false === $s || $s > $p) {
-            $purpose= false === $p ? trim($comment) : substr($comment, 0, $p);
-          } else {
-            $purpose= substr($comment, 0, $s);
-          }
-          $out->documentation(str_replace(["\n", '  '], [' ', ' '], trim($purpose)), '  ');
-        }
-
-        $out->line('  ', $type->modifiers()->names(true).' '.$type->kind()->name().' '.$type->name());
-        $i++;
-      }
-    }
-
+    $this->list($out, $i, $this->package->types());
     $out->line('}');
   }
 }

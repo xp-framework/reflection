@@ -51,4 +51,15 @@ abstract class Information extends Enum {
   public static function forPackage($name, $flags) {
     return new PackageInformation($name, $flags);
   }
+
+  /**
+   * Factory for information based on a directory
+   *
+   * @param  string $name
+   * @param  int $flags
+   * @return xp.reflection.DirectoryInformation
+   */
+  public static function forDirectory($name, $flags) {
+    return new DirectoryInformation($name, $flags);
+  }
 }
