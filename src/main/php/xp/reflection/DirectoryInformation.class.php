@@ -52,13 +52,11 @@ class DirectoryInformation {
   private function types() {
     $base= null === $this->base ? '' : $this->base.'.';
     $ext= strlen(\xp::CLASS_FILE_EXT);
-    $loader= ClassLoader::getDefault();
     foreach ($this->loader->packageContents($this->base) as $entry) {
       if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
         yield Reflection::of($this->loader->loadClass0($base.substr($entry, 0, -$ext)));
       }
     }
-
   }
 
   public function display($out) {
