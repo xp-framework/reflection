@@ -82,13 +82,15 @@ class DirectoryInformation {
 
     foreach ($order as $type => $types) {
       if (empty($types)) continue;
-      if ($i) $out->line();
+      $separator= $out->separator($i);
 
       ksort($types);
       $i= 0;
       foreach ($types as $type) {
-        if ($this->flags & Information::DOC && ($comment= $type->comment())) {
-          $out->line();
+        if ($this->flags & Information::DOC) {
+          $out->separator(!$separator) || $separator= false;
+
+          $comment= $type->comment() ?? '(Undocumented)';
           $p= strpos($comment, "\n\n");
           $s= min(strpos($comment, '. ') ?: $p, strpos($comment, ".\n") ?: $p);
 

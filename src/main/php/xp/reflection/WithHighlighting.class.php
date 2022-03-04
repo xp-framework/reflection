@@ -25,6 +25,14 @@ class WithHighlighting {
     $this->stream->write(preg_replace($this->patterns, $this->replacements, vsprintf($format, $args))."\n");
   }
 
+  public function separator($conditional) {
+    if ($conditional) {
+      $this->stream->write("\n");
+      return true;
+    }
+    return false;
+  }
+
   public function line(... $args) {
     $line= '';
     foreach ($args as $arg) {
