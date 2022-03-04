@@ -73,6 +73,8 @@ class ReflectRunner {
       return 1;
     } else if (strstr($name, \xp::CLASS_FILE_EXT)) {
       $information= Information::forClass($cl->loadUri(realpath($name)), $flags);
+    } else if (is_dir($name)) {
+      $information= Information::forDirectory($name, $flags);
     } else if ($cl->providesClass($name)) {
       $information= Information::forClass($cl->loadClass($name), $flags);
     } else if ($cl->providesPackage($name)) {
