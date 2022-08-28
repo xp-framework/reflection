@@ -11,10 +11,18 @@ class InterfaceInformation extends TypeInformation {
       $this->parents($this->type)
     );
 
+    $constants= iterator_to_array($this->type->constants());
     $properties= $this->partition($this->type->properties());
     $methods= $this->partition($this->type->methods());
 
     $section= 0;
+    if ($constants) {
+      $section++;
+      foreach ($constants as $constant) {
+        $this->member($out, $constant);
+      }
+    }
+
     if ($properties['class']) {
       $section++ && $out->line();
       foreach ($properties['class'] as $property) {
