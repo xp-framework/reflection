@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.4.0 / 2022-08-28
+
+* Merged PR #22: Include type constants in xp reflect output - @thekid
+
 ## 2.3.0 / 2022-08-28
 
 * Merged PR #21: Support `readonly` modifier on classes. Implements 8.2
