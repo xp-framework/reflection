@@ -110,6 +110,12 @@ class MethodsTest {
     Assert::equals(new TypeIntersection([new XPClass('Countable'), new XPClass('Traversable')]), $returns->type());
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")'), Values(['true', 'false'])]
+  public function returns_boolean_type($name) {
+    $returns= $this->declare('{ function fixture(): '.$name.' { } }')->method('fixture')->returns();
+    Assert::equals(Primitive::$BOOL, $returns->type());
+  }
+
   #[Test]
   public function returns_self() {
     $type= $this->declare('{ function fixture(): self { } }');

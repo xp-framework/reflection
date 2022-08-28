@@ -190,6 +190,15 @@ class PropertiesTest {
     );
   }
 
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")'), Values(['true', 'false'])]
+  public function type_from_boolean_types($name) {
+    $type= $this->declare('{ public '.$name.' $fixture; }');
+    Assert::equals(
+      new Constraint(Primitive::$BOOL, true),
+      $type->property('fixture')->constraint()
+    );
+  }
+
   #[Test]
   public function string_representation_without_type() {
     $t= $this->declare('{ public $fixture; }');
