@@ -2,7 +2,7 @@
 
 use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods, Package};
 use lang\{ElementNotFoundException, Reflection, Enum, Runnable, XPClass, ClassLoader};
-use unittest\actions\VerifyThat;
+use unittest\actions\{VerifyThat, RuntimeVersion};
 use unittest\{Action, Assert, Before, Test};
 
 class TypeTest {
@@ -76,6 +76,12 @@ class TypeTest {
   public function native_modifiers() {
     $t= Reflection::of(\ReflectionClass::class);
     Assert::equals(new Modifiers('public native'), $t->modifiers());
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")')]
+  public function readonly_modifiers() {
+    $t= $this->declare('M_R', ['modifiers' => 'readonly']);
+    Assert::equals(new Modifiers('public readonly'), $t->modifiers());
   }
 
   #[Test]

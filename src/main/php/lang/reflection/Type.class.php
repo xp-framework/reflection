@@ -30,20 +30,29 @@ class Type implements Value {
     if (PHP_VERSION_ID < 70400) {
 
       // PHP 7.4 made type and member modifiers consistent. For versions before that,
-      // map PHP reflection modifiers to generic form
+      // map PHP reflection modifiers to generic form.
       //
       // @codeCoverageIgnoreStart
       $m= $this->reflect->getModifiers();
       $r= 0;
-      $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r |= Modifiers::IS_ABSTRACT;
-      $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r |= Modifiers::IS_ABSTRACT;
-      $m & \ReflectionClass::IS_FINAL && $r |= Modifiers::IS_FINAL;
+      $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
+      $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
+      $m & \ReflectionClass::IS_FINAL && $r|= Modifiers::IS_FINAL;
+      // @codeCoverageIgnoreEnd
+    } else if (PHP_VERSION_ID >= 80200) {
+
+      // PHP 8.2 introduced readonly classes, but its modifier bit is different from
+      // the one that properties use (65536 vs. 128), map this to generic form.
+      //
+      // @codeCoverageIgnoreStart
+      $r= $this->reflect->getModifiers();
+      $r & \ReflectionClass::IS_READONLY && $r^= \ReflectionClass::IS_READONLY | Modifiers::IS_READONLY;
       // @codeCoverageIgnoreEnd
     } else {
       $r= $this->reflect->getModifiers();
     }
 
-    $this->reflect->isInternal() && $r |= Modifiers::IS_NATIVE;
+    $this->reflect->isInternal() && $r|= Modifiers::IS_NATIVE;
     return new Modifiers($r);
   }
 
