@@ -1,5 +1,7 @@
 <?php namespace xp\reflection;
 
+use lang\reflection\Modifiers;
+
 abstract class TypeListing {
   protected $flags;
 
@@ -11,10 +13,13 @@ abstract class TypeListing {
       'public enum'           => [],
       'public abstract class' => [],
       'public class'          => [],
-      'public final class'    => [],
     ];
+
+    // List readonly and final types alongside others
+    $join= MODIFIER_READONLY | MODIFIER_FINAL;
     foreach ($types as $type) {
-      $order[$type->modifiers()->names().' '.$type->kind()->name()][$type->name()]= $type;
+      $names= Modifiers::namesOf($type->modifiers()->bits() & ~$join);
+      $order[$names.' '.$type->kind()->name()][$type->name()]= $type;
     }
 
     foreach ($order as $type => $byName) {
