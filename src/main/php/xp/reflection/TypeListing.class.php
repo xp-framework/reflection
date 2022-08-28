@@ -4,9 +4,17 @@ abstract class TypeListing {
   protected $flags;
 
   protected function list($out, $separator, $types) {
-    $order= ['interface' => [], 'trait' => [], 'enum' => [], 'class' => []];
+    $order= [
+      'public interface'      => [],
+      'public trait'          => [],
+      'public abstract enum'  => [],
+      'public enum'           => [],
+      'public abstract class' => [],
+      'public class'          => [],
+      'public final class'    => [],
+    ];
     foreach ($types as $type) {
-      $order[$type->kind()->name()][$type->name()]= $type;
+      $order[$type->modifiers()->names().' '.$type->kind()->name()][$type->name()]= $type;
     }
 
     foreach ($order as $type => $byName) {
