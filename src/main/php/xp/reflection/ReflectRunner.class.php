@@ -93,7 +93,7 @@ class ReflectRunner {
       '/(class|enum|trait|interface|package|directory|function) (.+)/'      => "\e[34m\$1\e[0m \$2",
       '/(extends|implements) ([^ ]+)/'                                      => "\e[34m\$1\e[0m \$2",
       '/\b(var|int|string|float|array|iterable|object|void|static|self)\b/' => "\e[36m\$1\e[0m",
-      '/(public|private|protected|abstract|final|static) /'                 => "\e[1;35m\$1 \e[0m",
+      '/(public|private|protected|abstract|final|static|readonly) /'        => "\e[1;35m\$1 \e[0m",
       '/(\$[a-zA-Z0-9_]+)/'                                                 => "\e[1;31m\$1\e[0m",
       '/\'([^\']+)\'/'                                                      => "\e[32m'\$1'\e[0m"
     ]));
