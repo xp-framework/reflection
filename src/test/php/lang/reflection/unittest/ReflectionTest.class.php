@@ -47,7 +47,7 @@ class ReflectionTest {
     Assert::instance(FromSyntaxTree::class, Reflection::annotations($versionId));
   }
 
-  #[Test, Values([80000, 80100])]
+  #[Test, Values([80000, 80100, 80200])]
   public function parser_for_php8($versionId) {
     Assert::instance(FromAttributes::class, Reflection::annotations($versionId));
   }
