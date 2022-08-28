@@ -12,6 +12,7 @@ class EnumInformation extends TypeInformation {
       $this->implements($this->type)
     );
 
+    $constants= iterator_to_array($this->type->constants());
     $properties= $this->partition($this->type->properties());
     $methods= $this->partition($this->type->methods());
 
@@ -21,6 +22,13 @@ class EnumInformation extends TypeInformation {
       if ($property->modifiers()->isStatic()) $props.= ', $'.$property->name();
     }
     $out->line('  ', substr($props, 2), ';');
+
+    if ($constants) {
+      $out->line();
+      foreach ($constants as $constant) {
+        $this->member($out, $constant);
+      }
+    }
 
     // List instance properties, if any
     if ($properties['instance']) {
