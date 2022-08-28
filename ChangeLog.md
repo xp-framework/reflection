@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.3.0 / 2022-08-28
+
+* Merged PR #21: Support `readonly` modifier on classes. Implements 8.2
+  feature suggested in #20, see https://wiki.php.net/rfc/readonly_classes
+  (@thekid)
+
 ## 2.2.0 / 2022-08-28
 
 * Merged PR #19: Include type modifiers in ordering - @thekid
