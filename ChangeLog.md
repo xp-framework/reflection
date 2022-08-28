@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.2.0 / 2022-08-28
+
+* Merged PR #19: Include type modifiers in ordering - @thekid
+
 ## 2.1.0 / 2022-03-04
 
 * Merged PR #18: Also accept directories on command line - @thekid
