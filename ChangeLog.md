@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.4.1 / 2022-12-08
+
+* Fixed compatibility with `xp-framework/ast` version 9+ - @thekid
+
 ## 2.4.0 / 2022-08-28
 
 * Merged PR #22: Include type constants in xp reflect output - @thekid
