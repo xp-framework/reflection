@@ -1,8 +1,8 @@
 <?php namespace lang\meta;
 
 use lang\IllegalAccessException;
-use lang\ast\Visitor;
 use lang\ast\nodes\{Literal, Variable};
+use lang\ast\{Visitor, Type};
 
 class SyntaxTree extends Visitor {
   private $tree, $type;
@@ -17,14 +17,18 @@ class SyntaxTree extends Visitor {
 
   public function resolver() { return $this->tree->scope(); }
 
-  private function resolve($name) {
+  private function resolve($type) {
+    $name= $type instanceof Type ? $type->literal() : $type;
+
     if ('self' === $name) {
-      return $this->type->name;
+      $resolved= $this->type->name;
     } else if ('parent' === $name) {
-      return $this->tree->scope()->parent;
+      $resolved= $this->tree->scope()->parent;
     } else {
       return $name;
     }
+
+    return $resolved instanceof Type ? $resolved->literal() : $resolved;
   }
 
   /**
