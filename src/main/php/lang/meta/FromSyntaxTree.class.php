@@ -1,5 +1,6 @@
 <?php namespace lang\meta;
 
+use lang\IllegalArgumentException;
 use lang\ast\{Language, Tokens, Visitor, Code};
 
 /**
