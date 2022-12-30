@@ -26,7 +26,7 @@ The entry point class is the `lang.Reflection` class. It can be constructed by p
 use lang\Reflection;
 use org\example\{Base, Inject, Fixture};
 
-$type= Reflection::of(Fixture::class);
+$type= Reflection::type(Fixture::class);
 
 $type->name();                // org.example.Fixture
 $type->literal();             // Fixture::class
