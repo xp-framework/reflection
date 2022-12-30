@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #23: Add Reflection::type() to return type instances - @thekid
+
 ## 2.4.1 / 2022-12-08
 
 * Fixed compatibility with `xp-framework/ast` version 9+ - @thekid
