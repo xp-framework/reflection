@@ -49,7 +49,7 @@ abstract class Reflection {
       return new Type(new \ReflectionObject($arg));
     } else {
       try {
-        return new Type(new \ReflectionClass(strtr($arg,  '.', '\\')));
+        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
       } catch (\ReflectionException $e) {
         throw new ClassNotFoundException($arg, [ClassLoader::getDefault()]);
       }
@@ -83,7 +83,7 @@ abstract class Reflection {
       }
 
       try {
-        return new Type(new \ReflectionClass(strtr($arg,  '.', '\\')));
+        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
       } catch (\ReflectionException $e) {
         throw new ClassNotFoundException($name, [$cl]);
       }
