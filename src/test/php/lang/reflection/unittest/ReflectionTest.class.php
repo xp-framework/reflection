@@ -1,45 +1,37 @@
 <?php namespace lang\reflection\unittest;
 
+use ReflectionClass, ReflectionObject;
 use lang\meta\{FromAttributes, FromSyntaxTree};
+use lang\reflection\Package;
 use lang\{Reflection, Type, ClassNotFoundException};
 use unittest\{Assert, Test, Values, Expect};
 
 class ReflectionTest {
 
-  #[Test]
-  public function of_class() {
-    Assert::equals(nameof($this), Reflection::of(self::class)->name());
+  /** @return iterable */
+  private function arguments() {
+    yield [self::class, 'class literal'];
+    yield [nameof($this), 'class name'];
+    yield [$this, 'instance'];
+    yield [Type::forName(self::class), 'type'];
+    yield [Reflection::of(self::class), 'reflection'];
+    yield [new ReflectionClass(self::class), 'reflection class'];
+    yield [new ReflectionObject($this), 'reflection object'];
+  }
+
+  #[Test, Values('arguments')]
+  public function of($argument) {
+    Assert::equals(nameof($this), Reflection::of($argument)->name());
+  }
+
+  #[Test, Values('arguments')]
+  public function type($argument) {
+    Assert::equals(nameof($this), Reflection::type($argument)->name());
   }
 
   #[Test]
-  public function of_name() {
-    Assert::equals(nameof($this), Reflection::of(nameof($this))->name());
-  }
-
-  #[Test]
-  public function of_type() {
-    Assert::equals(nameof($this), Reflection::of(Type::forName(self::class))->name());
-  }
-
-  #[Test]
-  public function of_reflection() {
-    $t= Reflection::of(self::class);
-    Assert::equals($t, Reflection::of($t));
-  }
-
-  #[Test]
-  public function of_reflection_class() {
-    Assert::equals(nameof($this), Reflection::of(new \ReflectionClass(self::class))->name());
-  }
-
-  #[Test]
-  public function of_reflection_object() {
-    Assert::equals(nameof($this), Reflection::of(new \ReflectionObject($this))->name());
-  }
-
-  #[Test]
-  public function of_instance() {
-    Assert::equals(nameof($this), Reflection::of($this)->name());
+  public function of_package_name() {
+    Assert::instance(Package::class, Reflection::of('lang.reflection.unittest'));
   }
 
   #[Test, Values([70000, 70100, 70200, 70300, 70400])]
@@ -55,5 +47,15 @@ class ReflectionTest {
   #[Test, Expect(ClassNotFoundException::class)]
   public function of_non_existant() {
     Reflection::of('non.existant.Type');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function type_existant() {
+    Reflection::type('non.existant.Type');
+  }
+
+  #[Test, Expect(ClassNotFoundException::class)]
+  public function type_given_package_name() {
+    Assert::instance(Package::class, Reflection::type('lang.reflection.unittest'));
   }
 }

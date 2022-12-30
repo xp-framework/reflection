@@ -32,7 +32,33 @@ abstract class Reflection {
   }
 
   /**
-   * Creates a new reflection instance
+   * Returns a reflection type for a given argument.
+   *
+   * @param  string|object|lang.XPClass|lang.reflection.Type|ReflectionClass $arg
+   * @return lang.reflection.Type
+   * @throws lang.ClassNotFoundException
+   */
+  public static function type($arg) {
+    if ($arg instanceof XPClass) {
+      return new Type($arg->reflect());
+    } else if ($arg instanceof \ReflectionClass) {
+      return new Type($arg);
+    } else if ($arg instanceof Type) {
+      return $arg;
+    } else if (is_object($arg)) {
+      return new Type(new \ReflectionObject($arg));
+    } else {
+      try {
+        return new Type(new \ReflectionClass(strtr($arg,  '.', '\\')));
+      } catch (\ReflectionException $e) {
+        throw new ClassNotFoundException($arg, [ClassLoader::getDefault()]);
+      }
+    }
+  }
+
+  /**
+   * Creates a new reflection instance, which may either refer to a type
+   * or to a package.
    *
    * @param  string|object|lang.XPClass|lang.reflection.Type|ReflectionClass $arg
    * @return lang.reflection.Type|lang.reflection.Package
