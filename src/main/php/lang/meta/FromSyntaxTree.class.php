@@ -9,58 +9,14 @@ use lang\ast\{Language, Tokens, Visitor, Code};
  * @see  https://github.com/xp-framework/ast
  */
 class FromSyntaxTree {
-  const CACHE_SIZE = 16;
+  const CACHE_SIZE= 16;
+
   private static $lang;
+  private static $parse= null;
   private $cache= [];
 
   static function __static() {
     self::$lang= Language::named('PHP');
-
-    // Parse lambdas and closures into code
-    self::$lang->prefix('fn', 0, function($parse, $token) {
-      $signature= $this->signature($parse);
-      $parse->expecting('=>', 'fn');
-
-      // Parse rest
-      $code= '';
-      do {
-        $code.= ' '.$parse->token->value;
-        $parse->forward();
-      } while (';' !== $parse->token->value);
-
-      $params= '';
-      foreach ($signature->parameters as $param) {
-        $params.= ', $'.$param->name; 
-      }
-      if (0 === strncmp($code, ' throw ', 7)) {
-        return new Code('function('.substr($params, 2).') {'.$code.'; }');  
-      } else {
-        return new Code('function('.substr($params, 2).') { return'.$code.'; }');
-      }
-    });
-    self::$lang->prefix('function', 0, function($parse, $token) {
-      $signature= $this->signature($parse);
-
-      // Parse rest
-      $code= '';
-      $b= 0;
-      do {
-        if ('{' === $parse->token->value) {
-          $b++;
-        } else if ('}' === $parse->token->value) {
-          if (0 === --$b) break;
-        }
-        $code.= ' '.$parse->token->value;
-        $parse->forward();
-      } while (null !== $parse->token->value);
-      $parse->forward();
-
-      $params= '';
-      foreach ($signature->parameters as $param) {
-        $params.= ', $'.$param->name; 
-      }
-      return new Code('function('.substr($params, 2).')'.$code.' }');
-    });
   }
 
   private function tree($name) {
@@ -77,9 +33,69 @@ class FromSyntaxTree {
     return $this->cache[$name];
   }
 
+  private function parse($code, $resolver) {
+    if (null === self::$parse) {
+
+      // Parse lambdas and closures into code
+      self::$parse= clone self::$lang;
+      self::$parse->prefix('fn', 0, function($parse, $token) {
+        $signature= $this->signature($parse);
+        $parse->expecting('=>', 'fn');
+
+        // Parse expression
+        $code= '';
+        $b= $c= 0;
+        do {
+          switch ($parse->token->value) {
+            case '(': $b++; break;
+            case ')': $b--; if ($b < 0) break 2;
+            case '[': $c++; break;
+            case ']': $c--; if ($c < 0) break 2;
+          }
+          $code.= ' '.$parse->token->value;
+          $parse->forward();
+        } while (';' !== $parse->token->value);
+
+        $params= '';
+        foreach ($signature->parameters as $param) {
+          $params.= ', $'.$param->name; 
+        }
+        if (0 === strncmp($code, ' throw ', 7)) {
+          return new Code('function('.substr($params, 2).') {'.$code.'; }');  
+        } else {
+          return new Code('function('.substr($params, 2).') { return'.$code.'; }');
+        }
+      });
+      self::$parse->prefix('function', 0, function($parse, $token) {
+        $signature= $this->signature($parse);
+
+        // Parse body
+        $code= '';
+        $b= 0;
+        do {
+          if ('{' === $parse->token->value) {
+            $b++;
+          } else if ('}' === $parse->token->value) {
+            if (0 === --$b) break;
+          }
+          $code.= ' '.$parse->token->value;
+          $parse->forward();
+        } while (null !== $parse->token->value);
+        $parse->forward();
+
+        $params= '';
+        foreach ($signature->parameters as $param) {
+          $params.= ', $'.$param->name; 
+        }
+        return new Code('function('.substr($params, 2).')'.$code.' }');
+      });
+    }
+    return self::$parse->parse(new Tokens($code.';', '(evaluated)'), $resolver);
+  }
+
   public function evaluate($reflect, $code) {
     $tree= $this->tree($reflect->name);
-    $parsed= self::$lang->parse(new Tokens($code.';', '(evaluated)'), $tree->resolver())->tree()->children();
+    $parsed= self::parse($code, $tree->resolver())->tree()->children();
     if (1 === sizeof($parsed)) {
       return $parsed[0]->visit($tree);
     }
@@ -101,7 +117,7 @@ class FromSyntaxTree {
     $r= [];
     foreach ($annotated->annotations as $type => $arguments) {
       if ('eval' === key($arguments)) {
-        $parsed= self::$lang->parse(new Tokens($arguments['eval']->visit($tree).';', '(evaluated)'), $tree->resolver());
+        $parsed= self::parse($arguments['eval']->visit($tree).';', $tree->resolver());
         $r[$type]= [$parsed->tree()->children()[0]->visit($tree)];
       } else {
         $p= &$r[$type];
