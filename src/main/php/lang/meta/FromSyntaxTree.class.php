@@ -58,10 +58,10 @@ class FromSyntaxTree {
 
         $params= '';
         foreach ($signature->parameters as $param) {
-          $params.= ', $'.$param->name; 
+          $params.= ', $'.$param->name;
         }
         if (0 === strncmp($code, ' throw ', 7)) {
-          return new Code('function('.substr($params, 2).') {'.$code.'; }');  
+          return new Code('function('.substr($params, 2).') {'.$code.'; }');
         } else {
           return new Code('function('.substr($params, 2).') { return'.$code.'; }');
         }
@@ -85,7 +85,7 @@ class FromSyntaxTree {
 
         $params= '';
         foreach ($signature->parameters as $param) {
-          $params.= ', $'.$param->name; 
+          $params.= ', $'.$param->name;
         }
         return new Code('function('.substr($params, 2).')'.$code.' }');
       });
