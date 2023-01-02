@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.5.0 / 2023-01-02
+
+* Fixed parsing arrow functions (`fn() => E`) in annotations - @thekid
 * Merged PR #23: Add Reflection::type() to return type instances - @thekid
 
 ## 2.4.1 / 2022-12-08
