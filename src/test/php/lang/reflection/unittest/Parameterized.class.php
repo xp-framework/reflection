@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-class Parameterized {
+class Parameterized implements Declared {
   private $a, $b;
 
   public function __construct($a, $b) {
