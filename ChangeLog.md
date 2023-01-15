@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.7.0 / 2023-01-15
+
+* Merged PR #25: Add `Annotations::all()` with returns all annotations
+  of a given type (or subtype).
+  (@thekid)
+
 ## 2.6.0 / 2023-01-15
 
 * Merged PR #24: Add support for named annotation arguments in PHP 7
