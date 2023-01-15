@@ -220,6 +220,11 @@ class AnnotationTest {
     Assert::instance(Annotated::class, $t->annotation(Annotated::class)->newInstance());
   }
 
+  #[Test, Values(['#[Parameterized(1, 2)]', '#[Parameterized(a: 1, b: 2)]', '#[Parameterized(b: 2, a: 1)]'])]
+  public function parameterized_instantiation($declaration) {
+    $t= $this->declare('{}', $declaration);
+    Assert::equals(new Parameterized(1, 2), $t->annotation(Parameterized::class)->newInstance());
+  }
 
   #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]
   public function is($type) {
