@@ -323,9 +323,15 @@ class AnnotationTest {
   }
 
   #[Test]
-  public function all_of_direct() {
+  public function all_of_annotated() {
     $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
     $this->assertAnnotations([Annotated::class => []], $t->annotations()->all(Annotated::class));
+  }
+
+  #[Test]
+  public function all_of_error() {
+    $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
+    $this->assertAnnotations([Error::class => [Fixture::class]], $t->annotations()->all(Error::class));
   }
 
   #[Test, Values('types')]
