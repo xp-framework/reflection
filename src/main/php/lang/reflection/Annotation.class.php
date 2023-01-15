@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ReflectionMethod;
 use lang\{Value, XPClass};
 use util\Objects;
 
@@ -38,7 +39,20 @@ class Annotation implements Value {
   public function argument($key) { return $this->arguments[$key] ?? null; }
 
   /** @return object */
-  public function newInstance() { return new $this->type(...$this->arguments); }
+  public function newInstance() {
+
+    // Support named arguments for PHP 7
+    if (PHP_VERSION_ID < 80000 && is_string(key($this->arguments))) {
+      $ctor= new ReflectionMethod($this->type, '__construct');
+      $pass= [];
+      foreach ($ctor->getParameters() as $param) {
+        $pass[]= $this->arguments[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+      }
+      return new $this->type(...$pass);
+    }
+
+    return new $this->type(...$this->arguments);
+  }
 
   /**
    * Checks whether this annotation is of a given type
