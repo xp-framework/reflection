@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\XPClass;
 use lang\reflection\Annotation;
+use lang\{XPClass, Reflection};
 use unittest\{Assert, Test, Values};
 
 class AnnotationTest {
@@ -80,6 +80,13 @@ class AnnotationTest {
     yield ['#[Annotated(eval: "new Fixture()")]', [new Fixture()]];
     yield ['#[Annotated(eval: "Fixture::\$DEFAULT")]', [Fixture::$DEFAULT]];
     yield ['#[Annotated(eval: "self::\$member")]', ['Test']];
+  }
+
+  /** @return iterable */
+  private function types() {
+    yield [Declared::class];
+    yield [new XPClass(Declared::class)];
+    yield [Reflection::type(Declared::class)];
   }
 
   #[Test, Values('scalars')]
@@ -316,11 +323,17 @@ class AnnotationTest {
   }
 
   #[Test]
-  public function all_of() {
+  public function all_of_direct() {
+    $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
+    $this->assertAnnotations([Annotated::class => []], $t->annotations()->all(Annotated::class));
+  }
+
+  #[Test, Values('types')]
+  public function all_of($type) {
     $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
     $this->assertAnnotations(
       [Annotated::class => [], Parameterized::class => [1, 2]],
-      $t->annotations()->all(Declared::class)
+      $t->annotations()->all($type)
     );
-  } 
+  }
 }
