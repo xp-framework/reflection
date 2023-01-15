@@ -313,5 +313,14 @@ class AnnotationTest {
       'A33d3567738fa0159cd21f46db6f5d219',
       $t->annotation(Annotated::class)->hashCode()
     );
+  }
+
+  #[Test]
+  public function all_of() {
+    $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
+    $this->assertAnnotations(
+      [Annotated::class => [], Parameterized::class => [1, 2]],
+      $t->annotations()->all(Declared::class)
+    );
   } 
 }
