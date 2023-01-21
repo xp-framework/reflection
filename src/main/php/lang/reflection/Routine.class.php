@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionUnionType, ReflectionIntersectionType;
+use ReflectionException, ReflectionUnionType, ReflectionIntersectionType;
 use lang\{Reflection, Type, TypeUnion};
 
 /** Base class for methods and constructors */
@@ -86,5 +86,27 @@ abstract class Routine extends Member {
    */
   public function parameters(): Parameters {
     return new Parameters($this->reflect);
+  }
+
+  /** Support named arguments for PHP 7.X */
+  public static function pass($reflect, $args) {
+    if (is_string(key($args))) {
+      $pass= [];
+      foreach ($reflect->getParameters() as $param) {
+        if (isset($args[$param->name])) {
+          $pass[]= $args[$param->name];
+        } else if ($param->isOptional()) {
+          $pass[]= $param->getDefaultValue();
+        } else {
+          throw new ReflectionException('Missing parameter $'.$param->name);
+        }
+        unset($args[$param->name]);
+      }
+      if ($args) {
+        throw new ReflectionException('Unknown named parameter $'.key($args));
+      }
+      return $pass;
+    }
+    return $args;
   }
 }

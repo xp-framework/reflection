@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ArgumentCountError, ReflectionMethod, ReflectionClass, TypeError, Error, Throwable;
+use ArgumentCountError, ReflectionMethod, ReflectionClass, ReflectionException, TypeError, Error, Throwable;
 use lang\{Value, XPClass};
 use util\Objects;
 
@@ -46,28 +46,17 @@ class Annotation implements Value {
    * @throws lang.reflection.InvocationFailed if instantiaton raises an exception
    */
   public function newInstance() {
-
-    // Support named arguments for PHP 7.X
-    if (PHP_VERSION_ID < 80000 && is_string(key($this->arguments))) {
-      $ctor= new ReflectionMethod($this->type, '__construct');
-      $pass= [];
-      $args= $this->arguments;
-      foreach ($ctor->getParameters() as $param) {
-        $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
-        unset($args[$param->name]);
-      }
-      if ($args) {
-        throw new CannotInstantiate($this->type, new Error('Unknown named parameter $'.key($args)));
-      }
-    } else {
-      $pass= $this->arguments;
-    }
-
     try {
+      $pass= PHP_VERSION_ID < 80000 && is_string(key($this->arguments))
+        ? Routine::pass(new ReflectionMethod($this->type, '__construct'), $this->arguments)
+        : $this->arguments
+      ;
       return new $this->type(...$pass);
     } catch (ArgumentCountError $e) {
       throw new CannotInstantiate($this->type, $e);
     } catch (TypeError $e) {
+      throw new CannotInstantiate($this->type, $e);
+    } catch (ReflectionException $e) {
       throw new CannotInstantiate($this->type, $e);
     } catch (Throwable $e) {
 

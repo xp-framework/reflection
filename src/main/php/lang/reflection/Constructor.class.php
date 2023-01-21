@@ -36,22 +36,8 @@ class Constructor extends Routine implements Instantiation {
    * @throws lang.reflection.CannotInstantiate
    */
   public function newInstance(array $args= [], $context= null) {
-
-    // Support named arguments for PHP 7.X
-    if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-      $pass= [];
-      foreach ($this->reflect->getParameters() as $param) {
-        $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
-        unset($args[$param->name]);
-      }
-      if ($args) {
-        throw new CannotInstantiate($this->class->name, new Error('Unknown named parameter $'.key($args)));
-      }
-    } else {
-      $pass= $args;
-    }
-
     try {
+      $pass= PHP_VERSION_ID < 80000 ? self::pass($this->reflect, $args) : $args;
 
       // Workaround for non-public constructors: Set accessible, then manually
       // invoke after creating an instance without invoking the constructor.

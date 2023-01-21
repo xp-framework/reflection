@@ -55,21 +55,8 @@ class Initializer extends Routine implements Instantiation {
 
     if (null === $this->function) return $instance;
 
-    // Support named arguments for PHP 7.X
-    if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-      $pass= [];
-      foreach ($this->reflect->getParameters() as $param) {
-        $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
-        unset($args[$param->name]);
-      }
-      if ($args) {
-        throw new CannotInstantiate($this->class->name, new Error('Unknown named parameter $'.key($args)));
-      }
-    } else {
-      $pass= $args;
-    }
-
     try {
+      $pass= PHP_VERSION_ID < 80000 ? Routine::pass($this->reflect, $args) : $args;
       $this->function->__invoke($instance, $pass, $context);
       return $instance;
     } catch (ArgumentCountError $e) {

@@ -60,32 +60,14 @@ class Method extends Routine {
       }
     }
 
-    // Support named arguments for PHP 7.X
-    if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-      $pass= [];
-      foreach ($this->reflect->getParameters() as $param) {
-        if (isset($args[$param->name])) {
-          $pass[]= $args[$param->name];
-        } else if ($param->isOptional()) {
-          $pass[]= $param->getDefaultValue();
-        } else {
-          throw new CannotInvoke($this, new Error('Missing parameter $'.$param->name));
-        }
-        unset($args[$param->name]);
-      }
-      if ($args) {
-        throw new CannotInvoke($this, new Error('Unknown named parameter $'.key($args)));
-      }
-    } else {
-      $pass= $args;
-    }
-
-    // PHP 7.0 still had warnings for arguments
-    if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
-      throw new CannotInvoke($this, new Error('Too few arguments'));
-    }
-
     try {
+      $pass= PHP_VERSION_ID < 80000 ? self::pass($this->reflect, $args) : $args;
+
+      // PHP 7.0 still had warnings for arguments
+      if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
+        throw new ReflectionException('Too few arguments');
+      }
+
       return $this->reflect->invokeArgs($instance, $pass);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
