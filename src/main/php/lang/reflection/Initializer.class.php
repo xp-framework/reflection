@@ -76,6 +76,8 @@ class Initializer extends Routine implements Instantiation {
       throw new CannotInstantiate($this->class->name, $e);
     } catch (TypeError $e) {
       throw new CannotInstantiate($this->class->name, $e);
+    } catch (ReflectionException $e) {
+      throw new CannotInstantiate($this->class->name, $e);
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
