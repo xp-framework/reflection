@@ -259,4 +259,22 @@ class InstantiationTest {
     }');
     Assert::equals([1, 3], $t->newInstance(...['b' => 3])->values);
   }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  public function excess_named_arguments_raise_error_for_newInstance() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->newInstance(...['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  public function unknown_named_arguments_raise_error_for_newInstance() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->newInstance(...['c' => 3]);
+  }
 }

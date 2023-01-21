@@ -238,7 +238,9 @@ class Type implements Value {
     } catch (ReflectionException $e) {
       throw new CannotInstantiate($this->reflect->name, $e);
     } catch (Throwable $e) {
-      if ($this->reflect->isInstantiable() && $constructor) {
+      if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+        throw new CannotInstantiate($this->reflect->name, $e);
+      } else if ($this->reflect->isInstantiable() && $constructor) {
         throw new InvocationFailed($this->constructor(), $e);
       } else {
         throw new CannotInstantiate($this->reflect->name);
