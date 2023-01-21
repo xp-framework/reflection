@@ -4,14 +4,22 @@ use lang\reflection\{CannotInstantiate, InvocationFailed};
 use lang\{Reflection, Runnable, CommandLine, Error, IllegalAccessException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
+use util\Date;
 
 class InstantiationTest {
   use TypeDefinition;
 
   /** @return iterable */
-  private function invocations() {
+  private function memberInitializers() {
+    yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
+    yield [function($t, $args) { return $t->initializer('__construct')->newInstance($args); }];
+  }
+
+  /** @return iterable */
+  private function allInitializers() {
     yield [function($t, $args) { return $t->newInstance(...$args); }];
     yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
+    yield [function($t, $args) { return $t->initializer('__construct')->newInstance($args); }];
   }
 
   #[Test]
@@ -26,13 +34,13 @@ class InstantiationTest {
     Assert::instance($t->class(), $t->constructor()->newInstance());
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('allInitializers')]
   public function with_empty_constructor($invocation) {
     $t= $this->declare('{ public function __construct() { }}');
     Assert::instance($t->class(), $invocation($t, []));
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('allInitializers')]
   public function with_argument($invocation) {
     $t= $this->declare('{
       public $value= null;
@@ -41,7 +49,7 @@ class InstantiationTest {
     Assert::equals($this, $invocation($t, [$this])->value);
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('allInitializers')]
   public function exceptions_are_wrapped($invocation) {
     $t= $this->declare('{ public function __construct() { throw new \lang\IllegalAccessException("Test"); } }');
     try {
@@ -52,7 +60,7 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('allInitializers')]
   public function type_errors_are_wrapped($invocation) {
     $t= $this->declare('{
       public function __construct(\util\Date $date) { }
@@ -60,28 +68,41 @@ class InstantiationTest {
     try {
       $invocation($t, [null]);
       throw new AssertionFailedError('No exception was raised');
-    } catch (InvocationFailed $expected) {
+    } catch (CannotInstantiate $expected) {
       Assert::instance(Error::class, $expected->getCause());
     }
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
-  public function cannot_instantiate_using_private_constructor($invocation) {
-    $t= $this->declare('{ private function __construct() { } }');
-    $invocation($t, []);
+  #[Test, Values('allInitializers')]
+  public function missing_arguments_are_wrapped($invocation) {
+    $t= $this->declare('{
+      public function __construct(\util\Date $date) { }
+    }');
+    try {
+      $invocation($t, []);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (CannotInstantiate $expected) {
+      Assert::instance(Error::class, $expected->getCause());
+    }
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
-  public function cannot_instantiate_using_protected_constructor($invocation) {
-    $t= $this->declare('{ protected function __construct() { } }');
-    $invocation($t, []);
+  #[Test, Expect(CannotInstantiate::class), Values(['private', 'protected'])]
+  public function newInstance_cannot_instantiate_using_non_public_constructor($modifier) {
+    $t= $this->declare('{ '.$modifier.' function __construct() { } }');
+    $t->newInstance();
   }
 
-  #[Test]
-  public function instantiate_with_private_constructor_in_context() {
+  #[Test, Expect(CannotInstantiate::class), Values(['private', 'protected'])]
+  public function constructor_cannot_instantiate_using_non_public_constructor($modifier) {
+    $t= $this->declare('{ '.$modifier.' function __construct() { } }');
+    $t->constructor()->newInstance();
+  }
+
+  #[Test, Values(['private', 'protected'])]
+  public function instantiate_with_non_public_constructor_in_context($modifier) {
     $t= $this->declare('{
       public $value= null;
-      private function __construct($value) { $this->value= $value; }
+      '.$modifier.' function __construct($value) { $this->value= $value; }
     }');
     Assert::equals($this, $t->constructor()->newInstance([$this], $t)->value);
   }
@@ -100,12 +121,12 @@ class InstantiationTest {
 
   #[Test, Expect(CannotInstantiate::class)]
   public function interfaces_cannot_be_instantiated() {
-    Reflection::of(Runnable::class)->newInstance();
+    Reflection::type(Runnable::class)->newInstance();
   }
 
   #[Test, Expect(CannotInstantiate::class)]
   public function abstract_classes_cannot_be_instantiated() {
-    Reflection::of(CommandLine::class)->newInstance();
+    Reflection::type(CommandLine::class)->newInstance();
   }
 
   #[Test]
@@ -149,7 +170,7 @@ class InstantiationTest {
   }
 
   #[Test]
-  public function instantiate_from_private_constructor() {
+  public function instantiate_from_private_constructor_using_initializer() {
     $t= $this->declare('{
       private $name;
       public function name() { return $this->name; }
@@ -163,7 +184,7 @@ class InstantiationTest {
 
   #[Test]
   public function instantiate_on_interface() {
-    Assert::null(Reflection::of(Runnable::class)->initializer(null));
+    Assert::null(Reflection::type(Runnable::class)->initializer(null));
   }
 
   #[Test]
@@ -185,30 +206,75 @@ class InstantiationTest {
     $t->initializer('raise')->newInstance();
   }
 
-  #[Test]
-  public function supports_named_arguments() {
+  #[Test, Values('memberInitializers')]
+  public function supports_named_arguments($invocation) {
     $t= $this->declare('{
       public $values;
       public function __construct($a, $b) { $this->values= [$a, $b]; }
     }');
-    Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2, 'a' => 1])->values);
+    Assert::equals([1, 2], $invocation($t, ['b' => 2, 'a' => 1])->values);
   }
 
-  #[Test]
-  public function supports_optional_named_arguments() {
+  #[Test, Values('memberInitializers')]
+  public function supports_optional_named_arguments($invocation) {
     $t= $this->declare('{
       public $values;
       public function __construct($a= 1, $b= 2) { $this->values= [$a, $b]; }
     }');
-    Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2])->values);
+    Assert::equals([1, 3], $invocation($t, ['b' => 3])->values);
   }
 
-  #[Test, Expect(InvocationFailed::class)]
-  public function excess_named_arguments_raise_error() {
+  #[Test, Expect(CannotInstantiate::class), Values('memberInitializers')]
+  public function excess_named_arguments_raise_error($invocation) {
     $t= $this->declare('{
       public $values;
       public function __construct($a, $b) { $this->values= [$a, $b]; }
     }');
-    $t->constructor()->newInstance(['b' => 2, 'a' => 1, 'extra' => 3]);
+    $invocation($t, ['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
+
+  #[Test, Expect(CannotInstantiate::class), Values('memberInitializers')]
+  public function unknown_named_arguments_raise_error($invocation) {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $invocation($t, ['c' => 3]);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function newInstance_supports_named_arguments() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    Assert::equals([1, 2], $t->newInstance(...['b' => 2, 'a' => 1])->values);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  public function newInstance_supports_optional_named_arguments() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a= 1, $b= 2) { $this->values= [$a, $b]; }
+    }');
+    Assert::equals([1, 3], $t->newInstance(...['b' => 3])->values);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  public function excess_named_arguments_raise_error_for_newInstance() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->newInstance(...['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
+
+  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  public function unknown_named_arguments_raise_error_for_newInstance() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->newInstance(...['c' => 3]);
   }
 }

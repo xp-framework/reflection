@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\Annotation;
-use lang\{XPClass, Reflection};
-use unittest\{Assert, Test, Values};
+use lang\reflection\{Annotation, InvocationFailed, CannotInstantiate};
+use lang\{XPClass, Reflection, IllegalStateException};
+use unittest\{Assert, Expect, Test, Values};
 
 class AnnotationTest {
   use TypeDefinition;
@@ -231,6 +231,30 @@ class AnnotationTest {
   public function parameterized_instantiation($declaration) {
     $t= $this->declare('{}', $declaration);
     Assert::equals(new Parameterized(1, 2), $t->annotation(Parameterized::class)->newInstance());
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function missing_parameter() {
+    $t= $this->declare('{}', '#[Parameterized(1)]');
+    $t->annotation(Parameterized::class)->newInstance();
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function invalid_parameter_type() {
+    $t= $this->declare('{}', '#[Parameterized("test")]');
+    $t->annotation(Parameterized::class)->newInstance();
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function unknown_named_parameter() {
+    $t= $this->declare('{}', '#[Parameterized(c: 3)]');
+    $t->annotation(Parameterized::class)->newInstance();
+  }
+
+  #[Test, Expect(InvocationFailed::class)]
+  public function instantiation_failed() {
+    $t= $this->declare('{}', '#[Parameterized(1, -1)]');
+    $t->annotation(Parameterized::class)->newInstance();
   }
 
   #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]

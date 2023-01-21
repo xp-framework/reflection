@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError;
+use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError, Error;
 use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 /**
@@ -53,7 +53,7 @@ class Method extends Routine {
 
     // Only allow invoking non-public methods when given a compatible context
     if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->class)) {
+      if ($context && Reflection::type($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
       } else {
         throw new CannotInvoke($this, new ReflectionException('Trying to invoke non-public method'));
@@ -61,35 +61,14 @@ class Method extends Routine {
     }
 
     try {
-
-      // Support named arguments for PHP 7
-      if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-        $pass= [];
-        foreach ($this->reflect->getParameters() as $param) {
-          if (isset($args[$param->name])) {
-            $pass[]= $args[$param->name];
-          } else if ($param->isOptional()) {
-            $pass[]= $param->getDefaultValue();
-          } else {
-            throw new ReflectionException('Missing parameter $'.$param->name);
-          }
-          unset($args[$param->name]);
-        }
-
-        // Check for excess arguments
-        if ($args) {
-          throw new ReflectionException('Unknown named parameter $'.key($args));
-        }
-
-        return $this->reflect->invokeArgs($instance, $pass);
-      }
+      $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
 
       // PHP 7.0 still had warnings for arguments
-      if (PHP_VERSION_ID < 70100 && sizeof($args) < $this->reflect->getNumberOfRequiredParameters()) {
+      if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
         throw new ReflectionException('Too few arguments');
       }
 
-      return $this->reflect->invokeArgs($instance, $args);
+      return $this->reflect->invokeArgs($instance, $pass);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
     } catch (ArgumentCountError $e) {
@@ -99,7 +78,7 @@ class Method extends Routine {
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
-      if (PHP_VERSION_ID >= 80200 && 0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+      if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
         throw new CannotInvoke($this, $e);
       }
 
