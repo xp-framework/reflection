@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ArgumentCountError, ReflectionException, Throwable, TypeError;
 use lang\Reflection;
 
 /**
@@ -48,15 +49,20 @@ class Initializer extends Routine implements Instantiation {
   public function newInstance(array $args= [], $context= null) {
     try {
       $instance= $this->class->newInstanceWithoutConstructor();
-    } catch (\ReflectionException $e) {
+    } catch (ReflectionException $e) {
       throw new CannotInstantiate($this->class->name, $e);
     }
 
     if (null === $this->function) return $instance;
+
     try {
       $this->function->__invoke($instance, $args, $context);
       return $instance;
-    } catch (\Throwable $e) {
+    } catch (ArgumentCountError $e) {
+      throw new CannotInstantiate($this->reflect->name, $e);
+    } catch (TypeError $e) {
+      throw new CannotInstantiate($this->reflect->name, $e);
+    } catch (Throwable $e) {
       throw new InvocationFailed($this, $e);
     }
   }

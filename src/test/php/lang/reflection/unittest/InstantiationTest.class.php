@@ -10,9 +10,10 @@ class InstantiationTest {
   use TypeDefinition;
 
   /** @return iterable */
-  private function invocations() {
+  private function instantiation() {
     yield [function($t, $args) { return $t->newInstance(...$args); }];
     yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
+    yield [function($t, $args) { return $t->initializer('__construct')->newInstance($args); }];
   }
 
   #[Test]
@@ -27,13 +28,13 @@ class InstantiationTest {
     Assert::instance($t->class(), $t->constructor()->newInstance());
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('instantiation')]
   public function with_empty_constructor($invocation) {
     $t= $this->declare('{ public function __construct() { }}');
     Assert::instance($t->class(), $invocation($t, []));
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('instantiation')]
   public function with_argument($invocation) {
     $t= $this->declare('{
       public $value= null;
@@ -42,7 +43,7 @@ class InstantiationTest {
     Assert::equals($this, $invocation($t, [$this])->value);
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('instantiation')]
   public function exceptions_are_wrapped($invocation) {
     $t= $this->declare('{ public function __construct() { throw new \lang\IllegalAccessException("Test"); } }');
     try {
@@ -53,7 +54,7 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('instantiation')]
   public function type_errors_are_wrapped($invocation) {
     $t= $this->declare('{
       public function __construct(\util\Date $date) { }
@@ -66,7 +67,7 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Values('invocations')]
+  #[Test, Values('instantiation')]
   public function missing_arguments_are_wrapped($invocation) {
     $t= $this->declare('{
       public function __construct(\util\Date $date) { }
@@ -79,23 +80,23 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
-  public function cannot_instantiate_using_private_constructor($invocation) {
-    $t= $this->declare('{ private function __construct() { } }');
-    $invocation($t, []);
+  #[Test, Expect(CannotInstantiate::class), Values(['private', 'protected'])]
+  public function newInstance_cannot_instantiate_using_non_public_constructor($modifier) {
+    $t= $this->declare('{ '.$modifier.' function __construct() { } }');
+    $t->newInstance();
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('invocations')]
-  public function cannot_instantiate_using_protected_constructor($invocation) {
-    $t= $this->declare('{ protected function __construct() { } }');
-    $invocation($t, []);
+  #[Test, Expect(CannotInstantiate::class), Values(['private', 'protected'])]
+  public function constructor_cannot_instantiate_using_non_public_constructor($modifier) {
+    $t= $this->declare('{ '.$modifier.' function __construct() { } }');
+    $t->constructor()->newInstance();
   }
 
-  #[Test]
-  public function instantiate_with_private_constructor_in_context() {
+  #[Test, Values(['private', 'protected'])]
+  public function instantiate_with_non_public_constructor_in_context($modifier) {
     $t= $this->declare('{
       public $value= null;
-      private function __construct($value) { $this->value= $value; }
+      '.$modifier.' function __construct($value) { $this->value= $value; }
     }');
     Assert::equals($this, $t->constructor()->newInstance([$this], $t)->value);
   }
@@ -163,7 +164,7 @@ class InstantiationTest {
   }
 
   #[Test]
-  public function instantiate_from_private_constructor() {
+  public function instantiate_from_private_constructor_using_initializer() {
     $t= $this->declare('{
       private $name;
       public function name() { return $this->name; }
