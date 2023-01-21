@@ -53,7 +53,7 @@ class Method extends Routine {
 
     // Only allow invoking non-public methods when given a compatible context
     if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->class)) {
+      if ($context && Reflection::type($context)->is($this->reflect->class)) {
         $this->reflect->setAccessible(true);
       } else {
         throw new CannotInvoke($this, new ReflectionException('Trying to invoke non-public method'));
@@ -62,7 +62,7 @@ class Method extends Routine {
 
     try {
 
-      // Support named arguments for PHP 7
+      // Support named arguments for PHP 7.X
       if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
         $pass= [];
         foreach ($this->reflect->getParameters() as $param) {

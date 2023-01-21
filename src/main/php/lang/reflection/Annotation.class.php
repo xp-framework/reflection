@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionMethod;
+use ArgumentCountError, ReflectionMethod, ReflectionClass, TypeError, Error, Throwable;
 use lang\{Value, XPClass};
 use util\Objects;
 
@@ -38,20 +38,46 @@ class Annotation implements Value {
    */
   public function argument($key) { return $this->arguments[$key] ?? null; }
 
-  /** @return object */
+  /**
+   * Creates a new instance of this annotation
+   *
+   * @return object
+   * @throws lang.reflection.CannotInstantiate if prerequisites to the instantiation fail
+   * @throws lang.reflection.InvocationFailed if instantiaton raises an exception
+   */
   public function newInstance() {
 
-    // Support named arguments for PHP 7
+    // Support named arguments for PHP 7.X
     if (PHP_VERSION_ID < 80000 && is_string(key($this->arguments))) {
       $ctor= new ReflectionMethod($this->type, '__construct');
       $pass= [];
+      $args= $this->arguments;
       foreach ($ctor->getParameters() as $param) {
-        $pass[]= $this->arguments[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+        $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+        unset($args[$param->name]);
       }
-      return new $this->type(...$pass);
+      if ($args) {
+        throw new CannotInstantiate($this->type, new Error('Unknown named parameter $'.key($args)));
+      }
+    } else {
+      $pass= $this->arguments;
     }
 
-    return new $this->type(...$this->arguments);
+    try {
+      return new $this->type(...$pass);
+    } catch (ArgumentCountError $e) {
+      throw new CannotInstantiate($this->type, $e);
+    } catch (TypeError $e) {
+      throw new CannotInstantiate($this->type, $e);
+    } catch (Throwable $e) {
+
+      // This really should be an ArgumentCountError...
+      if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+        throw new CannotInstantiate($this->type, $e);
+      }
+
+      throw new InvocationFailed(new Constructor(new ReflectionClass($this->type)), $e);
+    }
   }
 
   /**
