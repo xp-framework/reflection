@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError;
+use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError, Error;
 use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
 
 /**
@@ -60,36 +60,33 @@ class Method extends Routine {
       }
     }
 
+    // Support named arguments for PHP 7.X
+    if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
+      $pass= [];
+      foreach ($this->reflect->getParameters() as $param) {
+        if (isset($args[$param->name])) {
+          $pass[]= $args[$param->name];
+        } else if ($param->isOptional()) {
+          $pass[]= $param->getDefaultValue();
+        } else {
+          throw new CannotInvoke($this, new Error('Missing parameter $'.$param->name));
+        }
+        unset($args[$param->name]);
+      }
+      if ($args) {
+        throw new CannotInvoke($this, new Error('Unknown named parameter $'.key($args)));
+      }
+    } else {
+      $pass= $args;
+    }
+
+    // PHP 7.0 still had warnings for arguments
+    if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
+      throw new CannotInvoke($this, new Error('Too few arguments'));
+    }
+
     try {
-
-      // Support named arguments for PHP 7.X
-      if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
-        $pass= [];
-        foreach ($this->reflect->getParameters() as $param) {
-          if (isset($args[$param->name])) {
-            $pass[]= $args[$param->name];
-          } else if ($param->isOptional()) {
-            $pass[]= $param->getDefaultValue();
-          } else {
-            throw new ReflectionException('Missing parameter $'.$param->name);
-          }
-          unset($args[$param->name]);
-        }
-
-        // Check for excess arguments
-        if ($args) {
-          throw new ReflectionException('Unknown named parameter $'.key($args));
-        }
-
-        return $this->reflect->invokeArgs($instance, $pass);
-      }
-
-      // PHP 7.0 still had warnings for arguments
-      if (PHP_VERSION_ID < 70100 && sizeof($args) < $this->reflect->getNumberOfRequiredParameters()) {
-        throw new ReflectionException('Too few arguments');
-      }
-
-      return $this->reflect->invokeArgs($instance, $args);
+      return $this->reflect->invokeArgs($instance, $pass);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
     } catch (ArgumentCountError $e) {
@@ -99,7 +96,7 @@ class Method extends Routine {
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
-      if (PHP_VERSION_ID >= 80200 && 0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+      if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
         throw new CannotInvoke($this, $e);
       }
 
