@@ -114,12 +114,12 @@ class InstantiationTest {
 
   #[Test, Expect(CannotInstantiate::class)]
   public function interfaces_cannot_be_instantiated() {
-    Reflection::of(Runnable::class)->newInstance();
+    Reflection::type(Runnable::class)->newInstance();
   }
 
   #[Test, Expect(CannotInstantiate::class)]
   public function abstract_classes_cannot_be_instantiated() {
-    Reflection::of(CommandLine::class)->newInstance();
+    Reflection::type(CommandLine::class)->newInstance();
   }
 
   #[Test]
@@ -177,7 +177,7 @@ class InstantiationTest {
 
   #[Test]
   public function instantiate_on_interface() {
-    Assert::null(Reflection::of(Runnable::class)->initializer(null));
+    Assert::null(Reflection::type(Runnable::class)->initializer(null));
   }
 
   #[Test]
