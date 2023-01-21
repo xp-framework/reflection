@@ -4,6 +4,7 @@ use lang\reflection\{CannotInstantiate, InvocationFailed};
 use lang\{Reflection, Runnable, CommandLine, Error, IllegalAccessException};
 use unittest\actions\RuntimeVersion;
 use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
+use util\Date;
 
 class InstantiationTest {
   use TypeDefinition;
@@ -60,7 +61,20 @@ class InstantiationTest {
     try {
       $invocation($t, [null]);
       throw new AssertionFailedError('No exception was raised');
-    } catch (InvocationFailed $expected) {
+    } catch (CannotInstantiate $expected) {
+      Assert::instance(Error::class, $expected->getCause());
+    }
+  }
+
+  #[Test, Values('invocations')]
+  public function missing_arguments_are_wrapped($invocation) {
+    $t= $this->declare('{
+      public function __construct(\util\Date $date) { }
+    }');
+    try {
+      $invocation($t, []);
+      throw new AssertionFailedError('No exception was raised');
+    } catch (CannotInstantiate $expected) {
       Assert::instance(Error::class, $expected->getCause());
     }
   }
@@ -203,12 +217,21 @@ class InstantiationTest {
     Assert::equals([1, 2], $t->constructor()->newInstance(['b' => 2])->values);
   }
 
-  #[Test, Expect(InvocationFailed::class)]
+  #[Test, Expect(CannotInstantiate::class)]
   public function excess_named_arguments_raise_error() {
     $t= $this->declare('{
       public $values;
       public function __construct($a, $b) { $this->values= [$a, $b]; }
     }');
     $t->constructor()->newInstance(['b' => 2, 'a' => 1, 'extra' => 3]);
+  }
+
+  #[Test, Expect(CannotInstantiate::class)]
+  public function unknown_named_arguments_raise_error() {
+    $t= $this->declare('{
+      public $values;
+      public function __construct($a, $b) { $this->values= [$a, $b]; }
+    }');
+    $t->constructor()->newInstance(['c' => 3]);
   }
 }

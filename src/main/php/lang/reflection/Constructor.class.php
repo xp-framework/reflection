@@ -1,6 +1,7 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Error};
+use ArgumentCountError, ReflectionMethod, ReflectionClass, ReflectionException, TypeError, Error, Throwable;
+use lang\Reflection;
 
 /**
  * Reflection for a type's constructor
@@ -36,7 +37,7 @@ class Constructor extends Routine implements Instantiation {
    */
   public function newInstance(array $args= [], $context= null) {
 
-    // Support named arguments for PHP 7.
+    // Support named arguments for PHP 7.X
     if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
       $pass= [];
       foreach ($this->reflect->getParameters() as $param) {
@@ -44,7 +45,7 @@ class Constructor extends Routine implements Instantiation {
         unset($args[$param->name]);
       }
       if ($args) {
-        throw new InvocationFailed($this, new Error('Unknown named parameter $'.key($args)));
+        throw new CannotInstantiate($this->class->name, new Error('Unknown named parameter $'.key($args)));
       }
     } else {
       $pass= $args;
@@ -64,9 +65,19 @@ class Constructor extends Routine implements Instantiation {
       }
 
       return $this->class->newInstanceArgs($pass);
-    } catch (\ReflectionException $e) {
+    } catch (ArgumentCountError $e) {
       throw new CannotInstantiate($this->class->name, $e);
-    } catch (\Throwable $e) {
+    } catch (TypeError $e) {
+      throw new CannotInstantiate($this->class->name, $e);
+    } catch (ReflectionException $e) {
+      throw new CannotInstantiate($this->class->name, $e);
+    } catch (Throwable $e) {
+
+      // This really should be an ArgumentCountError...
+      if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
+        throw new CannotInstantiate($this->class->name, $e);
+      }
+
       throw new InvocationFailed($this, $e);
     }
   }

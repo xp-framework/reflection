@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ArgumentCountError, TypeError, ReflectionClass, ReflectionException, ReflectionFunction, Throwable;
 use lang\{Reflection, Enum, XPClass, Value, VirtualProperty, IllegalArgumentException};
 
 /**
@@ -35,9 +36,9 @@ class Type implements Value {
       // @codeCoverageIgnoreStart
       $m= $this->reflect->getModifiers();
       $r= 0;
-      $m & \ReflectionClass::IS_EXPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
-      $m & \ReflectionClass::IS_IMPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
-      $m & \ReflectionClass::IS_FINAL && $r|= Modifiers::IS_FINAL;
+      $m & ReflectionClass::IS_EXPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
+      $m & ReflectionClass::IS_IMPLICIT_ABSTRACT && $r|= Modifiers::IS_ABSTRACT;
+      $m & ReflectionClass::IS_FINAL && $r|= Modifiers::IS_FINAL;
       // @codeCoverageIgnoreEnd
     } else if (PHP_VERSION_ID >= 80200) {
 
@@ -46,7 +47,7 @@ class Type implements Value {
       //
       // @codeCoverageIgnoreStart
       $r= $this->reflect->getModifiers();
-      $r & \ReflectionClass::IS_READONLY && $r^= \ReflectionClass::IS_READONLY | Modifiers::IS_READONLY;
+      $r & ReflectionClass::IS_READONLY && $r^= ReflectionClass::IS_READONLY | Modifiers::IS_READONLY;
       // @codeCoverageIgnoreEnd
     } else {
       $r= $this->reflect->getModifiers();
@@ -172,7 +173,7 @@ class Type implements Value {
     if (null === $function) {
       return new Initializer($this->reflect);
     } else if ($function instanceof \Closure) {
-      $reflect= new \ReflectionFunction($function);
+      $reflect= new ReflectionFunction($function);
       return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($function) {
         return $function->call($instance, ...$args);
       });
@@ -215,9 +216,13 @@ class Type implements Value {
       } else {
         return $this->reflect->newInstance();
       }
-    } catch (\ReflectionException $e) {
+    } catch (ArgumentCountError $e) {
       throw new CannotInstantiate($this->reflect->name, $e);
-    } catch (\Throwable $e) {
+    } catch (TypeError $e) {
+      throw new CannotInstantiate($this->reflect->name, $e);
+    } catch (ReflectionException $e) {
+      throw new CannotInstantiate($this->reflect->name, $e);
+    } catch (Throwable $e) {
       if ($this->reflect->isInstantiable() && $constructor) {
         throw new InvocationFailed($this->constructor(), $e);
       } else {
