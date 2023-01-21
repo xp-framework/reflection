@@ -47,7 +47,7 @@ class Annotation implements Value {
    */
   public function newInstance() {
     try {
-      $pass= PHP_VERSION_ID < 80000 && is_string(key($this->arguments))
+      $pass= PHP_VERSION_ID < 80000 && $this->arguments
         ? Routine::pass(new ReflectionMethod($this->type, '__construct'), $this->arguments)
         : $this->arguments
       ;
