@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.8.0 / 2023-01-21
+
+* Merged PR #26: Invocation exceptions consistency - @thekid
+
 ## 2.7.0 / 2023-01-15
 
 * Merged PR #25: Add `Annotations::all()` with returns all annotations
