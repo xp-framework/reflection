@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionUnionType, ReflectionIntersectionType;
+use Error, ReflectionException, ReflectionUnionType, ReflectionIntersectionType;
 use lang\{Reflection, Type, TypeUnion};
 
 /** Base class for methods and constructors */
@@ -103,7 +103,7 @@ abstract class Routine extends Member {
         unset($args[$param->name]);
       }
       if ($args) {
-        throw new ReflectionException('Unknown named parameter $'.key($args));
+        throw new Error('Unknown named parameter $'.key($args));
       }
       return $pass;
     }
