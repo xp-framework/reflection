@@ -212,7 +212,22 @@ class Type implements Value {
     $constructor= $this->reflect->hasMethod('__construct');
     try {
       if ($constructor) {
-        return $this->reflect->newInstanceArgs($args);
+
+        // Support named arguments for PHP 7.X
+        if (PHP_VERSION_ID < 80000 && is_string(key($args))) {
+          $pass= [];
+          foreach ($constructor->getParameters() as $param) {
+            $pass[]= $args[$param->name] ?? ($param->isOptional() ? $param->getDefaultValue() : null);
+            unset($args[$param->name]);
+          }
+          if ($args) {
+            throw new ReflectionException('Unknown named parameter $'.key($args));
+          }
+        } else {
+          $pass= $args;
+        }
+
+        return $this->reflect->newInstanceArgs($pass);
       } else {
         return $this->reflect->newInstance();
       }
