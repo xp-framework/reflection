@@ -212,7 +212,7 @@ class Type implements Value {
     $constructor= $this->reflect->hasMethod('__construct');
     try {
       if ($constructor) {
-        $pass= PHP_VERSION_ID < 80000 ? Routine::pass($constructor, $args) : $args;
+        $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($constructor, $args) : $args;
         return $this->reflect->newInstanceArgs($pass);
       } else {
         return $this->reflect->newInstance();

@@ -56,7 +56,7 @@ class Initializer extends Routine implements Instantiation {
     if (null === $this->function) return $instance;
 
     try {
-      $pass= PHP_VERSION_ID < 80000 ? Routine::pass($this->reflect, $args) : $args;
+      $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect, $args) : $args;
       $this->function->__invoke($instance, $pass, $context);
       return $instance;
     } catch (ArgumentCountError $e) {

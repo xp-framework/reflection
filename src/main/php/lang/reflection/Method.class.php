@@ -61,7 +61,7 @@ class Method extends Routine {
     }
 
     try {
-      $pass= PHP_VERSION_ID < 80000 ? self::pass($this->reflect, $args) : $args;
+      $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
 
       // PHP 7.0 still had warnings for arguments
       if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
