@@ -26,7 +26,8 @@ class MetaInformation {
   private function annotations($meta) {
     $r= [];
     foreach ($meta[DETAIL_ANNOTATIONS] as $name => $value) {
-      $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
+      $qname= $meta[DETAIL_TARGET_ANNO][$name] ?? $name;
+      $r[$qname]= isset($meta[DETAIL_TARGET_ANNO][$qname]) ? [$value] : (array)$value;
     }
     return $r;
   }
