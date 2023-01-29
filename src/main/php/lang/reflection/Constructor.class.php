@@ -52,16 +52,16 @@ class Constructor extends Routine implements Instantiation {
 
       return $this->class->newInstanceArgs($pass);
     } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate(new Type($this->class), $e);
+      throw new CannotInstantiate($this->class, $e);
     } catch (TypeError $e) {
-      throw new CannotInstantiate(new Type($this->class), $e);
+      throw new CannotInstantiate($this->class, $e);
     } catch (ReflectionException $e) {
-      throw new CannotInstantiate(new Type($this->class), $e);
+      throw new CannotInstantiate($this->class, $e);
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
       if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
-        throw new CannotInstantiate(new Type($this->class), $e);
+        throw new CannotInstantiate($this->class, $e);
       }
 
       throw new InvocationFailed($this, $e);
