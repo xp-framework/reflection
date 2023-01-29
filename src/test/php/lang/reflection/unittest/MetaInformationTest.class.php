@@ -141,7 +141,7 @@ class MetaInformationTest {
     );
   }
 
-  #[Test, Values([[null, null, []], [1, null, [1]], [1, true, [1]], [[1], null, [1]], [[1], true, [[1]]]])]
+  #[Test, Values([[null, null, []], [null, true, [null]], [1, null, [1]], [1, true, [1]], [[1], null, [1]], [[1], true, [[1]]]])]
   public function map_value_to_arguments($value, $flag, $arguments) {
     $meta= &\xp::$meta['lang.reflection.unittest.Fixture'][0]['DEFAULT'];
     $meta[DETAIL_ANNOTATIONS]['annotated']= $value;
