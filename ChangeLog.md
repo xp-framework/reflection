@@ -3,8 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.8.1 / 2023-01-29
+
 * Merged PR #27: Fix ambiguous annotation values by checking an additional
-  meta value
+  flag, see https://github.com/xp-framework/compiler/releases/tag/v8.8.1
   (@thekid)
 
 ## 2.8.0 / 2023-01-21
