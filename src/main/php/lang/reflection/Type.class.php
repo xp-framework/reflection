@@ -218,18 +218,18 @@ class Type implements Value {
         return $this->reflect->newInstance();
       }
     } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this->reflect->name, $e);
+      throw new CannotInstantiate($this, $e);
     } catch (TypeError $e) {
-      throw new CannotInstantiate($this->reflect->name, $e);
+      throw new CannotInstantiate($this, $e);
     } catch (ReflectionException $e) {
-      throw new CannotInstantiate($this->reflect->name, $e);
+      throw new CannotInstantiate($this, $e);
     } catch (Throwable $e) {
       if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
-        throw new CannotInstantiate($this->reflect->name, $e);
+        throw new CannotInstantiate($this, $e);
       } else if ($this->reflect->isInstantiable() && $constructor) {
         throw new InvocationFailed($this->constructor(), $e);
       } else {
-        throw new CannotInstantiate($this->reflect->name);
+        throw new CannotInstantiate($this);
       }
     }
   }
