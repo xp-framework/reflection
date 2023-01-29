@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #27: Fix ambiguous annotation values by checking an additional
+  meta value
+  (@thekid)
+
 ## 2.8.0 / 2023-01-21
 
 * Merged PR #26: Invocation exceptions consistency - @thekid
