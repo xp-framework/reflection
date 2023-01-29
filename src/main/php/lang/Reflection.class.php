@@ -22,13 +22,10 @@ use lang\{ClassLoader, ClassNotFoundException};
 abstract class Reflection {
   private static $meta= null;
 
-  public static function annotations($version) {
-    return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
-  }
 
   /** Lazy-loads meta information extraction */
   public static function meta(): MetaInformation {
-    return self::$meta ?? self::$meta= new MetaInformation(self::annotations(PHP_VERSION_ID));
+    return self::$meta ?? self::$meta= new MetaInformation();
   }
 
   /**

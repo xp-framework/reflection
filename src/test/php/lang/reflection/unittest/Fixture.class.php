@@ -1,13 +1,22 @@
 <?php namespace lang\reflection\unittest;
 
+#[Annotated('test')]
 class Fixture {
+
+  #[Annotated('test')]
   const TEST = 'test';
 
+  #[Annotated('test')]
   public static $DEFAULT = null;
+
   private $value;
 
   /** @param var */
-  public function __construct($value= null) {
+  #[Annotated('test')]
+  public function __construct(
+    #[Annotated('test')]
+    $value= null
+  ) {
     $this->value= $value;
   }
 

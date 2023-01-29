@@ -1,6 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\meta\MetaInformation;
+use ReflectionClass;
+use lang\meta\{MetaInformation, FromAttributes, FromSyntaxTree};
 use unittest\{Assert, Before, After, Test};
 
 class MetaInformationTest {
@@ -37,12 +38,22 @@ class MetaInformationTest {
         ]
       ]
     ];
-    $this->reflect= new \ReflectionClass(Fixture::class);
+    $this->reflect= new ReflectionClass(Fixture::class);
   }
 
   #[After]
   public function finalize() {
     unset(\xp::$meta['lang.reflection.unittest.Fixture']);
+  }
+
+  #[Test, Values([70000, 70100, 70200, 70300, 70400])]
+  public function parser_for_php7($versionId) {
+    Assert::instance(FromSyntaxTree::class, MetaInformation::annotations($versionId));
+  }
+
+  #[Test, Values([80000, 80100, 80200, 80300])]
+  public function parser_for_php8($versionId) {
+    Assert::instance(FromAttributes::class, MetaInformation::annotations($versionId));
   }
 
   #[Test]

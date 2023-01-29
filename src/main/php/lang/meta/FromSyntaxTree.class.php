@@ -111,7 +111,7 @@ class FromSyntaxTree {
    * @param  lang.ast.nodes.Annotated $annotated
    * @return [:var]
    */
-  private function annotations($tree, $annotated) {
+  private function treeAnnotations($tree, $annotated) {
     if (null === $annotated->annotations) return [];
 
     $r= [];
@@ -130,6 +130,20 @@ class FromSyntaxTree {
     return $r;
   }
 
+  /**
+   * Constructs annotations from meta information
+   *
+   * @param  [:var] $meta
+   * @return [:var]
+   */
+  private function metaAnnotations($meta) {
+    $r= [];
+    foreach ($meta[DETAIL_ANNOTATIONS] as $name => $value) {
+      $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
+    }
+    return $r;
+  }
+
   public function imports($reflect) {
     $resolver= $this->tree($reflect->name)->resolver();
     $imports= [];
@@ -141,35 +155,64 @@ class FromSyntaxTree {
 
   /** @return iterable */
   public function ofType($reflect) {
-    $tree= $this->tree($reflect->name);
-    return $this->annotations($tree, $tree->type());      
+    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
+      return $this->metaAnnotations($meta);
+    } else {
+      $tree= $this->tree($reflect->name);
+      return $this->treeAnnotations($tree, $tree->type());
+    }
   }
 
   /** @return iterable */
   public function ofConstant($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
-    return $this->annotations($tree, $tree->type()->constant($reflect->name));
+    $type= $reflect->getDeclaringClass()->name;
+    if ($meta= \xp::$meta[strtr($type, '\\', '.')][2][$reflect->name] ?? null) {
+      return $this->metaAnnotations($meta);
+    } else {
+      $tree= $this->tree($type);
+      return $this->treeAnnotations($tree, $tree->type()->constant($reflect->name));
+    }
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
-    return $this->annotations($tree, $tree->type()->property($reflect->name));
+    $type= $reflect->getDeclaringClass()->name;
+    if ($meta= \xp::$meta[strtr($type, '\\', '.')][0][$reflect->name] ?? null) {
+      return $this->metaAnnotations($meta);
+    } else {
+      $tree= $this->tree($type);
+      return $this->treeAnnotations($tree, $tree->type()->property($reflect->name));
+    }
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
-    return $this->annotations($tree, $tree->type()->method($reflect->name));
+    $type= $reflect->getDeclaringClass()->name;
+    if ($meta= \xp::$meta[strtr($type, '\\', '.')][1][$reflect->name] ?? null) {
+      return $this->metaAnnotations($meta);
+    } else {
+      $tree= $this->tree($type);
+      return $this->treeAnnotations($tree, $tree->type()->method($reflect->name));
+    }
   }
 
   /** @return iterable */
   public function ofParameter($method, $reflect) {
-    $tree= $this->tree($method->getDeclaringClass()->name);
-    return $this->annotations($tree, $tree->type()
-      ->method($method->name)
-      ->signature
-      ->parameters[$reflect->getPosition()]
-    );
+    $type= $reflect->getDeclaringClass()->name;
+
+    if ($target= \xp::$meta[strtr($type, '\\', '.')][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
+      $r= [];
+      foreach ($target['$'.$reflect->name] ?? [] as $name => $value) {
+        $r[$target[$name] ?? $name]= (array)$value;
+      }
+      return $r;
+    } else {
+      $tree= $this->tree($type);
+      return $this->treeAnnotations($tree, $tree->type()
+        ->method($method->name)
+        ->signature
+        ->parameters[$reflect->getPosition()]
+      );
+    }
   }
 }
