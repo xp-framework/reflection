@@ -140,4 +140,17 @@ class MetaInformationTest {
       (new MetaInformation(null))->parameterAnnotations($method, $method->getParameters()[0])
     );
   }
+
+  #[Test, Values([[null, null, []], [1, null, [1]], [1, true, [1]], [[1], null, [1]], [[1], true, [[1]]]])]
+  public function map_value_to_arguments($value, $flag, $arguments) {
+    $meta= &\xp::$meta['lang.reflection.unittest.Fixture'][0]['DEFAULT'];
+    $meta[DETAIL_ANNOTATIONS]['annotated']= $value;
+    $meta[DETAIL_TARGET_ANNO][Annotated::class]= $flag;
+
+    $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
+    Assert::equals(
+      [Annotated::class => $arguments],
+      (new MetaInformation(null))->propertyAnnotations($p)
+    );
+  }
 }
