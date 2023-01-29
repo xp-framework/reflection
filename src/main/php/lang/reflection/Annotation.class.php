@@ -53,16 +53,16 @@ class Annotation implements Value {
       ;
       return new $this->type(...$pass);
     } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this->type, $e);
+      throw new CannotInstantiate(new Type(new ReflectionClass($this->type)), $e);
     } catch (TypeError $e) {
-      throw new CannotInstantiate($this->type, $e);
+      throw new CannotInstantiate(new Type(new ReflectionClass($this->type)), $e);
     } catch (ReflectionException $e) {
-      throw new CannotInstantiate($this->type, $e);
+      throw new CannotInstantiate(new Type(new ReflectionClass($this->type)), $e);
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
       if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
-        throw new CannotInstantiate($this->type, $e);
+        throw new CannotInstantiate(new Type(new ReflectionClass($this->type)), $e);
       }
 
       throw new InvocationFailed(new Constructor(new ReflectionClass($this->type)), $e);

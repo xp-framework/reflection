@@ -60,16 +60,16 @@ class Initializer extends Routine implements Instantiation {
       $this->function->__invoke($instance, $pass, $context);
       return $instance;
     } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this->class->name, $e);
+      throw new CannotInstantiate(new Type($this->class), $e);
     } catch (TypeError $e) {
-      throw new CannotInstantiate($this->class->name, $e);
+      throw new CannotInstantiate(new Type($this->class), $e);
     } catch (ReflectionException $e) {
-      throw new CannotInstantiate($this->class->name, $e);
+      throw new CannotInstantiate(new Type($this->class), $e);
     } catch (Throwable $e) {
 
       // This really should be an ArgumentCountError...
       if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
-        throw new CannotInstantiate($this->class->name, $e);
+        throw new CannotInstantiate(new Type($this->class), $e);
       }
 
       throw new InvocationFailed($this, $e);
