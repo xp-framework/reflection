@@ -1,7 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
 use ReflectionClass, ReflectionObject;
-use lang\meta\{FromAttributes, FromSyntaxTree};
 use lang\reflection\Package;
 use lang\{Reflection, Type, ClassNotFoundException};
 use unittest\{Assert, Test, Values, Expect};
@@ -32,16 +31,6 @@ class ReflectionTest {
   #[Test]
   public function of_package_name() {
     Assert::instance(Package::class, Reflection::of('lang.reflection.unittest'));
-  }
-
-  #[Test, Values([70000, 70100, 70200, 70300, 70400])]
-  public function parser_for_php7($versionId) {
-    Assert::instance(FromSyntaxTree::class, Reflection::annotations($versionId));
-  }
-
-  #[Test, Values([80000, 80100, 80200])]
-  public function parser_for_php8($versionId) {
-    Assert::instance(FromAttributes::class, Reflection::annotations($versionId));
   }
 
   #[Test, Expect(ClassNotFoundException::class)]

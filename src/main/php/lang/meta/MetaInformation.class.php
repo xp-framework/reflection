@@ -9,26 +9,16 @@ Use lang\reflection\Modifiers;
 class MetaInformation {
   private $annotations;
 
-  public function __construct($annotations) {
-    $this->annotations= $annotations;
+  public function __construct($annotations= null) {
+    $this->annotations= $annotations ?? self::annotations(PHP_VERSION_ID);
+  }
+
+  public static function annotations($version) {
+    return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
   }
 
   public function evaluate($reflect, $code) {
     return $this->annotations->evaluate($reflect, $code);
-  }
-
-  /**
-   * Constructs annotations from meta information
-   *
-   * @param  [:var] $meta
-   * @return [:var]
-   */
-  private function annotations($meta) {
-    $r= [];
-    foreach ($meta[DETAIL_ANNOTATIONS] as $name => $value) {
-      $r[$meta[DETAIL_TARGET_ANNO][$name] ?? $name]= (array)$value;
-    }
-    return $r;
   }
 
   /**
@@ -64,11 +54,7 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function typeAnnotations($reflect) {
-    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
-      return $this->annotations($meta);
-    } else {
-      return $this->annotations->ofType($reflect);
-    }
+    return $this->annotations->ofType($reflect);
   }
 
   /**
@@ -94,12 +80,7 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function constantAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
-      return $this->annotations($meta);
-    } else {
-      return $this->annotations->ofConstant($reflect);
-    }
+    return $this->annotations->ofConstant($reflect);
   }
 
   /**
@@ -126,12 +107,7 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function propertyAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
-      return $this->annotations($meta);
-    } else {
-      return $this->annotations->ofProperty($reflect);
-    }
+    return $this->annotations->ofProperty($reflect);
   }
 
   /**
@@ -174,12 +150,7 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function methodAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
-    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
-      return $this->annotations($meta);
-    } else {
-      return $this->annotations->ofMethod($reflect);
-    }
+    return $this->annotations->ofMethod($reflect);
   }
 
   /**
@@ -239,16 +210,6 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function parameterAnnotations($method, $reflect) {
-    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
-    if ($target= \xp::$meta[$c][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
-      if ($param= $target['$'.$reflect->name] ?? null) {
-        $r= [];
-        foreach ($param as $name => $value) {
-          $r[$target[$name] ?? $name]= (array)$value;
-        }
-        return $r;
-      }
-    }
     return $this->annotations->ofParameter($method, $reflect);
   }
 
