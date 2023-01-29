@@ -36,6 +36,7 @@ class AnnotationTest {
   /** @return iterable */
   private function arrays() {
     yield ['#[Annotated([])]', [[]]];
+    yield ['#[Annotated([1])]', [[1]]];
     yield ['#[Annotated([1, 2,])]', [[1, 2]]];
     yield ['#[Annotated([1, 2, 3])]', [[1, 2, 3]]];
     yield ['#[Annotated(["key" => "value"])]', [['key' => 'value']]];
