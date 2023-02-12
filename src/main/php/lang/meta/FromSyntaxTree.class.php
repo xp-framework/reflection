@@ -1,7 +1,8 @@
 <?php namespace lang\meta;
 
 use lang\IllegalArgumentException;
-use lang\ast\{Language, Tokens, Visitor, Code};
+use lang\ast\nodes\FunctionDeclaration;
+use lang\ast\{Language, Token, Tokens, Visitor, Code};
 
 /**
  * Parses annotations from AST, using PHP language syntax.
@@ -73,7 +74,8 @@ class FromSyntaxTree {
           return new Code('function('.substr($params, 2).') { return'.$code.'; }');
         }
       });
-      self::$parse->prefix('function', 0, function($parse, $token) {
+
+      $function= function($parse, $token) {
         $signature= $this->signature($parse);
 
         // Parse body
@@ -95,6 +97,21 @@ class FromSyntaxTree {
           $params.= ', $'.$param->name;
         }
         return new Code('function('.substr($params, 2).')'.$code.' }');
+      };
+
+      // Function expressions and function expressions used as statement
+      self::$parse->prefix('function', 0, $function);
+      self::$parse->stmt('function', function($parse, $token) use($function) {
+        if ('(' === $parse->token->value) return $function->call($this, $parse, $token);
+        
+        $name= $parse->token->value;
+        $parse->forward();
+        $signature= $this->signature($parse);
+        $parse->expecting('{', 'function');
+        $statements= $this->statements($parse);
+        $parse->expecting('}', 'function');
+
+        return new FunctionDeclaration($name, $signature, $statements, $token->line);
       });
     }
     return self::$parse->parse(new Tokens($code.';', '(evaluated)'), $resolver);
