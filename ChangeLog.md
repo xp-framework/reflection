@@ -5,6 +5,8 @@ XP Reflection ChangeLog
 
 ## 2.9.1 / 2023-02-12
 
+* Merged PR #30: Migrate to new testing library - @thekid
+* Fixed function expressions inside annotations in PHP 7.x - @thekid
 * Fixed handling reflection on generics in PHP 7.x - @thekid
 
 ## 2.9.0 / 2023-01-29
