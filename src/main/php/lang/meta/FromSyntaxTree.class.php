@@ -20,17 +20,24 @@ class FromSyntaxTree {
   }
 
   private function tree($name) {
-    if (!isset($this->cache[$name])) {
+
+    // Handle generic class names correctly
+    if ($class= \xp::$cn[$name] ?? null) {
+      $class= substr($class, 0, strcspn($class, '<'));
+    } else {
       $class= strtr($name, '\\', '.');
+    }
+
+    if (!isset($this->cache[$class])) {
       sscanf(\xp::$cl[$class], '%[^:]://%[^$]', $cl, $argument);
       $instanceFor= [literal($cl), 'instanceFor'];
       $bytes= $instanceFor($argument)->loadClassBytes($class);
+      $this->cache[$class]= new SyntaxTree(self::$lang->parse(new Tokens($bytes, $class))->tree(), $class);
 
       // Limit cache
-      $this->cache[$name]= new SyntaxTree(self::$lang->parse(new Tokens($bytes, $class))->tree(), $name);
       if (sizeof($this->cache) > self::CACHE_SIZE) unset($this->cache[key($this->cache)]);
     }
-    return $this->cache[$name];
+    return $this->cache[$class];
   }
 
   private function parse($code, $resolver) {

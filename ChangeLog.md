@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.9.1 / 2023-02-12
+
+* Fixed handling reflection on generics in PHP 7.x - @thekid
+
 ## 2.9.0 / 2023-01-29
 
 * Merged PR #29: Add `lang.reflection.CannotInstantiate::type()` accessor
