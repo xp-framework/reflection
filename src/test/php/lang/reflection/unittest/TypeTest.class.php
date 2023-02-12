@@ -201,13 +201,13 @@ class TypeTest {
     Assert::equals('annotated', $this->fixture->annotation(Annotated::class)->name());
   }
 
-  #[Test, Condition(assert: 'fn() => self::$ENUMS')]
+  #[Test, Condition(assert: 'self::$ENUMS')]
   public function enum_annotation() {
    $t= $this->declare('A_E', ['kind' => 'enum'], '{ case M; }');
     Assert::equals('annotated', $t->annotation(Annotated::class)->name());
   }
 
-  #[Test, Condition(assert: 'fn() => self::$ENUMS')]
+  #[Test, Condition(assert: 'self::$ENUMS')]
   public function enum_case_annotation() {
    $t= $this->declare('A_C', ['kind' => 'enum'], '{ #[Annotated] case M; }');
     Assert::equals('annotated', $t->constant('M')->annotation(Annotated::class)->name());
