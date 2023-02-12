@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\Reflection;
-use lang\reflection\{Modifiers, AccessingFailed};
-use unittest\{Assert, Values, Expect, Test};
+use lang\reflection\{AccessingFailed, Modifiers};
+use test\{Assert, Expect, Test, Values};
 
 class VirtualPropertiesTest {
   use TypeDefinition;
@@ -23,12 +23,12 @@ class VirtualPropertiesTest {
     }
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function readonly_modifier_shown_in_string_representation($type) {
     Assert::equals('public readonly string $fixture', $type->property('fixture')->toString());
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function virtual_property_included_in_list($type) {
     Assert::equals(
       ['fixture' => 'public readonly'],
@@ -36,12 +36,12 @@ class VirtualPropertiesTest {
     );
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function named_virtual($type) {
     Assert::equals($type->property('fixture'), $type->properties()->named('fixture'));
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function initializing_readonly_allowed($type) {
     $property= $type->property('fixture');
     $instance= $type->newInstance();
@@ -49,7 +49,7 @@ class VirtualPropertiesTest {
     $property->set($instance, 'Test');
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function reading_readonly($type) {
     $property= $type->property('fixture');
     $instance= $type->newInstance();
@@ -58,7 +58,7 @@ class VirtualPropertiesTest {
     Assert::equals('Test', $property->get($instance));
   }
 
-  #[Test, Expect(AccessingFailed::class), Values('fixtures')]
+  #[Test, Expect(AccessingFailed::class), Values(from: 'fixtures')]
   public function overwriting_readonly_not_allowed($type) {
     $property= $type->property('fixture');
     $instance= $type->newInstance();

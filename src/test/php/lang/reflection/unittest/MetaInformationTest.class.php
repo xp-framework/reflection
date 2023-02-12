@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\meta\MetaInformation;
-use unittest\{Assert, Before, After, Test};
+use test\{After, Assert, Before, Test, Values};
 
 class MetaInformationTest {
   private $reflect;

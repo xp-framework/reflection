@@ -1,9 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Modifiers, CannotAccess, AccessingFailed, Constraint};
-use lang\{Type, Primitive, TypeUnion, TypeIntersection, XPClass};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Action, Expect, Test, AssertionFailedError};
+use lang\reflection\{AccessingFailed, CannotAccess, Constraint, Modifiers};
+use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass};
+use test\verify\Runtime;
+use test\{Action, Assert, AssertionFailedError, Expect, Test, Values};
 
 class PropertiesTest {
   use TypeDefinition;
@@ -103,7 +103,7 @@ class PropertiesTest {
     $type->property('fixture')->set(null, 'Modified', typeof($this));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")'), Expect(AccessingFailed::class)]
+  #[Test, Runtime(php: '>=7.4'), Expect(AccessingFailed::class)]
   public function type_mismatch() {
     $type= $this->declare('{ private static array $fixture; }');
     $type->property('fixture')->set(null, 1, $type);
@@ -145,7 +145,7 @@ class PropertiesTest {
     Assert::equals(new Constraint(Primitive::$STRING, false), $type->property('fixture')->constraint());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  #[Test, Runtime(php: '>=7.4')]
   public function type_from_declaration() {
     $type= $this->declare('{ public string $fixture; }');
     Assert::equals(
@@ -154,7 +154,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  #[Test, Runtime(php: '>=7.4')]
   public function type_from_array_declaration() {
     $type= $this->declare('{ public array $fixture; }');
     Assert::equals(
@@ -163,7 +163,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  #[Test, Runtime(php: '>=7.4')]
   public function type_from_self_declaration() {
     $type= $this->declare('{ public self $fixture; }');
     Assert::equals(
@@ -172,7 +172,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function type_from_union_declaration() {
     $type= $this->declare('{ public string|int $fixture; }');
     Assert::equals(
@@ -181,7 +181,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function type_from_intersection_declaration() {
     $type= $this->declare('{ public \Countable&\Traversable $fixture; }');
     Assert::equals(
@@ -190,7 +190,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")'), Values(['true', 'false'])]
+  #[Test, Runtime(php: '>=8.2'), Values(['true', 'false'])]
   public function type_from_boolean_types($name) {
     $type= $this->declare('{ public '.$name.' $fixture; }');
     Assert::equals(
@@ -217,7 +217,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  #[Test, Runtime(php: '>=7.4')]
   public function string_representation_with_type_declaration() {
     $t= $this->declare('{ public string $fixture; }');
     Assert::equals(
@@ -226,7 +226,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function string_representation_with_union_type_declaration() {
     $t= $this->declare('{ public string|int $fixture; }');
     Assert::equals(
@@ -235,7 +235,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.4")')]
+  #[Test, Runtime(php: '>=7.4')]
   public function accessing_failed_target() {
     $t= $this->declare('{ public static array $fixture; }');
     try {

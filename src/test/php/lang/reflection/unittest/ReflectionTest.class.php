@@ -3,8 +3,8 @@
 use ReflectionClass, ReflectionObject;
 use lang\meta\{FromAttributes, FromSyntaxTree};
 use lang\reflection\Package;
-use lang\{Reflection, Type, ClassNotFoundException};
-use unittest\{Assert, Test, Values, Expect};
+use lang\{ClassNotFoundException, Reflection, Type};
+use test\{Assert, Expect, Test, Values};
 
 class ReflectionTest {
 
@@ -19,12 +19,12 @@ class ReflectionTest {
     yield [new ReflectionObject($this), 'reflection object'];
   }
 
-  #[Test, Values('arguments')]
+  #[Test, Values(from: 'arguments')]
   public function of($argument) {
     Assert::equals(nameof($this), Reflection::of($argument)->name());
   }
 
-  #[Test, Values('arguments')]
+  #[Test, Values(from: 'arguments')]
   public function type($argument) {
     Assert::equals(nameof($this), Reflection::type($argument)->name());
   }

@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\{IllegalArgumentException, Reflection, Type};
-use unittest\{Assert, Expect, Test, Values};
+use test\{Assert, Expect, Test, Values};
 
 class EvaluateTest {
   private static $EMPTY;
@@ -32,20 +32,20 @@ class EvaluateTest {
     yield ['function($arg) { if ($arg) { return "test"; } }', [true], 'test'];
   }
 
-  #[Test, Values('expressions')]
+  #[Test, Values(from: 'expressions')]
   public function evaluate($expression, $value) {
     Assert::equals($value, Reflection::of($this)->evaluate($expression));
   }
 
-  #[Test, Values('functions')]
+  #[Test, Values(from: 'functions')]
   public function run($expression, $args, $value) {
     $func= cast(Reflection::of($this)->evaluate($expression), 'callable');
     Assert::equals($value, $func(...$args));
   }
 
-  #[Test]
+  #[Test, Expect(class: IllegalArgumentException::class, message: 'Test')]
   public function throw_expression_supported_in_fn() {
     $func= Reflection::of($this)->evaluate('fn() => throw new \lang\IllegalArgumentException("Test")');
-    Assert::throws(IllegalArgumentException::class, $func);
+    $func();
   }
 }
