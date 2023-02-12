@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
-use lang\{Reflection, IllegalAccessException, Runnable, CommandLine};
-use unittest\{Assert, AssertionFailedError, Before, Values, Expect, Test};
+use lang\{CommandLine, IllegalAccessException, Reflection, Runnable};
+use test\{Assert, AssertionFailedError, Before, Expect, Test, Values};
 
 class InvocationTest {
   use TypeDefinition;

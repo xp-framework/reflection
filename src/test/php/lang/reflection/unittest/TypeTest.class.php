@@ -1,9 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Kind, Modifiers, Annotations, Constants, Properties, Methods, Package};
-use lang\{ElementNotFoundException, Reflection, Enum, Runnable, XPClass, ClassLoader};
-use unittest\actions\{VerifyThat, RuntimeVersion};
-use unittest\{Action, Assert, Before, Test};
+use lang\reflection\{Annotations, Constants, Kind, Methods, Modifiers, Package, Properties};
+use lang\{ClassLoader, ElementNotFoundException, Enum, Reflection, Runnable, XPClass};
+use test\verify\{Condition, Runtime};
+use test\{Action, Assert, Before, Test};
 
 class TypeTest {
   private $fixture;
@@ -78,7 +78,7 @@ class TypeTest {
     Assert::equals(new Modifiers('public native'), $t->modifiers());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")')]
+  #[Test, Runtime(php: '>=8.2')]
   public function readonly_modifiers() {
     $t= $this->declare('M_R', ['modifiers' => 'readonly']);
     Assert::equals(new Modifiers('public readonly'), $t->modifiers());
@@ -108,13 +108,13 @@ class TypeTest {
     Assert::equals(Kind::$ENUM, $t->kind());
   }
 
-  #[Test, Action(eval: 'new VerifyThat(fn() => !self::$ENUMS)')]
+  #[Test, Condition(assert: '!self::$ENUMS')]
   public function enum_kind_for_enum_lookalikes() {
     $t= $this->declare('K_LE', ['kind' => 'class', 'implements' => [\UnitEnum::class]], '{ public static $M; }');
     Assert::equals(Kind::$ENUM, $t->kind());
   }
 
-  #[Test, Action(eval: 'new VerifyThat(fn() => self::$ENUMS)')]
+  #[Test, Condition(assert: 'self::$ENUMS')]
   public function enum_kind_for_native_enums() {
     $t= $this->declare('K_NE', ['kind' => 'enum'], '{ case M; }');
     Assert::equals(Kind::$ENUM, $t->kind());
@@ -201,13 +201,13 @@ class TypeTest {
     Assert::equals('annotated', $this->fixture->annotation(Annotated::class)->name());
   }
 
-  #[Test, Action(eval: 'new VerifyThat(fn() => self::$ENUMS)')]
+  #[Test, Condition(assert: 'fn() => self::$ENUMS')]
   public function enum_annotation() {
    $t= $this->declare('A_E', ['kind' => 'enum'], '{ case M; }');
     Assert::equals('annotated', $t->annotation(Annotated::class)->name());
   }
 
-  #[Test, Action(eval: 'new VerifyThat(fn() => self::$ENUMS)')]
+  #[Test, Condition(assert: 'fn() => self::$ENUMS')]
   public function enum_case_annotation() {
    $t= $this->declare('A_C', ['kind' => 'enum'], '{ #[Annotated] case M; }');
     Assert::equals('annotated', $t->constant('M')->annotation(Annotated::class)->name());

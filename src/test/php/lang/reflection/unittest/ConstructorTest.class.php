@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\Constructor;
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test};
+use test\verify\Runtime;
+use test\{Action, Assert, Test};
 
 class ConstructorTest {
   use TypeDefinition;

@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\{Type, ArrayType, FunctionType, TypeUnion, Primitive, IllegalStateException, IllegalArgumentException};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Expect, Test, Action, Values};
+use lang\{ArrayType, FunctionType, IllegalArgumentException, IllegalStateException, Primitive, Type, TypeUnion};
+use test\verify\Runtime;
+use test\{Action, Assert, Expect, Test, Values};
 
 class ParametersTest {
   use TypeDefinition;
@@ -29,7 +29,7 @@ class ParametersTest {
     Assert::null($this->declare('{ function fixture() { } }')->method('fixture')->parameter($lookup));
   }
 
-  #[Test, Values('types')]
+  #[Test, Values(from: 'types')]
   public function parameters($decl, $expected) {
     $method= $this->declare('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture');
     $actual= [];
@@ -140,7 +140,7 @@ class ParametersTest {
     Assert::equals($type->class(), $type->method('fixture')->parameter(0)->constraint()->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function type_union_parameter_constraint() {
     $param= $this->declare('{ function fixture(string|int $arg) { } }')->method('fixture')->parameter(0);
     Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $param->constraint()->type());

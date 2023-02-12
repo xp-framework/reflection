@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\Modifiers;
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 
 class ModifiersTest {
 
@@ -28,17 +28,17 @@ class ModifiersTest {
     new Modifiers(MODIFIER_PUBLIC);
   }
 
-  #[Test, Values('cases')]
+  #[Test, Values(from: 'cases')]
   public function names_from_bits($bits, $names) {
     Assert::equals($names, (new Modifiers($bits, false))->names());
   }
 
-  #[Test, Values('cases')]
+  #[Test, Values(from: 'cases')]
   public function bits_from_names($bits, $names) {
     Assert::equals($bits, (new Modifiers($names, false))->bits());
   }
 
-  #[Test, Values('cases')]
+  #[Test, Values(from: 'cases')]
   public function bits_from_name_array($bits, $names) {
     Assert::equals($bits, (new Modifiers(explode(' ', $names), false))->bits());
   }

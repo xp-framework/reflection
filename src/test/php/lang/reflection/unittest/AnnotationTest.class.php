@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\reflection\{Annotation, InvocationFailed, CannotInstantiate};
-use lang\{XPClass, Reflection, IllegalStateException};
-use unittest\{Assert, Expect, Test, Values};
+use lang\reflection\{Annotation, CannotInstantiate, InvocationFailed};
+use lang\{IllegalStateException, Reflection, XPClass};
+use test\{Assert, Expect, Test, Values};
 
 class AnnotationTest {
   use TypeDefinition;
@@ -90,31 +90,31 @@ class AnnotationTest {
     yield [Reflection::type(Declared::class)];
   }
 
-  #[Test, Values('scalars')]
+  #[Test, Values(from: 'scalars')]
   public function with_scalar($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
-  #[Test, Values('arrays')]
+  #[Test, Values(from: 'arrays')]
   public function with_array($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
-  #[Test, Values('expressions')]
+  #[Test, Values(from: 'expressions')]
   public function with_expression($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
-  #[Test, Values('arguments')]
+  #[Test, Values(from: 'arguments')]
   public function with($annotation, $arguments) {
     $t= $this->declare('{}', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
   }
 
-  #[Test, Values('evaluation')]
+  #[Test, Values(from: 'evaluation')]
   public function with_eval($annotation, $arguments) {
     $t= $this->declare('{ private static $member= "Test"; }', $annotation);
     $this->assertAnnotations([Annotated::class => $arguments], $t->annotations());
@@ -359,7 +359,7 @@ class AnnotationTest {
     $this->assertAnnotations([Error::class => [Fixture::class]], $t->annotations()->all(Error::class));
   }
 
-  #[Test, Values('types')]
+  #[Test, Values(from: 'types')]
   public function all_of($type) {
     $t= $this->declare('{}', '#[Annotated, Parameterized(1, 2), Error(Fixture::class)]');
     $this->assertAnnotations(

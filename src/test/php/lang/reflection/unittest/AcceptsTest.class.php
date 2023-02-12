@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use unittest\{Assert, Test, Values};
+use test\{Assert, Test, Values};
 use util\Date;
 
 class AcceptsTest {
@@ -194,7 +194,7 @@ class AcceptsTest {
     }
   }
 
-  #[Test, Values('fixtures')]
+  #[Test, Values(from: 'fixtures')]
   public function accept($t, $values, $size, $expected) {
     Assert::equals($expected, $t->method('fixture')->parameters()->accept($values, $size));
   }

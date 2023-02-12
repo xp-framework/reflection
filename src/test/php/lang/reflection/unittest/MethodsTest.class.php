@@ -1,8 +1,8 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\{Type, ArrayType, MapType, FunctionType, TypeUnion, TypeIntersection, Primitive, XPClass, IllegalStateException, IllegalArgumentException};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Expect, Test, Action, Values};
+use lang\{ArrayType, FunctionType, IllegalArgumentException, IllegalStateException, MapType, Primitive, Type, TypeIntersection, TypeUnion, XPClass};
+use test\verify\Runtime;
+use test\{Action, Assert, Expect, Test, Values};
 
 class MethodsTest {
   use TypeDefinition;
@@ -80,37 +80,37 @@ class MethodsTest {
     );
   }
 
-  #[Test, Values('returnTypes')]
+  #[Test, Values(from: 'returnTypes')]
   public function returns($decl, $present, $expected) {
     $returns= $this->declare('{ '.sprintf($decl, 'function fixture').' { } }')->method('fixture')->returns();
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function returns_void() {
     $returns= $this->declare('{ function fixture(): void { } }')->method('fixture')->returns();
     Assert::equals(Type::$VOID, $returns->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function returns_type_union() {
     $returns= $this->declare('{ function fixture(): string|int { } }')->method('fixture')->returns();
     Assert::equals(new TypeUnion([Primitive::$STRING, Primitive::$INT]), $returns->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function returns_never() {
     $returns= $this->declare('{ function fixture(): never { exit(); } }')->method('fixture')->returns();
     Assert::equals(Type::$NEVER, $returns->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function returns_type_intersection() {
     $returns= $this->declare('{ function fixture(): \Countable&\Traversable { } }')->method('fixture')->returns();
     Assert::equals(new TypeIntersection([new XPClass('Countable'), new XPClass('Traversable')]), $returns->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.2")'), Values(['true', 'false'])]
+  #[Test, Runtime(php: '>=8.2'), Values(['true', 'false'])]
   public function returns_boolean_type($name) {
     $returns= $this->declare('{ function fixture(): '.$name.' { } }')->method('fixture')->returns();
     Assert::equals(Primitive::$BOOL, $returns->type());
@@ -122,7 +122,7 @@ class MethodsTest {
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function return_never_more_specific_than_void() {
     $t= $this->declare('{ /** @return never */ function fixture(): void { exit(); } }');
     Assert::equals(Type::$NEVER, $t->method('fixture')->returns()->type());
@@ -225,7 +225,7 @@ class MethodsTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function string_representation_with_union_typed_parameter() {
     $t= $this->declare('{ public function fixture(string|int $s): string { } }');
     Assert::equals(
@@ -234,7 +234,7 @@ class MethodsTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function string_representation_with_nullable_union_typed_parameter() {
     $t= $this->declare('{ public function fixture(string|int|null $s): string { } }');
     Assert::equals(
@@ -243,7 +243,7 @@ class MethodsTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function string_representation_with_intersection_typed_parameter() {
     $t= $this->declare('{ public function fixture(\Countable&\Traversable $s): string { } }');
     Assert::equals(
@@ -282,7 +282,7 @@ class MethodsTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function string_representation_with_union_typed_return() {
     $t= $this->declare('{ public function fixture(): string|int { } }');
     Assert::equals(
@@ -291,7 +291,7 @@ class MethodsTest {
     );
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.1")')]
+  #[Test, Runtime(php: '>=8.1')]
   public function string_representation_with_intersection_typed_return() {
     $t= $this->declare('{ public function fixture(): \Countable&\Traversable { } }');
     Assert::equals(

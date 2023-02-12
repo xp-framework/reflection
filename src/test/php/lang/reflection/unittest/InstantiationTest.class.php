@@ -1,9 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInstantiate, InvocationFailed};
-use lang\{Reflection, Runnable, CommandLine, Error, IllegalAccessException};
-use unittest\actions\RuntimeVersion;
-use unittest\{Assert, Action, Expect, Test, Values, AssertionFailedError};
+use lang\{CommandLine, Error, IllegalAccessException, Reflection, Runnable};
+use test\verify\Runtime;
+use test\{Action, Assert, AssertionFailedError, Expect, Test, Values};
 use util\Date;
 
 class InstantiationTest {
@@ -34,13 +34,13 @@ class InstantiationTest {
     Assert::instance($t->class(), $t->constructor()->newInstance());
   }
 
-  #[Test, Values('allInitializers')]
+  #[Test, Values(from: 'allInitializers')]
   public function with_empty_constructor($invocation) {
     $t= $this->declare('{ public function __construct() { }}');
     Assert::instance($t->class(), $invocation($t, []));
   }
 
-  #[Test, Values('allInitializers')]
+  #[Test, Values(from: 'allInitializers')]
   public function with_argument($invocation) {
     $t= $this->declare('{
       public $value= null;
@@ -49,7 +49,7 @@ class InstantiationTest {
     Assert::equals($this, $invocation($t, [$this])->value);
   }
 
-  #[Test, Values('allInitializers')]
+  #[Test, Values(from: 'allInitializers')]
   public function exceptions_are_wrapped($invocation) {
     $t= $this->declare('{ public function __construct() { throw new \lang\IllegalAccessException("Test"); } }');
     try {
@@ -60,7 +60,7 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Values('allInitializers')]
+  #[Test, Values(from: 'allInitializers')]
   public function type_errors_are_wrapped($invocation) {
     $t= $this->declare('{
       public function __construct(\util\Date $date) { }
@@ -73,7 +73,7 @@ class InstantiationTest {
     }
   }
 
-  #[Test, Values('allInitializers')]
+  #[Test, Values(from: 'allInitializers')]
   public function missing_arguments_are_wrapped($invocation) {
     $t= $this->declare('{
       public function __construct(\util\Date $date) { }
@@ -107,7 +107,7 @@ class InstantiationTest {
     Assert::equals($this, $t->constructor()->newInstance([$this], $t)->value);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function instantiate_with_constructor_promotion() {
     $t= $this->declare('{ public function __construct(public $value) { } }');
     Assert::equals($this, $t->constructor()->newInstance([$this])->value);
@@ -206,7 +206,7 @@ class InstantiationTest {
     $t->initializer('raise')->newInstance();
   }
 
-  #[Test, Values('memberInitializers')]
+  #[Test, Values(from: 'memberInitializers')]
   public function supports_named_arguments($invocation) {
     $t= $this->declare('{
       public $values;
@@ -215,7 +215,7 @@ class InstantiationTest {
     Assert::equals([1, 2], $invocation($t, ['b' => 2, 'a' => 1])->values);
   }
 
-  #[Test, Values('memberInitializers')]
+  #[Test, Values(from: 'memberInitializers')]
   public function supports_optional_named_arguments($invocation) {
     $t= $this->declare('{
       public $values;
@@ -224,7 +224,7 @@ class InstantiationTest {
     Assert::equals([1, 3], $invocation($t, ['b' => 3])->values);
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('memberInitializers')]
+  #[Test, Expect(CannotInstantiate::class), Values(from: 'memberInitializers')]
   public function excess_named_arguments_raise_error($invocation) {
     $t= $this->declare('{
       public $values;
@@ -233,7 +233,7 @@ class InstantiationTest {
     $invocation($t, ['b' => 2, 'a' => 1, 'extra' => 3]);
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values('memberInitializers')]
+  #[Test, Expect(CannotInstantiate::class), Values(from: 'memberInitializers')]
   public function unknown_named_arguments_raise_error($invocation) {
     $t= $this->declare('{
       public $values;
@@ -242,7 +242,7 @@ class InstantiationTest {
     $invocation($t, ['c' => 3]);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function newInstance_supports_named_arguments() {
     $t= $this->declare('{
       public $values;
@@ -251,7 +251,7 @@ class InstantiationTest {
     Assert::equals([1, 2], $t->newInstance(...['b' => 2, 'a' => 1])->values);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")')]
+  #[Test, Runtime(php: '>=8.0')]
   public function newInstance_supports_optional_named_arguments() {
     $t= $this->declare('{
       public $values;
@@ -260,7 +260,7 @@ class InstantiationTest {
     Assert::equals([1, 3], $t->newInstance(...['b' => 3])->values);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  #[Test, Runtime(php: '>=8.0'), Expect(CannotInstantiate::class)]
   public function excess_named_arguments_raise_error_for_newInstance() {
     $t= $this->declare('{
       public $values;
@@ -269,7 +269,7 @@ class InstantiationTest {
     $t->newInstance(...['b' => 2, 'a' => 1, 'extra' => 3]);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=8.0")'), Expect(CannotInstantiate::class)]
+  #[Test, Runtime(php: '>=8.0'), Expect(CannotInstantiate::class)]
   public function unknown_named_arguments_raise_error_for_newInstance() {
     $t= $this->declare('{
       public $values;

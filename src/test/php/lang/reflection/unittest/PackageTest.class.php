@@ -2,7 +2,7 @@
 
 use lang\IllegalArgumentException;
 use lang\reflection\Package;
-use unittest\{Assert, Test};
+use test\{Assert, Expect, Test, Values};
 
 class PackageTest {
 
@@ -52,7 +52,7 @@ class PackageTest {
     Assert::equals(self::class, (new Package(__NAMESPACE__))->type(self::class)->literal());
   }
 
-  #[Test, Expect(class: IllegalArgumentException::class, withMessage: 'Given type util.Date is not in package lang')]
+  #[Test, Expect(class: IllegalArgumentException::class, message: 'Given type util.Date is not in package lang')]
   public function type_with_namespace() {
     (new Package('lang'))->type('util.Date');
   }

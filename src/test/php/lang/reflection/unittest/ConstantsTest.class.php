@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
-use unittest\actions\RuntimeVersion;
-use unittest\{Action, Assert, Test};
+use test\verify\Runtime;
+use test\{Action, Assert, Test};
 
 class ConstantsTest {
   use TypeDefinition;
@@ -27,7 +27,7 @@ class ConstantsTest {
     Assert::null($this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function with_comment() {
     Assert::equals('Test', $this->declare('{ /** Test */ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }
@@ -53,19 +53,19 @@ class ConstantsTest {
     Assert::equals($t->constant('FIXTURE'), $t->constants()->named('FIXTURE'));
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function private_constant() {
     $const= $this->declare('{ private const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PRIVATE, 'test'], [$const->modifiers(), $const->value()]);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function protected_constant() {
     $const= $this->declare('{ protected const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PROTECTED, 'test'], [$const->modifiers(), $const->value()]);
   }
 
-  #[Test, Action(eval: 'new RuntimeVersion(">=7.1")')]
+  #[Test, Runtime(php: '>=7.1')]
   public function public_constant() {
     $const= $this->declare('{ public const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PUBLIC, 'test'], [$const->modifiers(), $const->value()]);
