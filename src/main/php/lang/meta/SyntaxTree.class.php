@@ -96,7 +96,7 @@ class SyntaxTree extends Visitor {
     // Use PHP reflection API to access members' runtime values. We cannot use
     // getStaticPropertyValue() as it cannot get non-public members in PHP 7.0
     if ($self->member instanceof Variable) {
-      $p= (new \ReflectionClass($c))->getProperty($self->member->name);
+      $p= (new \ReflectionClass($c))->getProperty($self->member->pointer ?? $self->member->name);
       $p->setAccessible(true);
       return $p->getValue();
     } else if ($self->member instanceof Literal) {
