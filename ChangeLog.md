@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.10.0 / 2023-04-08
+
+* Merged PR #31: Add forward compatibility with xp-framework/ast - @thekid
+
 ## 2.9.1 / 2023-02-12
 
 * Merged PR #30: Migrate to new testing library - @thekid
