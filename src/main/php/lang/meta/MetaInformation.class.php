@@ -104,6 +104,23 @@ class MetaInformation {
   }
 
   /**
+   * Returns type for a given constant
+   *
+   * @see    https://stackoverflow.com/questions/3892063/phpdoc-class-constants-documentation
+   * @param  \ReflectionClassConstant $reflect
+   * @return ?string
+   */
+  public function constantType($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
+      return $meta[DETAIL_RETURNS];
+    } else {
+      $tags= $this->tags($reflect);
+      return $tags['var'][0] ?? $tags['type'][0] ?? null;
+    }
+  }
+
+  /**
    * Returns comment for a given constant
    *
    * @param  \ReflectionClassConstant $reflect
