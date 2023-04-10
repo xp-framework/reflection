@@ -28,7 +28,21 @@ module xp-framework/reflect {
 
         public function getValue() { return $this->reflect->getConstant($this->name); }
 
-        public function getDocComment() { return false; }
+        public function getDocComment() {
+          $tokens= token_get_all(file_get_contents($this->reflect->getFileName()));
+          $const= false;
+          for ($i= 0, $s= sizeof($tokens); $i < $s; $i++) {
+            if (T_DOC_COMMENT === $tokens[$i][0]) {
+              $comment= $tokens[$i][1];
+            } else if (T_CONST === $tokens[$i][0]) {
+              $const= true;
+            } else if ($const && "=" === $tokens[$i][0]) {
+              $const= false;
+              if ($this->name === $tokens[$i - 2][1]) return $comment;
+            }
+          }
+          return false;
+        }
 
         public function getDeclaringClass() { 
           $reflect= $this->reflect;
