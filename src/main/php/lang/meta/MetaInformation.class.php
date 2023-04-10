@@ -35,7 +35,7 @@ class MetaInformation {
   /**
    * Parses tags from API documentation
    *
-   * @param  \ReflectionClass|\ReflectionConstant|\ReflectionProperty|\ReflectionMethod $reflect
+   * @param  \ReflectionClass|\ReflectionClassConstant|\ReflectionProperty|\ReflectionMethod $reflect
    * @return [:var]
    */
   private function tags($reflect) {
