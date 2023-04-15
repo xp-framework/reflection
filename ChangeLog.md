@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.10.1 / 2023-04-15
+
+* Fixed issue #33: Undefined index: class@anonymous - @thekid
+
 ## 2.10.0 / 2023-04-08
 
 * Merged PR #31: Add forward compatibility with xp-framework/ast - @thekid
