@@ -20,22 +20,37 @@ class FromSyntaxTree {
     self::$lang= Language::named('PHP');
   }
 
-  private function tree($name) {
+  /** Locates an anonymous class creation expression */
+  private function anonymous($tree, $start, $end) {
+    foreach ($tree->children() as $child) {
+      yield from $this->anonymous($child, $start, $end);
+      if ('newclass' === $child->kind && $child->line >= $start && $child->line <= $end) yield $child;
+    }
+  }
+
+  /** Returns the syntax tree for a given type using a cache */
+  private function tree($reflect) {
 
     // Handle generic class names correctly
-    if ($class= \xp::$cn[$name] ?? null) {
+    if ($class= \xp::$cn[$reflect->name] ?? null) {
       $class= substr($class, 0, strcspn($class, '<'));
     } else {
-      $class= strtr($name, '\\', '.');
+      $class= strtr($reflect->name, '\\', '.');
     }
 
     if (!isset($this->cache[$class])) {
-      sscanf(\xp::$cl[$class], '%[^:]://%[^$]', $cl, $argument);
-      $instanceFor= [literal($cl), 'instanceFor'];
-      $bytes= $instanceFor($argument)->loadClassBytes($class);
-      $this->cache[$class]= new SyntaxTree(self::$lang->parse(new Tokens($bytes, $class))->tree(), $class);
+      if ($reflect->isAnonymous()) {
+        $tree= self::$lang->parse(new Tokens(file_get_contents($reflect->getFileName()), '<anonymous>'))->tree();
+        $type= $this->anonymous($tree, $reflect->getStartLine(), $reflect->getEndLine())->current()->definition;
+      } else {
+        sscanf(\xp::$cl[$class], '%[^:]://%[^$]', $cl, $argument);
+        $instanceFor= [literal($cl), 'instanceFor'];
+        $tree= self::$lang->parse(new Tokens($instanceFor($argument)->loadClassBytes($class), $class))->tree();
+        $type= $tree->type(strtr($class, '.', '\\'));
+      }
 
       // Limit cache
+      $this->cache[$class]= new SyntaxTree($tree, $type);
       if (sizeof($this->cache) > self::CACHE_SIZE) unset($this->cache[key($this->cache)]);
     }
     return $this->cache[$class];
@@ -122,7 +137,7 @@ class FromSyntaxTree {
   }
 
   public function evaluate($reflect, $code) {
-    $tree= $this->tree($reflect->name);
+    $tree= $this->tree($reflect);
     $parsed= self::parse($code, $tree->resolver())->tree()->children();
     if (1 === sizeof($parsed)) {
       return $parsed[0]->visit($tree);
@@ -159,7 +174,7 @@ class FromSyntaxTree {
   }
 
   public function imports($reflect) {
-    $resolver= $this->tree($reflect->name)->resolver();
+    $resolver= $this->tree($reflect)->resolver();
     $imports= [];
     foreach ($resolver->imports as $alias => $type) {
       $imports[$alias]= ltrim($type, '\\');
@@ -169,31 +184,31 @@ class FromSyntaxTree {
 
   /** @return iterable */
   public function ofType($reflect) {
-    $tree= $this->tree($reflect->name);
+    $tree= $this->tree($reflect);
     return $this->annotations($tree, $tree->type());      
   }
 
   /** @return iterable */
   public function ofConstant($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
+    $tree= $this->tree($reflect->getDeclaringClass());
     return $this->annotations($tree, $tree->type()->constant($reflect->name));
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
+    $tree= $this->tree($reflect->getDeclaringClass());
     return $this->annotations($tree, $tree->type()->property($reflect->name));
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
-    $tree= $this->tree($reflect->getDeclaringClass()->name);
+    $tree= $this->tree($reflect->getDeclaringClass());
     return $this->annotations($tree, $tree->type()->method($reflect->name));
   }
 
   /** @return iterable */
   public function ofParameter($method, $reflect) {
-    $tree= $this->tree($method->getDeclaringClass()->name);
+    $tree= $this->tree($method->getDeclaringClass());
     return $this->annotations($tree, $tree->type()
       ->method($method->name)
       ->signature

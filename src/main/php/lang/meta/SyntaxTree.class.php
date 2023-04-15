@@ -7,9 +7,9 @@ use lang\ast\{Visitor, Type};
 class SyntaxTree extends Visitor {
   private $tree, $type;
 
-  public function __construct($tree, $class) {
+  public function __construct($tree, $type) {
     $this->tree= $tree;
-    $this->type= $tree->type(strtr($class, '.', '\\'));
+    $this->type= $type;
   }
 
   /** @return lang.ast.TypeDeclaration */
