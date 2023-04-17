@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.11.0 / 2023-04-17
+
+* Merged PR #32: Add support for class constants types. For this PHP 8.3,
+  see https://wiki.php.net/rfc/typed_class_constants
+  (@thekid)
+
 ## 2.10.1 / 2023-04-15
 
 * Fixed issue #33: Undefined index: class@anonymous - @thekid
