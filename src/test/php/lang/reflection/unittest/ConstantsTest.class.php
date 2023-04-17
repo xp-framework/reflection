@@ -1,7 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
+use lang\reflection\Constraint;
+use lang\{Primitive, Type};
 use test\verify\Runtime;
-use test\{Action, Assert, Test};
+use test\{Assert, Test, Values};
 
 class ConstantsTest {
   use TypeDefinition;
@@ -75,8 +77,32 @@ class ConstantsTest {
   public function string_representation() {
     $t= $this->declare('{ const FIXTURE = "test"; }');
     Assert::equals(
-      'public const FIXTURE = "test"',
+      'public const var FIXTURE = "test"',
       $t->constant('FIXTURE')->toString()
+    );
+  }
+
+  #[Test]
+  public function without_constraint() {
+    Assert::equals(
+      new Constraint(Type::$VAR, false),
+      $this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->constraint()
+    );
+  }
+
+  #[Test, Values(['/** @type string */', '/** @var string */'])]
+  public function with_constraint_in_apidoc($comment) {
+    Assert::equals(
+      new Constraint(Primitive::$STRING, false),
+      $this->declare('{ '.$comment.' const FIXTURE = "test"; }')->constant('FIXTURE')->constraint()
+    );
+  }
+
+  #[Test, Runtime(php: '>=8.3.0-dev')]
+  public function with_constraint() {
+    Assert::equals(
+      new Constraint(Primitive::$STRING, true),
+      $this->declare('{ const string FIXTURE = "test"; }')->constant('FIXTURE')->constraint()
     );
   }
 }

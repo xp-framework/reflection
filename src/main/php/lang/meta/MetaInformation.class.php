@@ -35,7 +35,7 @@ class MetaInformation {
   /**
    * Parses tags from API documentation
    *
-   * @param  \ReflectionClass|\ReflectionConstant|\ReflectionProperty|\ReflectionMethod $reflect
+   * @param  \ReflectionClass|\ReflectionClassConstant|\ReflectionProperty|\ReflectionMethod $reflect
    * @return [:var]
    */
   private function tags($reflect) {
@@ -100,6 +100,23 @@ class MetaInformation {
       return $this->annotations($meta);
     } else {
       return $this->annotations->ofConstant($reflect);
+    }
+  }
+
+  /**
+   * Returns type for a given constant
+   *
+   * @see    https://stackoverflow.com/questions/3892063/phpdoc-class-constants-documentation
+   * @param  \ReflectionClassConstant $reflect
+   * @return ?string
+   */
+  public function constantType($reflect) {
+    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
+      return $meta[DETAIL_RETURNS];
+    } else {
+      $tags= $this->tags($reflect);
+      return $tags['var'][0] ?? $tags['type'][0] ?? null;
     }
   }
 

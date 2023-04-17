@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\Reflection;
+use lang\{Type, Reflection};
 use util\Objects;
 
 /**
@@ -22,6 +22,24 @@ class Constant extends Member {
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string { return strtr($this->reflect->class, '\\', '.').'::'.$this->reflect->name; }
 
+  /** @return lang.reflection.Constraint */
+  public function constraint() {
+    $present= true;
+
+    // Only use meta information if necessary
+    $api= function($set) use(&$present) {
+      $present= $set;
+      return Reflection::meta()->constantType($this->reflect);
+    };
+
+    $t= Type::resolve(
+      PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null,
+      Member::resolve($this->reflect),
+      $api
+    );
+    return new Constraint($t ?? Type::$VAR, $present);
+  }
+
   /** @return int */
   public function modifiers() { return $this->reflect->getModifiers(); }
 
@@ -30,8 +48,24 @@ class Constant extends Member {
 
   /** @return string */
   public function toString() {
-    return sprintf('%s const %s = %s',
+
+    // Compile constant type
+    $t= PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null;
+    if (null === $t) {
+      $type= Reflection::meta()->constantType($this->reflect) ?? 'var';
+    } else if ($t instanceof ReflectionUnionType) {
+      $type= '';
+      foreach ($t->getTypes() as $component) {
+        $type.= '|'.$component->getName();
+      }
+      $type= substr($type, 1);
+    } else {
+      $type= $t->getName();
+    }
+
+    return sprintf('%s const %s %s = %s',
       Modifiers::namesOf($this->reflect->getModifiers()),
+      $type,
       $this->reflect->name,
       Objects::stringOf($this->reflect->getValue())
     );
