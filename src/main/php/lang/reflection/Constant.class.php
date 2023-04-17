@@ -32,10 +32,8 @@ class Constant extends Member {
       return Reflection::meta()->constantType($this->reflect);
     };
 
-    // FIXME use `PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null`
-    // when php/php-src#10444 is merged.
     $t= Type::resolve(
-      method_exists($this->reflect, 'getType') ? $this->reflect->getType() : null,
+      PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null,
       Member::resolve($this->reflect),
       $api
     );
@@ -52,7 +50,7 @@ class Constant extends Member {
   public function toString() {
 
     // Compile constant type
-    $t= method_exists($this->reflect, 'getType') ? $this->reflect->getType() : null;
+    $t= PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null;
     if (null === $t) {
       $type= Reflection::meta()->constantType($this->reflect) ?? 'var';
     } else if ($t instanceof ReflectionUnionType) {

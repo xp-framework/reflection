@@ -98,7 +98,7 @@ class ConstantsTest {
     );
   }
 
-  #[Test, Runtime(php: '>=8.3')]
+  #[Test, Runtime(php: '>=8.3.0-dev')]
   public function with_constraint() {
     Assert::equals(
       new Constraint(Primitive::$STRING, true),
