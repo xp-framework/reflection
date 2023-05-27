@@ -13,7 +13,10 @@ class FromAttributes {
     $r= [];
     foreach ($reflect->getAttributes() as $attribute) {
       $args= $attribute->getArguments();
-      if ('eval' === key($args)) {
+      $key= key($args);
+      if ('yield' === $key) {
+        $r[$attribute->getName()]= $this->evaluate($context, $args['yield']);
+      } else if ('eval' === $key) {
         $r[$attribute->getName()]= [$this->evaluate($context, $args['eval'])];
       } else {
         $r[$attribute->getName()]= $args;
