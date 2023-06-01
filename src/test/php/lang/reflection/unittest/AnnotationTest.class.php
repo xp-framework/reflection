@@ -76,11 +76,11 @@ class AnnotationTest {
 
   /** @return iterable */
   private function evaluation() {
-    yield ['#[Annotated(eval: "\"Test\"")]', ['Test']];
-    yield ['#[Annotated(eval: \'"Test"\')]', ['Test']];
-    yield ['#[Annotated(eval: "new Fixture()")]', [new Fixture()]];
-    yield ['#[Annotated(eval: "Fixture::\$DEFAULT")]', [Fixture::$DEFAULT]];
-    yield ['#[Annotated(eval: "self::\$member")]', ['Test']];
+    yield ['#[Annotated(eval: "[\"Test\"]")]', ['Test']];
+    yield ['#[Annotated(eval: \'["Test"]\')]', ['Test']];
+    yield ['#[Annotated(eval: "[new Fixture()]")]', [new Fixture()]];
+    yield ['#[Annotated(eval: "[Fixture::\$DEFAULT]")]', [Fixture::$DEFAULT]];
+    yield ['#[Annotated(eval: "[self::\$member]")]', ['Test']];
   }
 
   /** @return iterable */
@@ -134,7 +134,7 @@ class AnnotationTest {
 
   #[Test]
   public function with_function() {
-    $t= $this->declare('{}', '#[Annotated(eval: "function() { return 6100; }")]');
+    $t= $this->declare('{}', '#[Annotated(eval: "[function() { return 6100; }]")]');
     $f= $t->annotation(Annotated::class)->argument(0);
 
     Assert::instance('callable', $f);
@@ -143,7 +143,7 @@ class AnnotationTest {
 
   #[Test, Values([['fn() => 6100', 6100], ['fn() => array(1, array(2))', [1, [2]]], ['fn() => [array(1), array(2)]', [[1], [2]]]])]
   public function with_lambda($code, $expected) {
-    $t= $this->declare('{}', '#[Annotated(eval: "'.$code.'")]');
+    $t= $this->declare('{}', '#[Annotated(eval: "['.$code.']")]');
     $f= $t->annotation(Annotated::class)->argument(0);
 
     Assert::instance('callable', $f);
@@ -152,7 +152,7 @@ class AnnotationTest {
 
   #[Test]
   public function with_nested_lambda() {
-    $t= $this->declare('{}', '#[Annotated(eval: "new Fixture(fn() => 6100)")]');
+    $t= $this->declare('{}', '#[Annotated(eval: "[new Fixture(fn() => 6100)]")]');
     $f= $t->annotation(Annotated::class)->argument(0);
 
     Assert::instance(Fixture::class, $f);
@@ -161,7 +161,7 @@ class AnnotationTest {
 
   #[Test]
   public function with_array_lambda() {
-    $t= $this->declare('{}', '#[Annotated(eval: "[fn() => 6100]")]');
+    $t= $this->declare('{}', '#[Annotated(eval: "[[fn() => 6100]]")]');
     $f= $t->annotation(Annotated::class)->argument(0);
 
     Assert::instance('array', $f);
@@ -258,10 +258,16 @@ class AnnotationTest {
     $t->annotation(Parameterized::class)->newInstance();
   }
 
-  #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]
-  public function is($type) {
+  #[Test]
+  public function is_class() {
     $t= $this->declare('{}', '#[Annotated]');
-    Assert::true($t->annotation(Annotated::class)->is($type));
+    Assert::true($t->annotation(Annotated::class)->is(Annotated::class));
+  }
+
+  #[Test]
+  public function is_type() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::true($t->annotation(Annotated::class)->is(new XPClass(Annotated::class)));
   }
 
   #[Test, Values([[Annotated::class, true], [Fixture::class, false]])]

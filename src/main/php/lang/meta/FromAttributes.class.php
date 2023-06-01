@@ -14,7 +14,7 @@ class FromAttributes {
     foreach ($reflect->getAttributes() as $attribute) {
       $args= $attribute->getArguments();
       if ('eval' === key($args)) {
-        $r[$attribute->getName()]= [$this->evaluate($context, $args['eval'])];
+        $r[$attribute->getName()]= $this->evaluate($context, $args['eval']);
       } else {
         $r[$attribute->getName()]= $args;
       }
