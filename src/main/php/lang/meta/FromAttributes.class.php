@@ -14,8 +14,8 @@ class FromAttributes {
     foreach ($reflect->getAttributes() as $attribute) {
       $args= $attribute->getArguments();
       $key= key($args);
-      if ('yield' === $key) {
-        $r[$attribute->getName()]= $this->evaluate($context, $args['yield']);
+      if ('use' === $key) {
+        $r[$attribute->getName()]= $this->evaluate($context, $args['use']);
       } else if ('eval' === $key) {
         $r[$attribute->getName()]= [$this->evaluate($context, $args['eval'])];
       } else {
@@ -57,7 +57,7 @@ class FromAttributes {
    * @return [:string]
    */
   public function imports($reflect) {
-    static $break= [T_CLASS => true, T_INTERFACE => true, T_TRAIT => true];
+    static $break= [T_CLASS => true, T_INTERFACE => true, T_TRAIT => true, T_ENUM => true, T_ATTRIBUTE => true];
 
     $tokens= \PhpToken::tokenize(file_get_contents($reflect->getFileName()));
     $imports= [];

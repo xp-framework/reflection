@@ -169,14 +169,14 @@ class AnnotationTest {
   }
 
   #[Test]
-  public function yield_arguments() {
-    $t= $this->declare('{}', '#[Annotated(yield: "[1, 2, 3]")]');
+  public function use_arguments() {
+    $t= $this->declare('{}', '#[Annotated(use: "[1, 2, 3]")]');
     $this->assertAnnotations([Annotated::class => [1, 2, 3]], $t->annotations());
   }
 
   #[Test]
-  public function yield_named_arguments() {
-    $t= $this->declare('{}', '#[Annotated(yield: "[\"power\" => 6100]")]');
+  public function use_named_arguments() {
+    $t= $this->declare('{}', '#[Annotated(use: "[\"power\" => 6100]")]');
     $this->assertAnnotations([Annotated::class => ['power' => 6100]], $t->annotations());
   }
 

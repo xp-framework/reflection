@@ -159,11 +159,12 @@ class FromSyntaxTree {
 
     $r= [];
     foreach ($annotated->annotations as $type => $arguments) {
-      if ($yield= $arguments['yield'] ?? null) {
-        $parsed= self::parse($yield->visit($tree).';', $tree->resolver());
+      $key= key($arguments);
+      if ('use' === $key) {
+        $parsed= self::parse($arguments['use']->visit($tree).';', $tree->resolver());
         $r[$type]= $parsed->tree()->children()[0]->visit($tree);
-      } else if ($eval= $arguments['eval'] ?? null) {
-        $parsed= self::parse($eval->visit($tree).';', $tree->resolver());
+      } else if ('eval' === $key) {
+        $parsed= self::parse($arguments['eval']->visit($tree).';', $tree->resolver());
         $r[$type]= [$parsed->tree()->children()[0]->visit($tree)];
       } else {
         $p= &$r[$type];
