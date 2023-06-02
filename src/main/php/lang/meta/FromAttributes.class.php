@@ -13,10 +13,17 @@ class FromAttributes {
     $r= [];
     foreach ($reflect->getAttributes() as $attribute) {
       $args= $attribute->getArguments();
-      if ('eval' === key($args)) {
-        $r[$attribute->getName()]= $this->evaluate($context, $args['eval']);
+      $ptr= &$r[$attribute->getName()];
+
+      if (!isset($args['eval'])) {
+        $ptr= $args;
+      } else if (is_array($args['eval'])) {
+        $ptr= [];
+        foreach ($args['eval'] as $key => $value) {
+          $ptr[$key]= $this->evaluate($context, $value);
+        }
       } else {
-        $r[$attribute->getName()]= $args;
+        $ptr= [$this->evaluate($context, $args['eval'])];
       }
     }
     return $r;
