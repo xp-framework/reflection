@@ -3,7 +3,7 @@
 use lang\{XPClass, Reflection, Value};
 
 /** Base class for constants, properties and methods */
-abstract class Member implements Value {
+abstract class Member implements Annotated, Value {
   protected $reflect, $annotations;
 
   /**
