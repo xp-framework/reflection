@@ -81,6 +81,8 @@ class AnnotationTest {
     yield ['#[Annotated(eval: "new Fixture()")]', [new Fixture()]];
     yield ['#[Annotated(eval: "Fixture::\$DEFAULT")]', [Fixture::$DEFAULT]];
     yield ['#[Annotated(eval: "self::\$member")]', ['Test']];
+    yield ['#[Annotated(eval: ["1", "2"])]', [1, 2]];
+    yield ['#[Annotated(eval: ["one" => "1", "two" => "2"])]', ['one' => 1, 'two' => 2]];
   }
 
   /** @return iterable */
@@ -258,10 +260,16 @@ class AnnotationTest {
     $t->annotation(Parameterized::class)->newInstance();
   }
 
-  #[Test, Values(eval: '[[Annotated::class], [new XPClass(Annotated::class)]]')]
-  public function is($type) {
+  #[Test]
+  public function is_class() {
     $t= $this->declare('{}', '#[Annotated]');
-    Assert::true($t->annotation(Annotated::class)->is($type));
+    Assert::true($t->annotation(Annotated::class)->is(Annotated::class));
+  }
+
+  #[Test]
+  public function is_type() {
+    $t= $this->declare('{}', '#[Annotated]');
+    Assert::true($t->annotation(Annotated::class)->is(new XPClass(Annotated::class)));
   }
 
   #[Test, Values([[Annotated::class, true], [Fixture::class, false]])]

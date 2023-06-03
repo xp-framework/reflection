@@ -1,7 +1,7 @@
 <?php namespace lang\meta;
 
 use lang\IllegalArgumentException;
-use lang\ast\nodes\FunctionDeclaration;
+use lang\ast\nodes\{ArrayLiteral, FunctionDeclaration};
 use lang\ast\{Language, Token, Tokens, Visitor, Code};
 
 /**
@@ -136,8 +136,8 @@ class FromSyntaxTree {
     return self::$parse->parse(new Tokens($code.';', '(evaluated)'), $resolver);
   }
 
-  public function evaluate($reflect, $code) {
-    $tree= $this->tree($reflect);
+  public function evaluate($arg, $code) {
+    $tree= $arg instanceof SyntaxTree ? $arg : $this->tree($arg);
     $parsed= self::parse($code, $tree->resolver())->tree()->children();
     if (1 === sizeof($parsed)) {
       return $parsed[0]->visit($tree);
@@ -158,16 +158,22 @@ class FromSyntaxTree {
     if (null === $annotated->annotations) return [];
 
     $r= [];
-    foreach ($annotated->annotations as $type => $arguments) {
-      if ('eval' === key($arguments)) {
-        $parsed= self::parse($arguments['eval']->visit($tree).';', $tree->resolver());
-        $r[$type]= [$parsed->tree()->children()[0]->visit($tree)];
-      } else {
-        $p= &$r[$type];
-        $p= [];
-        foreach ($arguments as $name => $argument) {
-          $p[$name]= $argument->visit($tree);
+    foreach ($annotated->annotations as $type => $args) {
+      $ptr= &$r[$type];
+
+      if (!isset($args['eval'])) {
+        $ptr= [];
+        foreach ($args as $name => $argument) {
+          $ptr[$name]= $argument->visit($tree);
         }
+      } else if ($args['eval'] instanceof ArrayLiteral) {
+        $ptr= [];
+        $i= 0;
+        foreach ($args['eval']->values as list($key, $value)) {
+          $ptr[$key ? $key->visit($tree) : $i++]= $this->evaluate($tree, $value->visit($tree).';');
+        }
+      } else {
+        $ptr= [$this->evaluate($tree, $args['eval']->visit($tree).';')];
       }
     }
     return $r;
