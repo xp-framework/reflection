@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use ReflectionClass, ReflectionClassConstant, ReflectionProperty, ReflectionMethod;
 use lang\meta\MetaInformation;
 use test\{After, Assert, Before, Test, Values};
 
@@ -37,7 +38,7 @@ class MetaInformationTest {
         ]
       ]
     ];
-    $this->reflect= new \ReflectionClass(Fixture::class);
+    $this->reflect= new ReflectionClass(Fixture::class);
   }
 
   #[After]
@@ -60,13 +61,13 @@ class MetaInformationTest {
 
   #[Test]
   public function constant_comment() {
-    $c= new \ReflectionClassConstant($this->reflect->name, 'TEST');
+    $c= new ReflectionClassConstant($this->reflect->name, 'TEST');
     Assert::equals('Test', (new MetaInformation(null))->constantComment($c));
   }
 
   #[Test]
   public function constant_annotations() {
-    $c= new \ReflectionClassConstant($this->reflect->name, 'TEST');
+    $c= new ReflectionClassConstant($this->reflect->name, 'TEST');
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->constantAnnotations($c)
@@ -75,13 +76,13 @@ class MetaInformationTest {
 
   #[Test]
   public function property_comment() {
-    $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
+    $p= new ReflectionProperty($this->reflect->name, 'DEFAULT');
     Assert::equals('Test', (new MetaInformation(null))->propertyComment($p));
   }
 
   #[Test]
   public function property_annotations() {
-    $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
+    $p= new ReflectionProperty($this->reflect->name, 'DEFAULT');
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->propertyAnnotations($p)
@@ -90,7 +91,7 @@ class MetaInformationTest {
 
   #[Test]
   public function property_type() {
-    $p= new \ReflectionProperty($this->reflect->name, 'value');
+    $p= new ReflectionProperty($this->reflect->name, 'value');
     Assert::equals(
       'function(): var',
       (new MetaInformation(null))->propertyType($p)
@@ -99,14 +100,14 @@ class MetaInformationTest {
 
   #[Test]
   public function method_comment() {
-    $m= new \ReflectionMethod($this->reflect->name, 'value');
+    $m= new ReflectionMethod($this->reflect->name, 'value');
     Assert::equals('Test', (new MetaInformation(null))->methodComment($m));
   }
 
 
   #[Test]
   public function method_annotations() {
-    $m= new \ReflectionMethod($this->reflect->name, '__construct');
+    $m= new ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->methodAnnotations($m)
@@ -115,7 +116,7 @@ class MetaInformationTest {
 
   #[Test]
   public function method_return_type() {
-    $m= new \ReflectionMethod($this->reflect->name, 'value');
+    $m= new ReflectionMethod($this->reflect->name, 'value');
     Assert::equals(
       'function(): var',
       (new MetaInformation(null))->methodReturns($m)
@@ -125,7 +126,7 @@ class MetaInformationTest {
 
   #[Test]
   public function method_parameter_types() {
-    $method= new \ReflectionMethod($this->reflect->name, '__construct');
+    $method= new ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       ['var'],
       (new MetaInformation(null))->methodParameterTypes($method, $method->getParameters()[0])
@@ -134,23 +135,36 @@ class MetaInformationTest {
 
   #[Test]
   public function parameter_annotations() {
-    $method= new \ReflectionMethod($this->reflect->name, '__construct');
+    $method= new ReflectionMethod($this->reflect->name, '__construct');
     Assert::equals(
       [Annotated::class => ['test']],
       (new MetaInformation(null))->parameterAnnotations($method, $method->getParameters()[0])
     );
   }
 
-  #[Test, Values([[null, null, []], [null, true, [null]], [1, null, [1]], [1, true, [1]], [[1], null, [1]], [[1], true, [[1]]]])]
-  public function map_value_to_arguments($value, $flag, $arguments) {
+  #[Test, Values([[null, null, []], [null, [true], [null]], [1, null, [1]], [1, [true], [1]], [[1], null, [1]], [[1], true, [[1]]]])]
+  public function map_member_value_to_arguments($value, $flag, $arguments) {
     $meta= &\xp::$meta['lang.reflection.unittest.Fixture'][0]['DEFAULT'];
     $meta[DETAIL_ANNOTATIONS]['annotated']= $value;
     $meta[DETAIL_TARGET_ANNO][Annotated::class]= $flag;
 
-    $p= new \ReflectionProperty($this->reflect->name, 'DEFAULT');
+    $p= new ReflectionProperty($this->reflect->name, 'DEFAULT');
     Assert::equals(
       [Annotated::class => $arguments],
       (new MetaInformation(null))->propertyAnnotations($p)
+    );
+  }
+
+  #[Test, Values([[null, null, []], [null, ['value' => true], [null]], [1, null, [1]], [1, ['value' => true], [1]], [[1], null, [1]], [[1], ['value' => true], [[1]]]])]
+  public function map_param_value_to_arguments($value, $flag, $arguments) {
+    $meta= &\xp::$meta['lang.reflection.unittest.Fixture'][1]['__construct'][DETAIL_TARGET_ANNO];
+    $meta['$value']['annotated']= $value;
+    $meta[Annotated::class]= $flag;
+
+    $m= new ReflectionMethod($this->reflect->name, '__construct');
+    Assert::equals(
+      [Annotated::class => $arguments],
+      (new MetaInformation(null))->parameterAnnotations($m, $m->getParameters()[0])
     );
   }
 }

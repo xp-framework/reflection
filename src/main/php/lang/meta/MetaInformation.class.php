@@ -262,7 +262,8 @@ class MetaInformation {
       if ($param= $target['$'.$reflect->name] ?? null) {
         $r= [];
         foreach ($param as $name => $value) {
-          $r[$target[$name] ?? $name]= (array)$value;
+          $qname= $target[$name] ?? $name;
+          $r[$qname]= isset($target[$qname][$reflect->name]) ? [$value] : (array)$value;
         }
         return $r;
       }

@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed value to argument mapping for parameter annotations - @thekid
+
 ## 2.12.0 / 2023-06-03
 
 * Merged PR #35: Add support for multiple arguments using arrays in eval
