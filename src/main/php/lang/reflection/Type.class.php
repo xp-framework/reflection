@@ -8,7 +8,7 @@ use lang\{Reflection, Enum, XPClass, Value, VirtualProperty, IllegalArgumentExce
  *
  * @test lang.reflection.unittest.TypeTest
  */
-class Type implements Value {
+class Type implements Annotated, Value {
   private $reflect;
   private $annotations= null;
 

@@ -7,7 +7,7 @@ use lang\{Reflection, Type, IllegalStateException};
  *
  * @test lang.reflection.unittest.MethodsTest
  */
-class Parameter {
+class Parameter implements Annotated {
   private $reflect, $method;
   private $annotations= null;
 
