@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.12.0 / 2023-06-03
+
+* Merged PR #35: Add support for multiple arguments using arrays in eval
+  (@thekid)
+
 ## 2.11.0 / 2023-04-17
 
 * Merged PR #32: Add support for class constants types. For this PHP 8.3,
