@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.13.0 / 2023-06-04
+
+* Merged PR #36: Make Type, Member and Parameter classes implement the
+  `lang.reflection.Annotated` interface
+  (@thekid)
 * Fixed value to argument mapping for parameter annotations - @thekid
 
 ## 2.12.0 / 2023-06-03
