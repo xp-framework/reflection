@@ -43,6 +43,12 @@ class EvaluateTest {
     Assert::equals($value, $func(...$args));
   }
 
+  #[Test]
+  public function arrow_function_with_trailing_comma() {
+    $func= cast(Reflection::of($this)->evaluate('[fn() => "test",]'), 'callable[]');
+    Assert::equals('test', $func[0]());
+  }
+
   #[Test, Expect(class: IllegalArgumentException::class, message: 'Test')]
   public function throw_expression_supported_in_fn() {
     $func= Reflection::of($this)->evaluate('fn() => throw new \lang\IllegalArgumentException("Test")');

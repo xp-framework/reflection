@@ -74,6 +74,7 @@ class FromSyntaxTree {
             case ')': $b--; if ($b < 0) break 2; else break;
             case '[': $c++; break;
             case ']': $c--; if ($c < 0) break 2; else break;
+            case ',': if ($c <= 0 && $b <= 0) break 2; else break; // outside of arrays or argument lists
             case '$': $parse->forward(); $parse->token->value= '$'.$parse->token->value; break;
           }
           $code.= ' '.$parse->token->value;

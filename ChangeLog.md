@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed parsing arrow functions inside arrays - @thekid
+
 ## 2.13.0 / 2023-06-04
 
 * Merged PR #36: Make Type, Member and Parameter classes implement the
