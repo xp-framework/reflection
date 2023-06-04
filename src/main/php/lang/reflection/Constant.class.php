@@ -40,9 +40,6 @@ class Constant extends Member {
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
-  /** @return int */
-  public function modifiers() { return $this->reflect->getModifiers(); }
-
   /** @return var */
   public function value() { return $this->reflect->getValue(); }
 
