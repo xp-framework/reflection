@@ -54,7 +54,7 @@ class Property extends Member {
 
     // Only allow reading non-public properties when given a compatible context
     if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->class)) {
+      if ($context && Reflection::of($context)->is($this->reflect->getDeclaringClass()->name)) {
         $this->reflect->setAccessible(true);
       } else {
         throw new CannotAccess($this, new ReflectionException('Trying to read non-public property'));
@@ -82,7 +82,7 @@ class Property extends Member {
 
     // Only allow reading non-public properties when given a compatible context
     if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->class)) {
+      if ($context && Reflection::of($context)->is($this->reflect->getDeclaringClass()->name)) {
         $this->reflect->setAccessible(true);
       } else {
         throw new CannotAccess($this, new ReflectionException('Trying to write non-public property'));
