@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.13.1 / 2023-06-04
+
 * Fixed parsing arrow functions inside arrays - @thekid
 
 ## 2.13.0 / 2023-06-04
