@@ -2,9 +2,11 @@
 
 use ReflectionClass, StdClass as Dynamic;
 use lang\meta\FromAttributes;
+use test\verify\Runtime;
 use test\{Assert, Test, Ignore as Skip};
 use util\Comparison as WithComparison;
 
+#[Runtime(php: '>=8.0')]
 class FromAttributesTest {
 
   #[Test]
@@ -19,6 +21,7 @@ class FromAttributesTest {
         'ReflectionClass' => null,
         'FromAttributes'  => FromAttributes::class,
         'Dynamic'         => Dynamic::class,
+        'Runtime'         => Runtime::class,
         'Assert'          => Assert::class,
         'Test'            => Test::class,
         'WithComparison'  => WithComparison::class,
