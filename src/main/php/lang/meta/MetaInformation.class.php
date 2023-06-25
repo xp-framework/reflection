@@ -54,7 +54,7 @@ class MetaInformation {
    * @return [:string]
    */
   public function scopeImports($reflect) {
-    $meta= &\xp::$meta[strtr($reflect->name, '\\', '.')];
+    $meta= &\xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')];
     return $meta['use'] ?? $meta['use']= $this->annotations->imports($reflect);
   }
 
@@ -65,7 +65,7 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function typeAnnotations($reflect) {
-    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
+    if ($meta= \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')]['class'] ?? null) {
       return $this->annotations($meta);
     } else {
       return $this->annotations->ofType($reflect);
@@ -79,7 +79,7 @@ class MetaInformation {
    * @return ?string
    */
   public function typeComment($reflect) {
-    if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')]['class'] ?? null) {
+    if ($meta= \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')]['class'] ?? null) {
       return $meta[DETAIL_COMMENT];
     } else if (false === ($c= $reflect->getDocComment())) {
       return null;
@@ -95,7 +95,8 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function constantAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
       return $this->annotations($meta);
     } else {
@@ -111,7 +112,8 @@ class MetaInformation {
    * @return ?string
    */
   public function constantType($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
       return $meta[DETAIL_RETURNS];
     } else {
@@ -127,7 +129,8 @@ class MetaInformation {
    * @return ?string
    */
   public function constantComment($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
       return $meta[DETAIL_COMMENT];
     } else if (false === ($c= $reflect->getDocComment())) {
@@ -144,7 +147,8 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function propertyAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
       return $this->annotations($meta);
     } else {
@@ -159,7 +163,8 @@ class MetaInformation {
    * @return ?string
    */
   public function propertyType($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
       return $meta[DETAIL_RETURNS];
     } else {
@@ -175,7 +180,8 @@ class MetaInformation {
    * @return ?string
    */
   public function propertyComment($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
       return $meta[DETAIL_COMMENT];
     } else if (false === ($c= $reflect->getDocComment())) {
@@ -207,7 +213,8 @@ class MetaInformation {
    * @return ?string
    */
   public function methodReturns($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
       return $meta[DETAIL_RETURNS];
     } else {
@@ -222,7 +229,8 @@ class MetaInformation {
    * @return ?string
    */
   public function methodComment($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
       return $meta[DETAIL_COMMENT];
     } else if (false === ($c= $reflect->getDocComment())) {
@@ -239,7 +247,8 @@ class MetaInformation {
    * @return string[]
    */
   public function methodParameterTypes($method) {
-    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
+    $name= $method->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$method->name][DETAIL_ARGUMENTS] ?? null) return $meta;
 
     $r= [];
@@ -257,7 +266,8 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function parameterAnnotations($method, $reflect) {
-    $c= strtr($method->getDeclaringClass()->name, '\\', '.');
+    $name= $method->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($target= \xp::$meta[$c][1][$method->name][DETAIL_TARGET_ANNO] ?? null) {
       if ($param= $target['$'.$reflect->name] ?? null) {
         $r= [];
@@ -282,7 +292,7 @@ class MetaInformation {
     do {
 
       // If meta information is already loaded, use property arguments
-      if ($meta= \xp::$meta[strtr($reflect->name, '\\', '.')][0] ?? null) {
+      if ($meta= \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')][0] ?? null) {
         foreach ($meta as $name => $property) {
           if ($arg= $property[DETAIL_ARGUMENTS] ?? null) {
             $r[$name]= [$arg[0], $property[DETAIL_RETURNS]];

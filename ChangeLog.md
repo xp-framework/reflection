@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.13.6 / 2023-06-25
+
+* Fixed missing `xp::$sn` lookup when reflecting generics - @thekid
+
 ## 2.13.5 / 2023-06-25
 
 * Fixed parameter default values, by-reference and variadic markers,
