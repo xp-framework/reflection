@@ -3,16 +3,18 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.13.4 / 2023-06-25
+
 * Fixed parsing global imports and grouped imports containing aliases,
   which surfaced as either *Syntax error, unexpected token `as`* or
   *Cannot use object of type PhpToken as array* errors
   (@thekid)
 
-### 2.13.3 / 2023-06-04
+## 2.13.3 / 2023-06-04
 
 * Fixed `lang.reflection.Constant::modifiers()` return type - @thekid
 
-### 2.13.2 / 2023-06-04
+## 2.13.2 / 2023-06-04
 
 * Fixed reading and writing non-public virtual properties - @thekid
 
