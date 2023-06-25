@@ -83,12 +83,20 @@ class FromSyntaxTree {
 
         $params= '';
         foreach ($signature->parameters as $param) {
-          $params.= ', $'.$param->name;
+          $params.=
+            ', '.
+            ($param->type ? $param->type->literal() : '').
+            ($param->variadic ? '...' : '').
+            ($param->reference ? ' &$': ' $').
+            $param->name.
+            ($param->default ? '='.$param->default->expression : '')
+          ;
         }
+        $return= $signature->returns ? ':'.$signature->returns->literal() : '';
         if (0 === strncmp($code, ' throw ', 7)) {
-          return new Code('function('.substr($params, 2).') {'.$code.'; }');
+          return new Code('function('.substr($params, 2).')'.$return.' {'.$code.'; }');
         } else {
-          return new Code('function('.substr($params, 2).') { return'.$code.'; }');
+          return new Code('function('.substr($params, 2).')'.$return.' { return'.$code.'; }');
         }
       });
 
@@ -114,9 +122,17 @@ class FromSyntaxTree {
 
         $params= '';
         foreach ($signature->parameters as $param) {
-          $params.= ', $'.$param->name;
+          $params.=
+            ', '.
+            ($param->type ? $param->type->literal() : '').
+            ($param->variadic ? '...' : '').
+            ($param->reference ? ' &$': ' $').
+            $param->name.
+            ($param->default ? '='.$param->default->expression : '')
+          ;
         }
-        return new Code('function('.substr($params, 2).')'.$code.' }');
+        $return= $signature->returns ? ':'.$signature->returns->literal() : '';
+        return new Code('function('.substr($params, 2).')'.$return.$code.' }');
       };
 
       // Function expressions and function expressions used as statement

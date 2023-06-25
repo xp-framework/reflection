@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use ReflectionFunction;
 use lang\reflection\{Annotation, CannotInstantiate, InvocationFailed};
 use lang\{IllegalStateException, Reflection, XPClass};
 use test\{Assert, Expect, Test, Values};
@@ -168,6 +169,48 @@ class AnnotationTest {
 
     Assert::instance('array', $f);
     Assert::equals(6100, $f[0]());
+  }
+
+  #[Test, Values(['function(\$param= null) { }', 'fn(\$param= null) => null'])]
+  public function with_optional_param($function) {
+    $t= $this->declare('{}', '#[Annotated(eval: "'.$function.'")]');
+    $f= $t->annotation(Annotated::class)->argument(0);
+
+    Assert::true((new ReflectionFunction($f))->getParameters()[0]->isOptional());
+  }
+
+  #[Test, Values(['function(... \$param) { }', 'fn(... \$param) => null'])]
+  public function with_variadic_param($function) {
+    $t= $this->declare('{}', '#[Annotated(eval: "'.$function.'")]');
+    $f= $t->annotation(Annotated::class)->argument(0);
+
+    Assert::true((new ReflectionFunction($f))->getParameters()[0]->isVariadic());
+  }
+
+  #[Test, Values(['function(&\$param) { }', 'fn(&\$param) => null'])]
+  public function with_reference_param($function) {
+    $t= $this->declare('{}', '#[Annotated(eval: "'.$function.'")]');
+    $f= $t->annotation(Annotated::class)->argument(0);
+
+    Assert::true((new ReflectionFunction($f))->getParameters()[0]->isPassedByReference());
+  }
+
+  #[Test, Values(['function(int \$param) { }', 'fn(int \$param) => null'])]
+  public function with_param_type($function) {
+    $t= $this->declare('{}', '#[Annotated(eval: "'.$function.'")]');
+    $f= $t->annotation(Annotated::class)->argument(0);
+
+    $type= (new ReflectionFunction($f))->getParameters()[0]->getType();
+    Assert::equals('int', PHP_VERSION_ID >= 70100 ? $type->getName() : (string)$type);
+  }
+
+  #[Test, Values(['function(): int { return 6100; }', 'fn(): int => 6100'])]
+  public function with_return_type($function) {
+    $t= $this->declare('{}', '#[Annotated(eval: "'.$function.'")]');
+    $f= $t->annotation(Annotated::class)->argument(0);
+
+    $type= (new ReflectionFunction($f))->getReturnType();
+    Assert::equals('int', PHP_VERSION_ID >= 70100 ? $type->getName() : (string)$type);
   }
 
   #[Test]

@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed parameter default values, by-reference and variadic markers,
+  and parameter and return types being swallowed for functions inside
+  annotations when using PHP 7
+  (@thekid)
+
 ## 2.13.4 / 2023-06-25
 
 * Fixed parsing global imports and grouped imports containing aliases,
