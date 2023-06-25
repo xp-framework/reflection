@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Fixed parsing global imports and grouped imports containing aliases,
+  which surfaced as either *Syntax error, unexpected token `as`* or
+  *Cannot use object of type PhpToken as array* errors
+  (@thekid)
+
 ### 2.13.3 / 2023-06-04
 
 * Fixed `lang.reflection.Constant::modifiers()` return type - @thekid
