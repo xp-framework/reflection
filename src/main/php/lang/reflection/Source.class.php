@@ -21,11 +21,6 @@ class Source implements Value {
   /** @return int */
   public function endLine() { return $this->reflect->getEndLine(); }
 
-  /** @return string */
-  public function hashCode() {
-    return "S{$this->reflect->getFileName()}:{$this->reflect->getStartLine()}-{$this->reflect->getEndLine()}";
-  }
-
   /** @return ReflectionClass */
   private function scope() {
     return $this->reflect instanceof ReflectionClass ? $this->reflect : $this->reflect->getDeclaringClass();
@@ -55,6 +50,11 @@ class Source implements Value {
       $this->reflect->getStartLine(),
       $this->reflect->getEndLine()
     );
+  }
+
+  /** @return string */
+  public function hashCode() {
+    return "S{$this->reflect->getFileName()}:{$this->reflect->getStartLine()}-{$this->reflect->getEndLine()}";
   }
 
   /**
