@@ -35,7 +35,7 @@ abstract class Member implements Annotated, Value {
       '*'      => function($type) use($reflect) {
         $declared= $reflect->getDeclaringClass();
         $imports= Reflection::meta()->scopeImports($declared);
-        return XPClass::forName($imports[$type] ?? $declared->getNamespaceName().'\\'.$type);
+        return XPClass::forName($imports['class'][$type] ?? $declared->getNamespaceName().'\\'.$type);
       },
     ];
   }

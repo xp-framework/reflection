@@ -15,6 +15,9 @@ class SyntaxTree extends Visitor {
   /** @return lang.ast.TypeDeclaration */
   public function type() { return $this->type; }
 
+  /** @return lang.ast.ParseTree */
+  public function root() { return $this->tree; }
+
   public function resolver() { return $this->tree->scope(); }
 
   private function resolve($type) {

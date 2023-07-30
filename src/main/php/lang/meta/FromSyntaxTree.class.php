@@ -197,10 +197,13 @@ class FromSyntaxTree {
   }
 
   public function imports($reflect) {
-    $resolver= $this->tree($reflect)->resolver();
-    $imports= [];
-    foreach ($resolver->imports as $alias => $type) {
-      $imports[$alias]= ltrim($type, '\\');
+    $imports= ['class' => [], 'function' => [], 'const' => []];
+    foreach ($this->tree($reflect)->root()->children() as $child) {
+      if ($child->is('import')) {
+        foreach ($child->names as $import => $alias) {
+          $imports[$child->type ?? 'class'][$alias ?? false === ($p= strrpos($import, '\\')) ? $import : substr($import, $p + 1)]= $import;
+        }
+      }
     }
     return $imports;
   }

@@ -66,14 +66,24 @@ class FromAttributes {
     static $types= [T_WHITESPACE => true, 44 => true, 59 => true, 123 => true];
 
     $tokens= PhpToken::tokenize(file_get_contents($reflect->getFileName()));
-    $imports= [];
+    $imports= ['class' => [], 'function' => [], 'const' => []];
     for ($i= 0, $s= sizeof($tokens); $i < $s; $i++) {
       if (isset($break[$tokens[$i]->id])) break;
       if (T_USE !== $tokens[$i]->id) continue;
 
       do {
-        $type= '';
-        for ($i+= 2; $i < $s, !isset($types[$tokens[$i]->id]); $i++) {
+        $i+= 2;
+        if (T_FUNCTION === $tokens[$i]->id) {
+          $kind= 'function';
+          $i+= 2;
+        } else if (T_CONST === $tokens[$i]->id) {
+          $kind= 'const';
+          $i+= 2;
+        } else {
+          $kind= 'class';
+        }
+
+        for ($type= ''; $i < $s, !isset($types[$tokens[$i]->id]); $i++) {
           $type.= $tokens[$i]->text;
         }
 
@@ -86,11 +96,11 @@ class FromAttributes {
           $group= '';
           for ($i+= 1; $i < $s; $i++) {
             if (44 === $tokens[$i]->id) {
-              $imports[$alias ?? $group]= $type.$group;
+              $imports[$kind][$alias ?? $group]= $type.$group;
               $alias= null;
               $group= '';
             } else if (125 === $tokens[$i]->id) {
-              $imports[$alias ?? $group]= $type.$group;
+              $imports[$kind][$alias ?? $group]= $type.$group;
               break;
             } else if (T_AS === $tokens[$i]->id) {
               $i+= 2;
@@ -101,11 +111,11 @@ class FromAttributes {
           }
         } else if (T_AS === $tokens[$i]->id) {
           $i+= 2;
-          $imports[$tokens[$i]->text]= $type;
+          $imports[$kind][$tokens[$i]->text]= $type;
         } else if (false === ($p= strrpos($type, '\\'))) {
-          $imports[$type]= null;
+          $imports[$kind][$type]= null;
         } else {
-          $imports[substr($type, strrpos($type, '\\') + 1)]= $type;
+          $imports[$kind][substr($type, strrpos($type, '\\') + 1)]= $type;
         }
 
         // Skip over whitespace
@@ -120,8 +130,13 @@ class FromAttributes {
     if ($namespace= $reflect->getNamespaceName()) {
       $header.= 'namespace '.$namespace.';';
     }
-    foreach ($this->imports($reflect) as $import => $type) {
-      $header.= $type ? "use {$type} as {$import};" : "use {$import};";
+
+    // Recreate all imports
+    foreach ($this->imports($reflect) as $kind => $list) {
+      $use= 'class' === $kind ? 'use' : 'use '.$kind;
+      foreach ($list as $import => $type) {
+        $header.= $type ? "{$use} {$type} as {$import};" : "{$use} {$import};";
+      }
     }
 
     $f= eval($header.' return static function() { return '.$code.'; };');

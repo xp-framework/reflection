@@ -6,6 +6,9 @@ use test\verify\Runtime;
 use test\{Assert, Test, Ignore as Skip};
 use util\Comparison as WithComparison;
 
+use const MODIFIER_PUBLIC;
+use function strncmp;
+
 #[Runtime(php: '>=8.0')]
 class FromAttributesTest {
 
@@ -18,14 +21,18 @@ class FromAttributesTest {
   public function imports() {
     Assert::equals(
       [
-        'ReflectionClass' => null,
-        'FromAttributes'  => FromAttributes::class,
-        'Dynamic'         => Dynamic::class,
-        'Runtime'         => Runtime::class,
-        'Assert'          => Assert::class,
-        'Test'            => Test::class,
-        'WithComparison'  => WithComparison::class,
-        'Skip'            => Skip::class,
+        'const'    => ['MODIFIER_PUBLIC' => null],
+        'function' => ['strncmp' => null],
+        'class'    => [
+          'ReflectionClass' => null,
+          'FromAttributes'  => FromAttributes::class,
+          'Dynamic'         => Dynamic::class,
+          'Runtime'         => Runtime::class,
+          'Assert'          => Assert::class,
+          'Test'            => Test::class,
+          'WithComparison'  => WithComparison::class,
+          'Skip'            => Skip::class,
+        ]
       ],
       (new FromAttributes())->imports(new ReflectionClass(self::class))
     );
