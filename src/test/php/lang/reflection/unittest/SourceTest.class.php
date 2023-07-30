@@ -39,7 +39,11 @@ class SourceTest {
 
   #[Test]
   public function defined_type_source() {
-    $type= ClassLoader::defineClass('lang.reflection.unittest.SourceTest_Defined', null, [], []);
+    $type= ClassLoader::defineType(
+      'lang.reflection.unittest.SourceTest_Defined',
+      ['kind' => 'class', 'extends' => [], 'implements' => [], 'use' => []],
+      []
+    );
     $source= Reflection::type($type)->source();
 
     Assert::equals('dyn://lang.reflection.unittest.SourceTest_Defined', $source->fileName());
@@ -56,5 +60,19 @@ class SourceTest {
     Assert::equals(__FILE__, $source->fileName());
     Assert::equals($start, $source->startLine());
     Assert::equals($end, $source->endLine());
+  }
+
+  #[Test]
+  public function trait_method_source() {
+    $type= ClassLoader::defineType(
+      'lang.reflection.unittest.SourceTest_Trait',
+      ['kind' => 'class', 'extends' => [], 'implements' => [], 'use' => [WithMethod::class]],
+      []
+    );
+    $source= Reflection::type($type)->method('fixture')->source();
+
+    Assert::equals('WithMethod.class.php', basename($source->fileName()));
+    Assert::equals(5, $source->startLine());
+    Assert::equals(7, $source->endLine());
   }
 }
