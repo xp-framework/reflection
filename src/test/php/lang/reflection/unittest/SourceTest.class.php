@@ -5,6 +5,9 @@ use io\streams\LinesIn;
 use lang\{ClassLoader, Reflection};
 use test\{Assert, Before, Test};
 
+use const MODIFIER_PUBLIC;
+use function strncmp;
+
 class SourceTest {
   private $start, $end;
 
@@ -74,5 +77,29 @@ class SourceTest {
     Assert::equals('WithMethod.class.php', basename($source->fileName()));
     Assert::equals(5, $source->startLine());
     Assert::equals(7, $source->endLine());
+  }
+
+  #[Test]
+  public function class_imports() {
+    $resolved= [
+      'File'        => File::class,
+      'LinesIn'     => LinesIn::class,
+      'ClassLoader' => ClassLoader::class,
+      'Reflection'  => Reflection::class,
+      'Assert'      => Assert::class,
+      'Before'      => Before::class,
+      'Test'        => Test::class,
+    ];
+    Assert::equals($resolved, Reflection::type($this)->source()->imports()['class']);
+  }
+
+  #[Test]
+  public function const_imports() {
+    Assert::equals(['MODIFIER_PUBLIC' => null], Reflection::type($this)->source()->imports()['const']);
+  }
+
+  #[Test]
+  public function function_imports() {
+    Assert::equals(['strncmp' => null], Reflection::type($this)->source()->imports()['function']);
   }
 }

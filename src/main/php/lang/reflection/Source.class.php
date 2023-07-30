@@ -1,6 +1,7 @@
 <?php namespace lang\reflection;
 
-use lang\Value;
+use ReflectionMethod, ReflectionClass;
+use lang\{Reflection, Value};
 
 /** @test lang.reflection.unittest.SourceTest */
 class Source implements Value {
@@ -23,6 +24,14 @@ class Source implements Value {
   /** @return string */
   public function hashCode() {
     return "S{$this->reflect->getFileName()}:{$this->reflect->getStartLine()}-{$this->reflect->getEndLine()}";
+  }
+
+  /** @return [:[:string]] */
+  public function imports() {
+    return Reflection::meta()->scopeImports($this->reflect instanceof ReflectionClass
+      ? $this->reflect
+      : $this->reflect->getDeclaringClass()
+    );
   }
 
   /** @return string */
