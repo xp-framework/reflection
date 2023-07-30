@@ -26,12 +26,24 @@ class Source implements Value {
     return "S{$this->reflect->getFileName()}:{$this->reflect->getStartLine()}-{$this->reflect->getEndLine()}";
   }
 
-  /** @return [:[:string]] */
-  public function imports() {
-    return Reflection::meta()->scopeImports($this->reflect instanceof ReflectionClass
-      ? $this->reflect
-      : $this->reflect->getDeclaringClass()
-    );
+  /** @return ReflectionClass */
+  private function scope() {
+    return $this->reflect instanceof ReflectionClass ? $this->reflect : $this->reflect->getDeclaringClass();
+  }
+
+  /** @return [:string] */
+  public function usedTypes() {
+    return Reflection::meta()->scopeImports($this->scope())['class'];
+  }
+
+  /** @return [:string] */
+  public function usedConstants() {
+    return Reflection::meta()->scopeImports($this->scope())['const'];
+  }
+
+  /** @return [:string] */
+  public function usedFunctions() {
+    return Reflection::meta()->scopeImports($this->scope())['function'];
   }
 
   /** @return string */

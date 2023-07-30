@@ -80,7 +80,7 @@ class SourceTest {
   }
 
   #[Test]
-  public function class_imports() {
+  public function used_classes() {
     $resolved= [
       'File'        => File::class,
       'LinesIn'     => LinesIn::class,
@@ -90,16 +90,16 @@ class SourceTest {
       'Before'      => Before::class,
       'Test'        => Test::class,
     ];
-    Assert::equals($resolved, Reflection::type($this)->source()->imports()['class']);
+    Assert::equals($resolved, Reflection::type($this)->source()->usedTypes());
   }
 
   #[Test]
-  public function const_imports() {
-    Assert::equals(['MODIFIER_PUBLIC' => 'MODIFIER_PUBLIC'], Reflection::type($this)->source()->imports()['const']);
+  public function used_constants() {
+    Assert::equals(['MODIFIER_PUBLIC' => 'MODIFIER_PUBLIC'], Reflection::type($this)->source()->usedConstants());
   }
 
   #[Test]
-  public function function_imports() {
-    Assert::equals(['strncmp' => 'strncmp'], Reflection::type($this)->source()->imports()['function']);
+  public function used_functions() {
+    Assert::equals(['strncmp' => 'strncmp'], Reflection::type($this)->source()->usedFunctions());
   }
 }
