@@ -18,6 +18,9 @@ abstract class Member implements Annotated, Value {
     $this->annotations= $annotations;
   }
 
+  /** Returns type source */
+  public function source(): Source { return new Source($this->reflect); }
+
   /**
    * Returns context for `Type::resolve()`
    *

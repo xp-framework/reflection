@@ -70,6 +70,9 @@ class Type implements Annotated, Value {
     }
   }
 
+  /** Returns type source */
+  public function source(): Source { return new Source($this->reflect); }
+
   /**
    * Returns whether a given value is an instance of this type
    *
