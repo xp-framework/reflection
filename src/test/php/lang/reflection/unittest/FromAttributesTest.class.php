@@ -21,10 +21,10 @@ class FromAttributesTest {
   public function imports() {
     Assert::equals(
       [
-        'const'    => ['MODIFIER_PUBLIC' => null],
-        'function' => ['strncmp' => null],
+        'const'    => ['MODIFIER_PUBLIC' => 'MODIFIER_PUBLIC'],
+        'function' => ['strncmp' => 'strncmp'],
         'class'    => [
-          'ReflectionClass' => null,
+          'ReflectionClass' => ReflectionClass::class,
           'FromAttributes'  => FromAttributes::class,
           'Dynamic'         => Dynamic::class,
           'Runtime'         => Runtime::class,

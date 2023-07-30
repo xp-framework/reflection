@@ -113,7 +113,7 @@ class FromAttributes {
           $i+= 2;
           $imports[$kind][$tokens[$i]->text]= $type;
         } else if (false === ($p= strrpos($type, '\\'))) {
-          $imports[$kind][$type]= null;
+          $imports[$kind][$type]= $type;
         } else {
           $imports[$kind][substr($type, strrpos($type, '\\') + 1)]= $type;
         }

@@ -95,11 +95,11 @@ class SourceTest {
 
   #[Test]
   public function const_imports() {
-    Assert::equals(['MODIFIER_PUBLIC' => null], Reflection::type($this)->source()->imports()['const']);
+    Assert::equals(['MODIFIER_PUBLIC' => 'MODIFIER_PUBLIC'], Reflection::type($this)->source()->imports()['const']);
   }
 
   #[Test]
   public function function_imports() {
-    Assert::equals(['strncmp' => null], Reflection::type($this)->source()->imports()['function']);
+    Assert::equals(['strncmp' => 'strncmp'], Reflection::type($this)->source()->imports()['function']);
   }
 }
