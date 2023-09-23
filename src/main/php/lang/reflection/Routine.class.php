@@ -9,6 +9,9 @@ abstract class Routine extends Member {
   /** @return [:var] */
   protected function meta() { return Reflection::meta()->methodAnnotations($this->reflect); }
 
+  /** Returns type source */
+  public function source(): Source { return new Source($this->reflect); }
+
   /**
    * Compiles signature
    *
