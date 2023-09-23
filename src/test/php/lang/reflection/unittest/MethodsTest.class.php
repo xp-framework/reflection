@@ -153,6 +153,12 @@ class MethodsTest {
   }
 
   #[Test]
+  public function no_returns() {
+    $type= $this->declare('{ function fixture() { } }');
+    Assert::equals(Type::$VAR, $type->method('fixture')->returns()->type());
+  }
+
+  #[Test]
   public function annotations() {
     $t= $this->declare('{
       #[Author("Test")]

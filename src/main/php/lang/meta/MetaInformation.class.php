@@ -79,8 +79,9 @@ class MetaInformation {
    * @return ?string
    */
   public function typeComment($reflect) {
-    if ($meta= \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')]['class'] ?? null) {
-      return $meta[DETAIL_COMMENT];
+    $c= \xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.');
+    if ($meta= \xp::$meta[$c]['class'][DETAIL_COMMENT] ?? null) {
+      return $meta;
     } else if (false === ($c= $reflect->getDocComment())) {
       return null;
     } else {
@@ -114,8 +115,8 @@ class MetaInformation {
   public function constantType($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
-      return $meta[DETAIL_RETURNS];
+    if ($meta= \xp::$meta[$c][2][$reflect->name][DETAIL_RETURNS] ?? null) {
+      return $meta;
     } else {
       $tags= $this->tags($reflect);
       return $tags['var'][0] ?? $tags['type'][0] ?? null;
@@ -131,8 +132,8 @@ class MetaInformation {
   public function constantComment($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][2][$reflect->name] ?? null) {
-      return $meta[DETAIL_COMMENT];
+    if ($meta= \xp::$meta[$c][2][$reflect->name][DETAIL_COMMENT] ?? null) {
+      return $meta;
     } else if (false === ($c= $reflect->getDocComment())) {
       return null;
     } else {
@@ -165,8 +166,8 @@ class MetaInformation {
   public function propertyType($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
-      return $meta[DETAIL_RETURNS];
+    if ($meta= \xp::$meta[$c][0][$reflect->name][DETAIL_RETURNS] ?? null) {
+      return $meta;
     } else {
       $tags= $this->tags($reflect);
       return $tags['var'][0] ?? $tags['type'][0] ?? null;
@@ -182,8 +183,8 @@ class MetaInformation {
   public function propertyComment($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][0][$reflect->name] ?? null) {
-      return $meta[DETAIL_COMMENT];
+    if ($meta= \xp::$meta[$c][0][$reflect->name][DETAIL_COMMENT] ?? null) {
+      return $meta;
     } else if (false === ($c= $reflect->getDocComment())) {
       return null;
     } else {
@@ -215,8 +216,8 @@ class MetaInformation {
   public function methodReturns($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
-      return $meta[DETAIL_RETURNS];
+    if ($meta= \xp::$meta[$c][1][$reflect->name][DETAIL_RETURNS] ?? null) {
+      return $meta;
     } else {
       return $this->tags($reflect)['return'][0] ?? null;
     }
@@ -231,8 +232,8 @@ class MetaInformation {
   public function methodComment($reflect) {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
-    if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
-      return $meta[DETAIL_COMMENT];
+    if ($meta= \xp::$meta[$c][1][$reflect->name][DETAIL_COMMENT] ?? null) {
+      return $meta;
     } else if (false === ($c= $reflect->getDocComment())) {
       return null;
     } else {
@@ -295,7 +296,7 @@ class MetaInformation {
       if ($meta= \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')][0] ?? null) {
         foreach ($meta as $name => $property) {
           if ($arg= $property[DETAIL_ARGUMENTS] ?? null) {
-            $r[$name]= [$arg[0], $property[DETAIL_RETURNS]];
+            $r[$name]= [$arg[0], $property[DETAIL_RETURNS] ?? null];
           }
         }
         continue;

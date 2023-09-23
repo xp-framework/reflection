@@ -105,4 +105,10 @@ class ConstantsTest {
       $this->declare('{ const string FIXTURE = "test"; }')->constant('FIXTURE')->constraint()
     );
   }
+
+  #[Test]
+  public function no_type() {
+    $type= $this->declare('{ const FIXTURE= 1; }');
+    Assert::equals(Type::$VAR, $type->constant('FIXTURE')->constraint()->type());
+  }
 }

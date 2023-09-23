@@ -200,6 +200,12 @@ class PropertiesTest {
   }
 
   #[Test]
+  public function no_type() {
+    $type= $this->declare('{ public $fixture; }');
+    Assert::equals(Type::$VAR, $type->property('fixture')->constraint()->type());
+  }
+
+  #[Test]
   public function string_representation_without_type() {
     $t= $this->declare('{ public $fixture; }');
     Assert::equals(

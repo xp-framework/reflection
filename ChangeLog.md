@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.14.0 / 2023-09-23
+
+* Added support for partial meta information - @thekid
+
 ## 2.13.6 / 2023-06-25
 
 * Fixed missing `xp::$sn` lookup when reflecting generics - @thekid
