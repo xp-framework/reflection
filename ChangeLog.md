@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 2.14.1 / 2023-09-30
+
+* Fixed `FromAttributes::imports()` for classes created inside `eval`
+  (@thekid)
+
 ## 2.14.0 / 2023-09-23
 
 * Added support for partial meta information - @thekid

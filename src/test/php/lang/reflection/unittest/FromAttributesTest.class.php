@@ -32,6 +32,12 @@ class FromAttributesTest {
   }
 
   #[Test]
+  public function imports_from_eval() {
+    $name= eval('class FromAttributesTest_eval { } return FromAttributesTest_eval::class;');
+    Assert::equals([], (new FromAttributes())->imports(new ReflectionClass($name)));
+  }
+
+  #[Test]
   public function evaluate_constant() {
     Assert::equals(
       ReflectionClass::IS_FINAL,

@@ -58,14 +58,18 @@ class FromAttributes {
   /**
    * Returns imports used in the class file the given class was declared in
    *
-   * @param  \ReflectionClass $reflect
+   * @param  ReflectionClass $reflect
    * @return [:string]
    */
   public function imports($reflect) {
     static $break= [T_CLASS => true, T_INTERFACE => true, T_TRAIT => true, 372 /* T_ENUM */ => true];
     static $types= [T_WHITESPACE => true, 44 => true, 59 => true, 123 => true];
 
-    $tokens= PhpToken::tokenize(file_get_contents($reflect->getFileName()));
+    // Exclude classes declared inside eval(), their declaration is not accessible
+    $file= $reflect->getFileName();
+    if (false !== strpos($file, ': eval')) return [];
+
+    $tokens= PhpToken::tokenize(file_get_contents($file));
     $imports= [];
     for ($i= 0, $s= sizeof($tokens); $i < $s; $i++) {
       if (isset($break[$tokens[$i]->id])) break;
