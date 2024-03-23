@@ -44,6 +44,7 @@ class Property extends Member {
    * @param  ?object $instance
    * @return var
    * @throws lang.reflection.CannotAccess
+   * @throws lang.reflection.AccessingFailed if getting raises an exception
    */
   public function get(?object $instance) {
     try {
@@ -63,7 +64,7 @@ class Property extends Member {
    * @param  var $value
    * @return var The given value
    * @throws lang.reflection.CannotAccess
-   * @throws lang.reflection.AccessFailed if setting raises an exception
+   * @throws lang.reflection.AccessingFailed if setting raises an exception
    */
   public function set(?object $instance, $value) {
     try {
