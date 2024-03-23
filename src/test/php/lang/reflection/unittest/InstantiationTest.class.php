@@ -11,15 +11,15 @@ class InstantiationTest {
 
   /** @return iterable */
   private function memberInitializers() {
-    yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
-    yield [function($t, $args) { return $t->initializer('__construct')->newInstance($args); }];
+    yield [fn($t, $args) => $t->constructor()->newInstance($args)];
+    yield [fn($t, $args) => $t->initializer('__construct')->newInstance($args)];
   }
 
   /** @return iterable */
   private function allInitializers() {
-    yield [function($t, $args) { return $t->newInstance(...$args); }];
-    yield [function($t, $args) { return $t->constructor()->newInstance($args); }];
-    yield [function($t, $args) { return $t->initializer('__construct')->newInstance($args); }];
+    yield [fn($t, $args) => $t->newInstance(...$args)];
+    yield [fn($t, $args) => $t->constructor()->newInstance($args)];
+    yield [fn($t, $args) => $t->initializer('__construct')->newInstance($args)];
   }
 
   #[Test]

@@ -32,7 +32,7 @@ class VirtualPropertiesTest {
   public function virtual_property_included_in_list($type) {
     Assert::equals(
       ['fixture' => 'public readonly'],
-      array_map(function($p) { return $p->modifiers()->names(); }, iterator_to_array($type->properties()))
+      array_map(fn($p) => $p->modifiers()->names(), iterator_to_array($type->properties()))
     );
   }
 
