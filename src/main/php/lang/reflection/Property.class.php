@@ -35,7 +35,7 @@ class Property extends Member {
     };
 
     $t= Type::resolve(
-      PHP_VERSION_ID >= 70400 || '' === $this->reflect->name ? $this->reflect->getType() : null,
+      $this->reflect->getType(),
       Member::resolve($this->reflect),
       $api
     );
@@ -103,8 +103,7 @@ class Property extends Member {
   public function toString() {
 
     // Compile property type
-    $t= PHP_VERSION_ID >= 70400 || '' === $this->reflect->name ? $this->reflect->getType() : null;
-    if (null === $t) {
+    if (null === ($t= $this->reflect->getType())) {
       $name= Reflection::meta()->propertyType($this->reflect) ?? 'var';
     } else if ($t instanceof ReflectionUnionType) {
       $name= '';

@@ -40,7 +40,7 @@ abstract class Routine extends Member {
         }
         $type= substr($name, 1);
       } else {
-        $type= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
+        $type= strtr($t->getName(), '\\', '.');
         $parameter->isVariadic() && $type.= '...';
         $t->allowsNull() && $nullable= '?';
       }

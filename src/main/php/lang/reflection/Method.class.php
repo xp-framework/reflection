@@ -62,12 +62,6 @@ class Method extends Routine {
 
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
-
-      // PHP 7.0 still had warnings for arguments
-      if (PHP_VERSION_ID < 70100 && sizeof($pass) < $this->reflect->getNumberOfRequiredParameters()) {
-        throw new ReflectionException('Too few arguments');
-      }
-
       return $this->reflect->invokeArgs($instance, $pass);
     } catch (ReflectionException $e) {
       throw new CannotInvoke($this, $e);
@@ -126,7 +120,7 @@ class Method extends Routine {
       }
       $returns= substr($name, 1);
     } else {
-      $returns= strtr(PHP_VERSION_ID >= 70100 ? $t->getName() : $t->__toString(), '\\', '.');
+      $returns= strtr($t->getName(), '\\', '.');
       $t->allowsNull() && $nullable= '?';
     }
 

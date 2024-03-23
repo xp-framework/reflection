@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.0.0 / 2024-03-23
+
+* Made this library compatible with XP 12, droppping support for all but
+  the latest PHP 7 version. Minimum PHP version required is now **7.4**!
+  (@thekid)
+
 ## 2.14.1 / 2023-09-30
 
 * Fixed `FromAttributes::imports()` for classes created inside `eval`

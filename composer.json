@@ -6,15 +6,12 @@
   "description" : "Reflection",
   "keywords": ["module", "xp"],
   "require" : {
-    "xp-framework/core": "^11.0 | ^10.13",
-    "xp-framework/ast": "^10.0 | ^9.0 | ^8.0 | ^7.6",
-    "php" : ">=7.0.0"
-  },
-  "suggest" : {
+    "xp-framework/core": "^12.0 | ^11.0 | ^10.13",
+    "xp-framework/ast": "^11.0 | ^10.0 | ^9.0 | ^8.0 | ^7.6",
     "php" : ">=7.4.0"
   },
   "require-dev" : {
-    "xp-framework/test": "^1.0"
+    "xp-framework/test": "^2.0 | ^1.0"
   },
   "bin": ["bin/xp.xp-framework.reflection.reflect"],
   "autoload" : {
