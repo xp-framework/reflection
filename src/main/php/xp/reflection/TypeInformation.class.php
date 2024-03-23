@@ -53,12 +53,12 @@ abstract class TypeInformation {
 
   protected function implements($type) {
     $i= $type->interfaces();
-    return $i ? ' implements '.implode(', ', array_map(function($t) { return $t->name(); }, $i)) : '';
+    return $i ? ' implements '.implode(', ', array_map(fn($t) => $t->name(), $i)) : '';
   }
 
   protected function parents($type) {
     $i= $type->interfaces();
-    return $i ? ' extends '.implode(', ', array_map(function($t) { return $t->name(); }, $i)) : '';
+    return $i ? ' extends '.implode(', ', array_map(fn($t) => $t->name(), $i)) : '';
   }
 
   protected function partition($members) {

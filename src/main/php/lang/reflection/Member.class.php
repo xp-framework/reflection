@@ -26,9 +26,9 @@ abstract class Member implements Annotated, Value {
    */
   public static function resolve($reflect) {
     return [
-      'static' => function() use($reflect) { return new XPClass($reflect->class); },
-      'self'   => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()); },
-      'parent' => function() use($reflect) { return new XPClass($reflect->getDeclaringClass()->getParentClass()); },
+      'static' => fn() => new XPClass($reflect->class),
+      'self'   => fn() => new XPClass($reflect->getDeclaringClass()),
+      'parent' => fn() => new XPClass($reflect->getDeclaringClass()->getParentClass()),
       '*'      => function($type) use($reflect) {
         $declared= $reflect->getDeclaringClass();
         $imports= Reflection::meta()->scopeImports($declared);
