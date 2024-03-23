@@ -1,9 +1,9 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{AccessingFailed, CannotAccess, Constraint, Modifiers};
-use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass};
+use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass, IllegalStateException};
 use test\verify\Runtime;
-use test\{Action, Assert, AssertionFailedError, Expect, Test, Values};
+use test\{Action, Assert, Expect, Test, Values};
 
 class PropertiesTest {
   use TypeDefinition;
@@ -79,34 +79,10 @@ class PropertiesTest {
     Assert::equals('Modified', $class::$fixture);
   }
 
-  #[Test, Expect(CannotAccess::class)]
-  public function cannot_read_private_by_default() {
-    $type= $this->declare('{ private static $fixture = "Test"; }');
-    $type->property('fixture')->get(null);
-  }
-
-  #[Test, Expect(CannotAccess::class)]
-  public function cannot_write_private_by_default() {
-    $type= $this->declare('{ private static $fixture = "Test"; }');
-    $type->property('fixture')->set(null, 'Modified');
-  }
-
-  #[Test, Expect(CannotAccess::class)]
-  public function cannot_read_private_with_incorrect_context() {
-    $type= $this->declare('{ private static $fixture = "Test"; }');
-    $type->property('fixture')->get(null, typeof($this));
-  }
-
-  #[Test, Expect(CannotAccess::class)]
-  public function cannot_write_private_with_incorrect_context() {
-    $type= $this->declare('{ private static $fixture = "Test"; }');
-    $type->property('fixture')->set(null, 'Modified', typeof($this));
-  }
-
   #[Test, Expect(AccessingFailed::class)]
   public function type_mismatch() {
     $type= $this->declare('{ private static array $fixture; }');
-    $type->property('fixture')->set(null, 1, $type);
+    $type->property('fixture')->set(null, 1);
   }
 
   #[Test]
@@ -114,9 +90,9 @@ class PropertiesTest {
     $type= $this->declare('{ private $fixture = "Test"; }');
     $instance= $type->newInstance();
     $property= $type->properties()->named('fixture');
-    $property->set($instance, 'Modified', $type);
+    $property->set($instance, 'Modified');
 
-    Assert::equals('Modified', $property->get($instance, $type));
+    Assert::equals('Modified', $property->get($instance));
   }
 
   #[Test]
@@ -242,23 +218,12 @@ class PropertiesTest {
   }
 
   #[Test]
-  public function accessing_failed_target() {
+  public function set_accessing_failed_exceptions_target_member() {
     $t= $this->declare('{ public static array $fixture; }');
     try {
       $t->property('fixture')->set(null, 1);
       throw new AssertionFailedError('No exception was raised');
     } catch (AccessingFailed $expected) {
-      Assert::equals($t->property('fixture'), $expected->target());
-    }
-  }
-
-  #[Test]
-  public function cannot_access_target() {
-    $t= $this->declare('{ private static $fixture; }');
-    try {
-      $t->property('fixture')->get(null);
-      throw new AssertionFailedError('No exception was raised');
-    } catch (CannotAccess $expected) {
       Assert::equals($t->property('fixture'), $expected->target());
     }
   }

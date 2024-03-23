@@ -162,15 +162,13 @@ class Type implements Annotated, Value {
       return new Initializer($this->reflect);
     } else if ($function instanceof \Closure) {
       $reflect= new ReflectionFunction($function);
-      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($function) {
+      return new Initializer($this->reflect, $reflect, function($instance, $args) use($function) {
         return $function->call($instance, ...$args);
       });
     } else if ($this->reflect->hasMethod($function)) {
       $reflect= $this->reflect->getMethod($function);
-      return new Initializer($this->reflect, $reflect, function($instance, $args, $context) use($reflect) {
-        if ($context && !$reflect->isPublic() && Reflection::of($context)->isInstance($instance)) {
-          $reflect->setAccessible(true);
-        }
+      return new Initializer($this->reflect, $reflect, function($instance, $args) use($reflect) {
+        $reflect->setAccessible(true);
         return $reflect->invokeArgs($instance, $args);
       });
     }

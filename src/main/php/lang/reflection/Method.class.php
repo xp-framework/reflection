@@ -44,24 +44,14 @@ class Method extends Routine {
    *
    * @param  ?object $instance
    * @param  var[] $args
-   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return var
    * @throws lang.reflection.CannotInvoke if prerequisites to the invocation fail
    * @throws lang.reflection.InvocationFailed if invocation raises an exception
    */
-  public function invoke($instance, $args= [], $context= null) {
-
-    // Only allow invoking non-public methods when given a compatible context
-    if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::type($context)->is($this->reflect->class)) {
-        $this->reflect->setAccessible(true);
-      } else {
-        throw new CannotInvoke($this, new ReflectionException('Trying to invoke non-public method'));
-      }
-    }
-
+  public function invoke(?object $instance, $args= []) {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
+      $this->reflect->setAccessible(true);
       return $this->reflect->invokeArgs($instance, $pass);
     } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInvoke($this, $e);

@@ -30,32 +30,25 @@ class Constructor extends Routine implements Instantiation {
    * Creates a new instance of the type this constructor belongs to
    *
    * @param  var[] $args
-   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return object
    * @throws lang.reflection.InvocationFailed
    * @throws lang.reflection.CannotInstantiate
    */
-  public function newInstance(array $args= [], $context= null) {
+  public function newInstance(array $args= []) {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
 
       // Workaround for non-public constructors: Set accessible, then manually
       // invoke after creating an instance without invoking the constructor.
-      if ($context && !$this->reflect->isPublic()) {
-        if (Reflection::of($context)->is($this->class->name)) {
-          $instance= $this->class->newInstanceWithoutConstructor();
-          $this->reflect->setAccessible(true);
-          $this->reflect->invokeArgs($instance, $pass);
-          return $instance;
-        }
+      if (!$this->reflect->isPublic()) {
+        $instance= $this->class->newInstanceWithoutConstructor();
+        $this->reflect->setAccessible(true);
+        $this->reflect->invokeArgs($instance, $pass);
+        return $instance;
+      } else {
+        return $this->class->newInstanceArgs($pass);
       }
-
-      return $this->class->newInstanceArgs($pass);
-    } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this->class, $e);
-    } catch (TypeError $e) {
-      throw new CannotInstantiate($this->class, $e);
-    } catch (ReflectionException $e) {
+    } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInstantiate($this->class, $e);
     } catch (Throwable $e) {
 
