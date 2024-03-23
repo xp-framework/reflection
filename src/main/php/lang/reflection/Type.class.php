@@ -205,11 +205,7 @@ class Type implements Annotated, Value {
       } else {
         return $this->reflect->newInstance();
       }
-    } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this, $e);
-    } catch (TypeError $e) {
-      throw new CannotInstantiate($this, $e);
-    } catch (ReflectionException $e) {
+    } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInstantiate($this, $e);
     } catch (Throwable $e) {
       if (0 === strpos($e->getMessage(), 'Unknown named parameter $')) {
