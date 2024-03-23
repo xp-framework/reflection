@@ -86,7 +86,7 @@ class MethodsTest {
     Assert::equals([$present, $expected], [$returns->present(), $returns->type()]);
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function returns_void() {
     $returns= $this->declare('{ function fixture(): void { } }')->method('fixture')->returns();
     Assert::equals(Type::$VOID, $returns->type());
@@ -122,7 +122,7 @@ class MethodsTest {
     Assert::equals($type->class(), $type->method('fixture')->returns()->type());
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function return_never_more_specific_than_void() {
     $t= $this->declare('{ /** @return never */ function fixture(): void { exit(); } }');
     Assert::equals(Type::$NEVER, $t->method('fixture')->returns()->type());

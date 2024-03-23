@@ -103,7 +103,7 @@ class PropertiesTest {
     $type->property('fixture')->set(null, 'Modified', typeof($this));
   }
 
-  #[Test, Runtime(php: '>=7.4'), Expect(AccessingFailed::class)]
+  #[Test, Expect(AccessingFailed::class)]
   public function type_mismatch() {
     $type= $this->declare('{ private static array $fixture; }');
     $type->property('fixture')->set(null, 1, $type);
@@ -145,7 +145,7 @@ class PropertiesTest {
     Assert::equals(new Constraint(Primitive::$STRING, false), $type->property('fixture')->constraint());
   }
 
-  #[Test, Runtime(php: '>=7.4')]
+  #[Test]
   public function type_from_declaration() {
     $type= $this->declare('{ public string $fixture; }');
     Assert::equals(
@@ -154,7 +154,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Runtime(php: '>=7.4')]
+  #[Test]
   public function type_from_array_declaration() {
     $type= $this->declare('{ public array $fixture; }');
     Assert::equals(
@@ -163,7 +163,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Runtime(php: '>=7.4')]
+  #[Test]
   public function type_from_self_declaration() {
     $type= $this->declare('{ public self $fixture; }');
     Assert::equals(
@@ -223,7 +223,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Runtime(php: '>=7.4')]
+  #[Test]
   public function string_representation_with_type_declaration() {
     $t= $this->declare('{ public string $fixture; }');
     Assert::equals(
@@ -241,7 +241,7 @@ class PropertiesTest {
     );
   }
 
-  #[Test, Runtime(php: '>=7.4')]
+  #[Test]
   public function accessing_failed_target() {
     $t= $this->declare('{ public static array $fixture; }');
     try {

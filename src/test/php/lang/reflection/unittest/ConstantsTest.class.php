@@ -29,7 +29,7 @@ class ConstantsTest {
     Assert::null($this->declare('{ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function with_comment() {
     Assert::equals('Test', $this->declare('{ /** Test */ const FIXTURE = "test"; }')->constant('FIXTURE')->comment());
   }
@@ -55,19 +55,19 @@ class ConstantsTest {
     Assert::equals($t->constant('FIXTURE'), $t->constants()->named('FIXTURE'));
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function private_constant() {
     $const= $this->declare('{ private const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PRIVATE, 'test'], [$const->modifiers()->bits(), $const->value()]);
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function protected_constant() {
     $const= $this->declare('{ protected const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PROTECTED, 'test'], [$const->modifiers()->bits(), $const->value()]);
   }
 
-  #[Test, Runtime(php: '>=7.1')]
+  #[Test]
   public function public_constant() {
     $const= $this->declare('{ public const FIXTURE = "test"; }')->constant('FIXTURE');
     Assert::equals([MODIFIER_PUBLIC, 'test'], [$const->modifiers()->bits(), $const->value()]);
