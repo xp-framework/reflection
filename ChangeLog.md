@@ -5,6 +5,9 @@ XP Reflection ChangeLog
 
 ## 3.0.0 / 2024-03-23
 
+* Merged PR #38: Remove context from properties, methods, constructors and
+  initializers
+  (@thekid)
 * Made this library compatible with XP 12, droppping support for all but
   the latest PHP 7 version. Minimum PHP version required is now **7.4**!
   (@thekid)
