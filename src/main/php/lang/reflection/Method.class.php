@@ -18,7 +18,7 @@ class Method extends Routine {
    * @return Closure
    * @throws lang.IllegalArgumentException for incorrect or missing instances
    */
-  public function closure($instance= null) {
+  public function closure(?object $instance= null) {
     try {
       $closure= $this->reflect->getClosure($instance);
     } catch (\Throwable $e) {
