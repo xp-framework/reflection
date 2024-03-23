@@ -1,5 +1,6 @@
 <?php namespace lang\meta;
 
+use ReflectionClass;
 use lang\IllegalAccessException;
 use lang\ast\nodes\{Literal, Variable};
 use lang\ast\{Visitor, Type};
@@ -76,7 +77,7 @@ class SyntaxTree extends Visitor {
    * @return var
    */
   public function new($self) {
-    $c= new \ReflectionClass($this->resolve($self->type));
+    $c= new ReflectionClass($this->resolve($self->type));
     $arguments= [];
     foreach ($self->arguments as $key => $node) {
       $arguments[$key]= $node->visit($this);
@@ -93,16 +94,13 @@ class SyntaxTree extends Visitor {
   public function scope($self) {
     $c= $this->resolve($self->type);
 
-    // Use PHP reflection API to access members' runtime values. We cannot use
-    // getStaticPropertyValue() as it cannot get non-public members in PHP 7.0
+    // Use PHP reflection API to access members' runtime values
     if ($self->member instanceof Variable) {
-      $p= (new \ReflectionClass($c))->getProperty($self->member->pointer ?? $self->member->name);
-      $p->setAccessible(true);
-      return $p->getValue();
+      return (new ReflectionClass($c))->getStaticPropertyValue($self->member->pointer ?? $self->member->name);
     } else if ($self->member instanceof Literal) {
       return 'class' === $self->member->expression
         ? substr($c, 1)
-        : (new \ReflectionClass($c))->getConstant($self->member->expression)
+        : (new ReflectionClass($c))->getConstant($self->member->expression)
       ;
     } else {
       throw new IllegalAccessException('Cannot resolve '.$type->name.'::'.$self->member->kind);

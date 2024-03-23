@@ -241,12 +241,8 @@ class Type implements Annotated, Value {
 
   /** @return ?lang.reflection.Constant */
   public function constant($name) {
-
-    // Cannot use getReflectionConstant(), which does not exist in PHP 7.0.
-    // Instantiate the polyfilled ReflectionClassConstant class directly in
-    // order to make this compatible will all versions.
     return $this->reflect->hasConstant($name)
-      ? new Constant(new \ReflectionClassConstant($this->reflect->name, $name))
+      ? new Constant($this->reflect->getReflectionConstant($name))
       : null
     ;
   }
