@@ -63,11 +63,7 @@ class Method extends Routine {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
       return $this->reflect->invokeArgs($instance, $pass);
-    } catch (ReflectionException $e) {
-      throw new CannotInvoke($this, $e);
-    } catch (ArgumentCountError $e) {
-      throw new CannotInvoke($this, $e);
-    } catch (TypeError $e) {
+    } catch (ReflectionException | ArgumentCountError | TypeError $e) {
       throw new CannotInvoke($this, $e);
     } catch (Throwable $e) {
 
