@@ -42,25 +42,18 @@ class Property extends Member {
    * Gets this property's value
    *
    * @param  ?object $instance
-   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return var
    * @throws lang.reflection.CannotAccess
+   * @throws lang.reflection.AccessingFailed if getting raises an exception
    */
-  public function get($instance, $context= null) {
-
-    // Only allow reading non-public properties when given a compatible context
-    if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->getDeclaringClass()->name)) {
-        $this->reflect->setAccessible(true);
-      } else {
-        throw new CannotAccess($this, new ReflectionException('Trying to read non-public property'));
-      }
-    }
-
+  public function get(?object $instance) {
     try {
+      $this->reflect->setAccessible(true);
       return $this->reflect->getValue($instance);
     } catch (ReflectionException $e) {
       throw new CannotAccess($this, $e);
+    } catch (Throwable $e) {
+      throw new AccessingFailed($this, $e);
     }
   }
 
@@ -69,23 +62,13 @@ class Property extends Member {
    *
    * @param  ?object $instance
    * @param  var $value
-   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return var The given value
    * @throws lang.reflection.CannotAccess
-   * @throws lang.reflection.AccessFailed if setting raises an exception
+   * @throws lang.reflection.AccessingFailed if setting raises an exception
    */
-  public function set($instance, $value, $context= null) {
-
-    // Only allow reading non-public properties when given a compatible context
-    if (!$this->reflect->isPublic()) {
-      if ($context && Reflection::of($context)->is($this->reflect->getDeclaringClass()->name)) {
-        $this->reflect->setAccessible(true);
-      } else {
-        throw new CannotAccess($this, new ReflectionException('Trying to write non-public property'));
-      }
-    }
-
+  public function set(?object $instance, $value) {
     try {
+      $this->reflect->setAccessible(true);
       $this->reflect->setValue($instance, $value);
       return $value;
     } catch (ReflectionException $e) {

@@ -92,12 +92,6 @@ class InstantiationTest {
     $t->newInstance();
   }
 
-  #[Test, Expect(CannotInstantiate::class), Values(['private', 'protected'])]
-  public function constructor_cannot_instantiate_using_non_public_constructor($modifier) {
-    $t= $this->declare('{ '.$modifier.' function __construct() { } }');
-    $t->constructor()->newInstance();
-  }
-
   #[Test, Values(['private', 'protected'])]
   public function instantiate_with_non_public_constructor_in_context($modifier) {
     $t= $this->declare('{
@@ -111,12 +105,6 @@ class InstantiationTest {
   public function instantiate_with_constructor_promotion() {
     $t= $this->declare('{ public function __construct(public $value) { } }');
     Assert::equals($this, $t->constructor()->newInstance([$this])->value);
-  }
-
-  #[Test, Expect(CannotInstantiate::class)]
-  public function cannot_instantiate_with_private_constructor_in_incorrect_context() {
-    $t= $this->declare('{ private function __construct() { } }');
-    $t->constructor()->newInstance([], typeof($this));
   }
 
   #[Test, Expect(CannotInstantiate::class)]

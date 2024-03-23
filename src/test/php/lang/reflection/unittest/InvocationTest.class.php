@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use lang\reflection\{CannotInvoke, InvocationFailed};
-use lang\{CommandLine, IllegalAccessException, Reflection, Runnable};
+use lang\{CommandLine, IllegalAccessException, Reflection, Runnable, IllegalStateException};
 use test\{Assert, AssertionFailedError, Before, Expect, Test, Values};
 
 class InvocationTest {
@@ -32,22 +32,10 @@ class InvocationTest {
     Assert::equals('External', $method->invoke($this->fixtures[$context]->newInstance(), []));
   }
 
-  #[Test, Values([['friend'], ['internal']]), Expect(CannotInvoke::class)]
-  public function cannot_invoke_non_public_method_by_default($method) {
-    $method= $this->fixtures['parent']->method($method);
-    $method->invoke($this->fixtures['parent']->newInstance(), []);
-  }
-
   #[Test, Values([['parent', 'parent'], ['child', 'parent'], ['parent', 'child']])]
   public function invoke_private_method_in_context($instance, $context) {
     $method= $this->fixtures['parent']->method('internal');
-    Assert::equals('Internal', $method->invoke($this->fixtures[$instance]->newInstance(), [], $this->fixtures[$context]));
-  }
-
-  #[Test, Expect(CannotInvoke::class)]
-  public function cannot_invoke_private_method_in_incorrect_context() {
-    $method= $this->fixtures['parent']->method('internal');
-    $method->invoke($this->fixtures['parent']->newInstance(), [], typeof($this));
+    Assert::equals('Internal', $method->invoke($this->fixtures[$instance]->newInstance(), []));
   }
 
   #[Test, Expect(CannotInvoke::class)]
@@ -137,11 +125,11 @@ class InvocationTest {
   }
 
   #[Test]
-  public function cannot_invoke_target() {
-    $t= $this->declare('{ private static function fixture() { } }');
+  public function cannot_invoke_exceptions_target_member() {
+    $t= $this->declare('{ private static function fixture($a) { } }');
     try {
       $t->method('fixture')->invoke(null, []);
-      throw new AssertionFailedError('No exception was raised');
+      throw new IllegalStateException('No exception was raised');
     } catch (CannotInvoke $expected) {
       Assert::equals($t->method('fixture'), $expected->target());
     }

@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ArgumentCountError, Error, ReflectionException, Throwable, TypeError;
+use ArgumentCountError, Error, ReflectionException, ReflectionFunction, Throwable, TypeError;
 use lang\Reflection;
 
 /**
@@ -13,7 +13,7 @@ class Initializer extends Routine implements Instantiation {
   private $class, $function;
 
   static function __static() {
-    self::$NOOP= new \ReflectionFunction(function() { });
+    self::$NOOP= new ReflectionFunction(function() { });
   }
 
   /**
@@ -41,12 +41,11 @@ class Initializer extends Routine implements Instantiation {
    * Creates a new instance of the type this constructor belongs to
    *
    * @param  var[] $args
-   * @param  ?string|?lang.XPClass|?lang.reflection.Type $context
    * @return object
    * @throws lang.reflection.InvocationFailed
    * @throws lang.reflection.CannotInstantiate
    */
-  public function newInstance(array $args= [], $context= null) {
+  public function newInstance(array $args= []) {
     try {
       $instance= $this->class->newInstanceWithoutConstructor();
     } catch (ReflectionException $e) {
@@ -57,13 +56,9 @@ class Initializer extends Routine implements Instantiation {
 
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect, $args) : $args;
-      $this->function->__invoke($instance, $pass, $context);
+      $this->function->__invoke($instance, $pass);
       return $instance;
-    } catch (ArgumentCountError $e) {
-      throw new CannotInstantiate($this->class, $e);
-    } catch (TypeError $e) {
-      throw new CannotInstantiate($this->class, $e);
-    } catch (ReflectionException $e) {
+    } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInstantiate($this->class, $e);
     } catch (Throwable $e) {
 
