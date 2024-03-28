@@ -83,13 +83,12 @@ class Type implements Annotated, Value {
   }
 
   /**
-   * Returns this type's package, or NULL if this type is in the global namespace.
+   * Returns this type's package
    *
-   * @return ?lang.reflection.Package
+   * @return lang.reflection.Package
    */
   public function package() {
-    $name= $this->reflect->getNamespaceName();
-    return $name ? new Package($name) : null;
+    return new Package($this->reflect->getNamespaceName());
   }
 
   /**
