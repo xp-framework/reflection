@@ -12,6 +12,21 @@ class PackageTest {
   }
 
   #[Test]
+  public function global() {
+    Assert::true((new Package())->global());
+  }
+
+  #[Test, Values(['lang', 'lang.reflection', 'lang.reflect.unittest'])]
+  public function leveled($package) {
+    Assert::false((new Package($package))->global());
+  }
+
+  #[Test]
+  public function global_name() {
+    Assert::equals('', (new Package())->name());
+  }
+
+  #[Test]
   public function create_via_components() {
     Assert::equals('lang.reflection.unittest', (new Package('lang', 'reflection', 'unittest'))->name());
   }
@@ -24,6 +39,16 @@ class PackageTest {
   #[Test]
   public function parent() {
     Assert::equals(new Package('lang'), (new Package('lang.reflection'))->parent());
+  }
+
+  #[Test]
+  public function parent_of_toplevel() {
+    Assert::equals(new Package(), (new Package('lang'))->parent());
+  }
+
+  #[Test]
+  public function global_package_has_no_parent() {
+    Assert::null((new Package())->parent());
   }
 
   #[Test]
