@@ -29,6 +29,7 @@ use org\example\{Base, Inject, Fixture};
 $type= Reflection::type(Fixture::class);
 
 $type->name();                // org.example.Fixture
+$type->declaredName();        // Fixture
 $type->literal();             // Fixture::class
 $type->modifiers();           // Modifiers<public>
 $type->comment();             // (api doc comment)
