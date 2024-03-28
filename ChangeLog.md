@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #40: Add support for the global package, fixing issue #39
+  (@thekid)
+
 ## 3.0.0 / 2024-03-23
 
 * Merged PR #38: Remove context from properties, methods, constructors and
