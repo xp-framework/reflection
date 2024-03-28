@@ -1,13 +1,13 @@
 <?php namespace lang\reflection;
 
-use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException};
+use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException, Value};
 
 /**
  * Represents a namespace, which may exist in various class loaders
  *
  * @test lang.reflection.unittest.PackageTest
  */
-class Package {
+class Package implements Value {
   private $name;
 
   /**
@@ -20,6 +20,9 @@ class Package {
   public function __construct(... $components) {
     $this->name= rtrim(strtr(implode('.', $components), '\\', '.'), '.');
   }
+
+  /** Returns whether this is the global package */
+  public function global(): bool { return '' === $this->name; }
 
   /** Returns this package's name (in dotted form) */
   public function name(): string { return $this->name; }
@@ -39,13 +42,16 @@ class Package {
   }
 
   /**
-   * Returns this package's parent, if any
+   * Returns this package's parent. Returns NULL if this package refers to the
+   * global package.
    *
    * @return ?self
    */
   public function parent() {
+    if ('' === $this->name) return null;
+
     $p= strrpos($this->name, '.');
-    return false === $p ? null : new Package(substr($this->name, 0, $p));
+    return false === $p ? new Package() : new Package(substr($this->name, 0, $p));
   }
 
   /**
@@ -54,7 +60,7 @@ class Package {
    * @return iterable
    */
   public function children() {
-    $base= $this->name.'.';
+    $base= $this->name ? $this->name.'.' : '';
     $loader= ClassLoader::getDefault();
     foreach ($loader->packageContents($this->name) as $entry) {
       if ('/' === $entry[strlen($entry) - 1]) {
@@ -70,7 +76,7 @@ class Package {
    */
   public function types() {
     $ext= strlen(\xp::CLASS_FILE_EXT);
-    $base= $this->name.'.';
+    $base= $this->name ? $this->name.'.' : '';
     $loader= ClassLoader::getDefault();
     foreach ($loader->packageContents($this->name) as $entry) {
       if (0 === substr_compare($entry, \xp::CLASS_FILE_EXT, -$ext)) {
@@ -87,15 +93,36 @@ class Package {
    * @throws lang.IllegalArgumentException
    */
   public function type($name) {
+    if ('' === $this->name) return Reflection::type($name);
+
+    // Compare type package and this package
     $type= strtr($name, '\\', '.');
     $p= strrpos($type, '.');
-
     if (false === $p) {
-      return Reflection::of($this->name.'.'.$type);
+      return Reflection::type($this->name.'.'.$type);
     } else if (0 === strncmp($this->name, $type, $p)) {
-      return Reflection::of($type);
-    } else {
-      throw new IllegalArgumentException('Given type '.$type.' is not in package '.$this->name);
+      return Reflection::type($type);
     }
+
+    throw new IllegalArgumentException('Given type '.$type.' is not in package '.$this->name);
+  }
+
+  /** @return string */
+  public function hashCode() { return md5($this->name); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'<'.$this->name().'>'; }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? $this->name <=> $value->name
+      : 1
+    ;
   }
 }

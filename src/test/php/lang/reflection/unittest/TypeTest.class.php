@@ -51,7 +51,7 @@ class TypeTest {
 
   #[Test]
   public function global_namespace() {
-    Assert::null(Reflection::of(\Throwable::class)->package());
+    Assert::equals(new Package(), Reflection::of(\Throwable::class)->package());
   }
 
   #[Test]
