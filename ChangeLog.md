@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.1.0 / 2024-03-28
+
+* Merged PR #41: Add `lang.reflection.Type::declaredName()` which returns
+  the class name without the namespace, if any
+  (@thekid)
 * Merged PR #40: Add support for the global package, fixing issue #39
   (@thekid)
 
