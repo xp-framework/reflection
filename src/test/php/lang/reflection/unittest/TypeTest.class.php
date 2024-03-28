@@ -50,6 +50,12 @@ class TypeTest {
   }
 
   #[Test]
+  public function declaredName() {
+    $qualified= nameof($this).'Fixture';
+    Assert::equals(substr($qualified, strrpos($qualified, '.') + 1), $this->fixture->declaredName());
+  }
+
+  #[Test]
   public function global_namespace() {
     Assert::equals(new Package(), Reflection::of(\Throwable::class)->package());
   }
