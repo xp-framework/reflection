@@ -1,13 +1,13 @@
 <?php namespace lang\reflection;
 
-use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException};
+use lang\{ClassLoader, IClassLoader, Reflection, IllegalArgumentException, Value};
 
 /**
  * Represents a namespace, which may exist in various class loaders
  *
  * @test lang.reflection.unittest.PackageTest
  */
-class Package {
+class Package implements Value {
   private $name;
 
   /**
@@ -105,5 +105,24 @@ class Package {
     }
 
     throw new IllegalArgumentException('Given type '.$type.' is not in package '.$this->name);
+  }
+
+  /** @return string */
+  public function hashCode() { return md5($this->name); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'<'.$this->name().'>'; }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? $this->name <=> $value->name
+      : 1
+    ;
   }
 }
