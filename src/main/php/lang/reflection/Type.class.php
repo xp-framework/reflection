@@ -20,6 +20,9 @@ class Type implements Annotated, Value {
   /** Returns type name (in dotted form) */
   public function name(): string { return strtr($this->reflect->name, '\\', '.'); }
 
+  /** Returns declared name (without namespace) */
+  public function declaredName(): string { return $this->reflect->getShortName(); }
+
   /** Returns type literal (in namespaced form) */
   public function literal(): string { return $this->reflect->name; }
 
