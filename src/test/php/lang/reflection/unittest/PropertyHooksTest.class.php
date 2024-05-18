@@ -3,7 +3,7 @@
 use ReflectionProperty;
 use lang\reflection\AccessingFailed;
 use test\verify\Condition;
-use test\{Assert, Expect, Test};
+use test\{Assert, Expect, Test, Values};
 
 #[Condition(assert: 'method_exists(ReflectionProperty::class, "getHooks")')]
 class PropertyHooksTest {
@@ -13,6 +13,12 @@ class PropertyHooksTest {
   public function is_virtual() {
     $type= $this->declare('{ public string $fixture { get => "test"; } }');
     Assert::true($type->properties()->named('fixture')->virtual());
+  }
+
+  #[Test, Values(['get { return $this->fixture; }', 'get => $this->fixture;'])]
+  public function backed_is_not_virtual($declaration) {
+    $type= $this->declare('{ public string $fixture { '.$declaration.' } }');
+    Assert::false($type->properties()->named('fixture')->virtual());
   }
 
   #[Test]
