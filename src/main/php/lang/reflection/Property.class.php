@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionUnionType, Throwable;
+use ReflectionException, ReflectionProperty, ReflectionUnionType, Throwable;
 use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion};
 
 /**
@@ -9,6 +9,11 @@ use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion};
  * @test lang.reflection.unittest.PropertiesTest
  */
 class Property extends Member {
+  private static $HOOKS;
+
+  static function __static() {
+    self::$HOOKS= method_exists(ReflectionProperty::class, 'getHooks');
+  }
 
   protected function meta() { return Reflection::meta()->propertyAnnotations($this->reflect); }
 
@@ -18,6 +23,11 @@ class Property extends Member {
    * @return ?string
    */
   public function comment() { return Reflection::meta()->propertyComment($this->reflect); }
+
+  /** Returns whether this property is virtual */
+  public function virtual() {
+    return $this->reflect instanceof VirtualProperty || self::$HOOKS && $this->reflect->isVirtual();
+  }
 
   /** Returns a compound name consisting of `[CLASS]::$[NAME]`  */
   public function compoundName(): string {
