@@ -16,11 +16,7 @@ class VirtualPropertiesTest {
       DETAIL_RETURNS   => 'string',
       DETAIL_ARGUMENTS => [Modifiers::IS_PUBLIC | Modifiers::IS_READONLY]
     ];
-
     yield $t;
-    if (PHP_VERSION_ID >= 80100) {
-      yield $this->declare('{ public readonly string $fixture; }');
-    }
   }
 
   #[Test, Values(from: 'fixtures')]
@@ -34,6 +30,11 @@ class VirtualPropertiesTest {
       ['fixture' => 'public readonly'],
       array_map(fn($p) => $p->modifiers()->names(), iterator_to_array($type->properties()))
     );
+  }
+
+  #[Test, Values(from: 'fixtures')]
+  public function is_virtual($type) {
+    Assert::true($type->properties()->named('fixture')->virtual());
   }
 
   #[Test, Values(from: 'fixtures')]
