@@ -227,4 +227,13 @@ class PropertiesTest {
       Assert::equals($t->property('fixture'), $expected->target());
     }
   }
+
+  #[Test, Runtime(php: '>=8.4')]
+  public function asymmetric_visibility() {
+    $t= $this->declare('{ public private(set) string $fixture; }');
+    Assert::equals(
+      'public private(set) string $name',
+      $t->property('fixture')->toString()
+    );
+  }
 }
