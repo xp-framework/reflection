@@ -15,9 +15,9 @@ class Modifiers implements Value {
   const IS_PROTECTED     = MODIFIER_PROTECTED;
   const IS_PRIVATE       = MODIFIER_PRIVATE;
   const IS_READONLY      = MODIFIER_READONLY;
-  const IS_PRIVATE_SET   = 0x0400;
+  const IS_PUBLIC_SET    = 0x0400;
   const IS_PROTECTED_SET = 0x0800;
-  const IS_PUBLIC_SET    = 0x1000;
+  const IS_PRIVATE_SET   = 0x1000;
   const IS_NATIVE        = 0x10000;
 
   private static $names= [
@@ -29,9 +29,9 @@ class Modifiers implements Value {
     'abstract'       => self::IS_ABSTRACT,
     'native'         => self::IS_NATIVE,
     'readonly'       => self::IS_READONLY,
-    'private(set)'   => self::IS_PRIVATE_SET,
-    'protected(set)' => self::IS_PROTECTED_SET,
     'public(set)'    => self::IS_PUBLIC_SET,
+    'protected(set)' => self::IS_PROTECTED_SET,
+    'private(set)'   => self::IS_PRIVATE_SET,
   ];
   private $bits;
 
@@ -117,7 +117,7 @@ class Modifiers implements Value {
   /**
    * Gets whether these modifiers are public in regard to the specified hook
    *
-   * @param  ?string $hook
+   * @param  string $hook
    * @return bool
    * @throws lang.IllegalArgumentException
    */
@@ -132,7 +132,7 @@ class Modifiers implements Value {
   /**
    * Gets whether these modifiers are protected in regard to the specified hook
    *
-   * @param  ?string $hook
+   * @param  string $hook
    * @return bool
    * @throws lang.IllegalArgumentException
    */
@@ -147,7 +147,7 @@ class Modifiers implements Value {
   /**
    * Gets whether these modifiers are private in regard to the specified hook
    *
-   * @param  ?string $hook
+   * @param  string $hook
    * @return bool
    * @throws lang.IllegalArgumentException
    */

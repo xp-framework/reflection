@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
 use ReflectionException, ReflectionUnionType, Throwable;
-use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion};
+use lang\{Reflection, XPClass, Type, VirtualProperty, TypeUnion, IllegalArgumentException};
 
 /**
  * Reflection for a single property
@@ -36,6 +36,29 @@ class Property extends Member {
 
     $t= Type::resolve($this->reflect->getType(), Member::resolve($this->reflect), $api);
     return new Constraint($t ?? Type::$VAR, $present);
+  }
+
+  /**
+   * Gets whether these modifiers are public in regard to the specified hook
+   *
+   * @param  ?string $hook Optionally, filter for specified hook only
+   * @return lang.reflection.Modifiers
+   * @throws lang.IllegalArgumentException
+   */
+  public function modifiers($hook= null) {
+    static $set= [
+      Modifiers::IS_PUBLIC_SET    => Modifiers::IS_PUBLIC,
+      Modifiers::IS_PROTECTED_SET => Modifiers::IS_PROTECTED,
+      Modifiers::IS_PRIVATE_SET   => Modifiers::IS_PRIVATE,
+    ];
+
+    $bits= $this->reflect->getModifiers();
+    switch ($hook) {
+      case null: return new Modifiers($bits);
+      case 'get': return new Modifiers($bits & ~0x1c00);
+      case 'set': return new Modifiers($set[$bits & 0x1c00] ?? $bits);
+      default: throw new IllegalArgumentException('Unknown hook '.$hook);
+    }
   }
 
   /**
