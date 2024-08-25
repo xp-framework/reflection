@@ -74,6 +74,9 @@ class Property extends Member {
    */
   public function get(?object $instance) {
     try {
+
+      // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
+      // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
       $this->reflect->setAccessible(true);
       return $this->reflect->getValue($instance);
     } catch (ReflectionException $e) {
@@ -94,6 +97,9 @@ class Property extends Member {
    */
   public function set(?object $instance, $value) {
     try {
+
+      // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
+      // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
       $this->reflect->setAccessible(true);
       $this->reflect->setValue($instance, $value);
       return $value;
