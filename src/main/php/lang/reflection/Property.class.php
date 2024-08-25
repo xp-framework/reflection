@@ -52,7 +52,10 @@ class Property extends Member {
       Modifiers::IS_PRIVATE_SET   => Modifiers::IS_PRIVATE,
     ];
 
+    // Readonly implies protected(set)
     $bits= $this->reflect->getModifiers();
+    $bits & Modifiers::IS_READONLY && $bits|= Modifiers::IS_PROTECTED_SET;
+
     switch ($hook) {
       case null: return new Modifiers($bits);
       case 'get': return new Modifiers(($bits & ~Modifiers::SET_MASK) & Modifiers::GET_MASK);
@@ -117,7 +120,9 @@ class Property extends Member {
       $name= $t->getName();
     }
 
-    return Modifiers::namesOf($this->reflect->getModifiers()).' '.$name.' $'.$this->reflect->getName();
+    $bits= $this->reflect->getModifiers();
+    $bits & Modifiers::IS_READONLY && $bits|= Modifiers::IS_PROTECTED_SET;
+    return Modifiers::namesOf($bits).' '.$name.' $'.$this->reflect->getName();
   }
 
   /**

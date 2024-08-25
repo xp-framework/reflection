@@ -54,7 +54,7 @@ class Modifiers implements Value {
     }
 
     if ($visibility && 0 === ($this->bits & (self::IS_PROTECTED | self::IS_PRIVATE))) {
-      $this->bits |= self::IS_PUBLIC;
+      $this->bits|= self::IS_PUBLIC;
     }
   }
 
@@ -67,7 +67,7 @@ class Modifiers implements Value {
   private static function parse($names) {
     $bits= 0;
     foreach ($names as $name) {
-      $bits |= self::$names[$name];
+      $bits|= self::$names[$name];
     }
     return $bits;
   }
