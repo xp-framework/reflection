@@ -55,8 +55,8 @@ class Property extends Member {
     $bits= $this->reflect->getModifiers();
     switch ($hook) {
       case null: return new Modifiers($bits);
-      case 'get': return new Modifiers($bits & ~0x1c00);
-      case 'set': return new Modifiers($set[$bits & 0x1c00] ?? $bits);
+      case 'get': return new Modifiers(($bits & ~Modifiers::SET_MASK) & Modifiers::GET_MASK);
+      case 'set': return new Modifiers($set[$bits & Modifiers::SET_MASK] ?? $bits & Modifiers::GET_MASK);
       default: throw new IllegalArgumentException('Unknown hook '.$hook);
     }
   }

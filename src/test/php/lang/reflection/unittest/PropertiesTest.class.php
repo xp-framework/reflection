@@ -49,6 +49,22 @@ class PropertiesTest {
     );
   }
 
+  #[Test]
+  public function get_modifiers_erases_static() {
+    Assert::equals(
+      new Modifiers('public'),
+      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('get')
+    );
+  }
+
+  #[Test]
+  public function set_modifiers_erases_static() {
+    Assert::equals(
+      new Modifiers('public'),
+      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('set')
+    );
+  }
+
   #[Test, Expect(IllegalArgumentException::class)]
   public function modifiers_unknown_hook() {
     $this->declare('{ private $fixture; }')->property('fixture')->modifiers('@unknown');
