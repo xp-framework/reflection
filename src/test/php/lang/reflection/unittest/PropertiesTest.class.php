@@ -1,5 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
+use ReflectionProperty;
 use lang\reflection\{AccessingFailed, CannotAccess, Constraint, Modifiers};
 use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass, IllegalArgumentException};
 use test\verify\{Condition, Runtime};
@@ -11,7 +12,7 @@ class PropertiesTest {
   private static $ASYMMETRIC;
 
   static function __static() {
-    self::$ASYMMETRIC= method_exists(\ReflectionProperty::class, 'isPrivateSet');
+    self::$ASYMMETRIC= method_exists(ReflectionProperty::class, 'isPrivateSet');
   }
 
   #[Test]
