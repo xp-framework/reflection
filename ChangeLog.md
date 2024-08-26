@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.2.0 / 2024-08-26
+
+* Merged PR #43: Add support for asymmetric visibility for properties, see
+  https://wiki.php.net/rfc/asymmetric-visibility-v2, targeted for PHP 8.4.
+  (@thekid)
+
 ## 3.1.0 / 2024-03-28
 
 * Merged PR #41: Add `lang.reflection.Type::declaredName()` which returns
