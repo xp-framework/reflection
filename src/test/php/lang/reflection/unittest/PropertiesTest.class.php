@@ -1,12 +1,19 @@
 <?php namespace lang\reflection\unittest;
 
+use ReflectionProperty;
 use lang\reflection\{AccessingFailed, CannotAccess, Constraint, Modifiers};
-use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass, IllegalStateException};
-use test\verify\Runtime;
+use lang\{Primitive, Type, TypeIntersection, TypeUnion, XPClass, IllegalArgumentException};
+use test\verify\{Condition, Runtime};
 use test\{Action, Assert, Expect, Test, Values};
 
 class PropertiesTest {
   use TypeDefinition;
+
+  private static $ASYMMETRIC;
+
+  static function __static() {
+    self::$ASYMMETRIC= method_exists(ReflectionProperty::class, 'isPrivateSet');
+  }
 
   #[Test]
   public function name() {
@@ -25,6 +32,43 @@ class PropertiesTest {
       new Modifiers('private'),
       $this->declare('{ private $fixture; }')->property('fixture')->modifiers()
     );
+  }
+
+  #[Test, Values(['public', 'protected', 'private'])]
+  public function get_modifiers($modifier) {
+    Assert::equals(
+      new Modifiers($modifier),
+      $this->declare('{ '.$modifier.' $fixture; }')->property('fixture')->modifiers('get')
+    );
+  }
+
+  #[Test, Values(['public', 'protected', 'private'])]
+  public function set_modifiers($modifier) {
+    Assert::equals(
+      new Modifiers($modifier),
+      $this->declare('{ '.$modifier.' $fixture; }')->property('fixture')->modifiers('set')
+    );
+  }
+
+  #[Test]
+  public function get_modifiers_erases_static() {
+    Assert::equals(
+      new Modifiers('public'),
+      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('get')
+    );
+  }
+
+  #[Test]
+  public function set_modifiers_erases_static() {
+    Assert::equals(
+      new Modifiers('public'),
+      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('set')
+    );
+  }
+
+  #[Test, Expect(IllegalArgumentException::class)]
+  public function modifiers_unknown_hook() {
+    $this->declare('{ private $fixture; }')->property('fixture')->modifiers('@unknown');
   }
 
   #[Test]
@@ -226,5 +270,39 @@ class PropertiesTest {
     } catch (AccessingFailed $expected) {
       Assert::equals($t->property('fixture'), $expected->target());
     }
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public protected(set)', 'public private(set)', 'protected private(set)'])]
+  public function asymmetric_visibility($modifiers) {
+    $t= $this->declare('{ '.$modifiers.' int $fixture; }');
+    Assert::equals(
+      $modifiers.' int $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public', 'protected', 'private'])]
+  public function set_implicit_when_same_as_get($modifier) {
+    $t= $this->declare('{ '.$modifier.' '.$modifier.'(set) int $fixture; }');
+    Assert::equals(
+      $modifier.' int $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public', 'protected', 'private'])]
+  public function asymmetric_get($modifier) {
+    Assert::equals(
+      new Modifiers($modifier),
+      $this->declare('{ '.$modifier.' private(set) int $fixture; }')->property('fixture')->modifiers('get')
+    );
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public', 'protected', 'private'])]
+  public function asymmetric_set($modifier) {
+    Assert::equals(
+      new Modifiers($modifier),
+      $this->declare('{ public '.$modifier.'(set) int $fixture; }')->property('fixture')->modifiers('set')
+    );
   }
 }

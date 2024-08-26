@@ -15,6 +15,9 @@ class ModifiersTest {
     yield [Modifiers::IS_PRIVATE, 'private'];
     yield [Modifiers::IS_NATIVE, 'native'];
     yield [Modifiers::IS_READONLY, 'readonly'];
+    yield [Modifiers::IS_PRIVATE_SET, 'private(set)'];
+    yield [Modifiers::IS_PROTECTED_SET, 'protected(set)'];
+    yield [Modifiers::IS_PUBLIC_SET, 'public(set)'];
     yield [Modifiers::IS_FINAL | Modifiers::IS_PUBLIC, 'public final'];
     yield [Modifiers::IS_ABSTRACT | Modifiers::IS_PUBLIC, 'public abstract'];
     yield [Modifiers::IS_ABSTRACT | Modifiers::IS_PROTECTED, 'protected abstract'];
@@ -81,6 +84,36 @@ class ModifiersTest {
   #[Test, Values([['readonly', true], ['public', false]])]
   public function isReadonly($input, $expected) {
     Assert::equals($expected, (new Modifiers($input))->isReadonly());
+  }
+
+  #[Test, Values([['public(set)', true], ['public', true]])]
+  public function isPublicGet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isPublic('get'));
+  }
+
+  #[Test, Values([['protected(set)', false], ['protected', true]])]
+  public function isProtectedGet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isProtected('get'));
+  }
+
+  #[Test, Values([['private(set)', false], ['private', true]])]
+  public function isPrivateGet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isPrivate('get'));
+  }
+
+  #[Test, Values([['public(set)', true], ['public', false]])]
+  public function isPublicSet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isPublic('set'));
+  }
+
+  #[Test, Values([['protected(set)', true], ['protected', false]])]
+  public function isProtectedSet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isProtected('set'));
+  }
+
+  #[Test, Values([['private(set)', true], ['private', false]])]
+  public function isPrivateSet($input, $expected) {
+    Assert::equals($expected, (new Modifiers($input))->isPrivate('set'));
   }
 
   #[Test]
