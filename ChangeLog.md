@@ -26,6 +26,11 @@ XP Reflection ChangeLog
   the latest PHP 7 version. Minimum PHP version required is now **7.4**!
   (@thekid)
 
+## 2.15.0 / 2024-08-27
+
+* Backport PR #43, asymmetric visibility for properties - @thekid
+* Backport PR #41, `lang.reflection.Type::declaredName()` - @thekid
+
 ## 2.14.1 / 2023-09-30
 
 * Fixed `FromAttributes::imports()` for classes created inside `eval`
