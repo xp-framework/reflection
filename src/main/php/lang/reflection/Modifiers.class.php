@@ -15,13 +15,13 @@ class Modifiers implements Value {
   const IS_PROTECTED     = MODIFIER_PROTECTED;
   const IS_PRIVATE       = MODIFIER_PRIVATE;
   const IS_READONLY      = MODIFIER_READONLY;
-  const IS_PUBLIC_SET    = 0x0400;
-  const IS_PROTECTED_SET = 0x0800;
-  const IS_PRIVATE_SET   = 0x1000;
-  const IS_NATIVE        = 0x10000;
+  const IS_PROTECTED_SET = 0x0000800;
+  const IS_PRIVATE_SET   = 0x0001000;
+  const IS_PUBLIC_SET    = 0x1000000; // XP only
+  const IS_NATIVE        = 0x2000000; // XP only
 
-  const GET_MASK         = 0x0007; // PUBLIC | PROTECTED | PRIVATE
-  const SET_MASK         = 0x1c00; // PUBLIC_SET | PROTECTED_SET | PRIVATE_SET
+  const GET_MASK         = self::IS_PUBLIC | self::IS_PROTECTED | self::IS_PRIVATE;
+  const SET_MASK         = self::IS_PUBLIC_SET | self::IS_PROTECTED_SET | self::IS_PRIVATE_SET;
 
   private static $names= [
     'public'         => self::IS_PUBLIC,
