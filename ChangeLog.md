@@ -3,6 +3,7 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Backport PR #43, asymmetric visibility for properties - @thekid
 * Backport PR #41, `lang.reflection.Type::declaredName()` - @thekid
 
 ## 2.14.1 / 2023-09-30

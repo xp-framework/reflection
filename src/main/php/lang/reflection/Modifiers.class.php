@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use lang\Value;
+use lang\{Value, IllegalArgumentException};
 
 /**
  * Type and member modifiers
@@ -8,24 +8,33 @@ use lang\Value;
  * @test lang.reflection.unittest.ModifiersTest
  */
 class Modifiers implements Value {
-  const IS_STATIC    = MODIFIER_STATIC;
-  const IS_ABSTRACT  = MODIFIER_ABSTRACT;
-  const IS_FINAL     = MODIFIER_FINAL;
-  const IS_PUBLIC    = MODIFIER_PUBLIC;
-  const IS_PROTECTED = MODIFIER_PROTECTED;
-  const IS_PRIVATE   = MODIFIER_PRIVATE;
-  const IS_READONLY  = 0x0080; // XP 10.13: MODIFIER_READONLY
-  const IS_NATIVE    = 0xF000;
+  const IS_STATIC        = MODIFIER_STATIC;
+  const IS_ABSTRACT      = MODIFIER_ABSTRACT;
+  const IS_FINAL         = MODIFIER_FINAL;
+  const IS_PUBLIC        = MODIFIER_PUBLIC;
+  const IS_PROTECTED     = MODIFIER_PROTECTED;
+  const IS_PRIVATE       = MODIFIER_PRIVATE;
+  const IS_READONLY      = MODIFIER_READONLY;
+  const IS_PUBLIC_SET    = 0x0400;
+  const IS_PROTECTED_SET = 0x0800;
+  const IS_PRIVATE_SET   = 0x1000;
+  const IS_NATIVE        = 0x10000;
+
+  const GET_MASK         = 0x0007; // PUBLIC | PROTECTED | PRIVATE
+  const SET_MASK         = 0x1c00; // PUBLIC_SET | PROTECTED_SET | PRIVATE_SET
 
   private static $names= [
-    'public'    => self::IS_PUBLIC,
-    'protected' => self::IS_PROTECTED,
-    'private'   => self::IS_PRIVATE,
-    'static'    => self::IS_STATIC,
-    'final'     => self::IS_FINAL,
-    'abstract'  => self::IS_ABSTRACT,
-    'native'    => self::IS_NATIVE,
-    'readonly'  => self::IS_READONLY,
+    'public'         => self::IS_PUBLIC,
+    'protected'      => self::IS_PROTECTED,
+    'private'        => self::IS_PRIVATE,
+    'static'         => self::IS_STATIC,
+    'final'          => self::IS_FINAL,
+    'abstract'       => self::IS_ABSTRACT,
+    'native'         => self::IS_NATIVE,
+    'readonly'       => self::IS_READONLY,
+    'public(set)'    => self::IS_PUBLIC_SET,
+    'protected(set)' => self::IS_PROTECTED_SET,
+    'private(set)'   => self::IS_PRIVATE_SET,
   ];
   private $bits;
 
@@ -45,7 +54,7 @@ class Modifiers implements Value {
     }
 
     if ($visibility && 0 === ($this->bits & (self::IS_PROTECTED | self::IS_PRIVATE))) {
-      $this->bits |= self::IS_PUBLIC;
+      $this->bits|= self::IS_PUBLIC;
     }
   }
 
@@ -58,7 +67,7 @@ class Modifiers implements Value {
   private static function parse($names) {
     $bits= 0;
     foreach ($names as $name) {
-      $bits |= self::$names[$name];
+      $bits|= self::$names[$name];
     }
     return $bits;
   }
@@ -103,19 +112,55 @@ class Modifiers implements Value {
   public function isFinal() { return 0 !== ($this->bits & self::IS_FINAL); }
 
   /** @return bool */
-  public function isPublic() { return 0 !== ($this->bits & self::IS_PUBLIC); }
-
-  /** @return bool */
-  public function isProtected() { return 0 !== ($this->bits & self::IS_PROTECTED); }
-
-  /** @return bool */
-  public function isPrivate() { return 0 !== ($this->bits & self::IS_PRIVATE); }
-
-  /** @return bool */
   public function isNative() { return 0 !== ($this->bits & self::IS_NATIVE); }
 
   /** @return bool */
   public function isReadonly() { return 0 !== ($this->bits & self::IS_READONLY); }
+
+  /**
+   * Gets whether these modifiers are public in regard to the specified hook
+   *
+   * @param  string $hook
+   * @return bool
+   * @throws lang.IllegalArgumentException
+   */
+  public function isPublic($hook= 'get') {
+    switch ($hook) {
+      case 'get': return 0 !== ($this->bits & self::IS_PUBLIC);
+      case 'set': return 0 !== ($this->bits & self::IS_PUBLIC_SET);
+      default: throw new IllegalArgumentException('Unknown hook '.$hook);
+    }
+  }
+
+  /**
+   * Gets whether these modifiers are protected in regard to the specified hook
+   *
+   * @param  string $hook
+   * @return bool
+   * @throws lang.IllegalArgumentException
+   */
+  public function isProtected($hook= 'get') {
+    switch ($hook) {
+      case 'get': return 0 !== ($this->bits & self::IS_PROTECTED);
+      case 'set': return 0 !== ($this->bits & self::IS_PROTECTED_SET);
+      default: throw new IllegalArgumentException('Unknown hook '.$hook);
+    }
+  }
+
+  /**
+   * Gets whether these modifiers are private in regard to the specified hook
+   *
+   * @param  string $hook
+   * @return bool
+   * @throws lang.IllegalArgumentException
+   */
+  public function isPrivate($hook= 'get') {
+    switch ($hook) {
+      case 'get': return 0 !== ($this->bits & self::IS_PRIVATE);
+      case 'set': return 0 !== ($this->bits & self::IS_PRIVATE_SET);
+      default: throw new IllegalArgumentException('Unknown hook '.$hook);
+    }
+  }
 
   /**
    * Compares a given value to this modifiers instance

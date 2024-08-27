@@ -25,13 +25,13 @@ class VirtualPropertiesTest {
 
   #[Test, Values(from: 'fixtures')]
   public function readonly_modifier_shown_in_string_representation($type) {
-    Assert::equals('public readonly string $fixture', $type->property('fixture')->toString());
+    Assert::equals('public readonly protected(set) string $fixture', $type->property('fixture')->toString());
   }
 
   #[Test, Values(from: 'fixtures')]
   public function virtual_property_included_in_list($type) {
     Assert::equals(
-      ['fixture' => 'public readonly'],
+      ['fixture' => 'public readonly protected(set)'],
       array_map(function($p) { return $p->modifiers()->names(); }, iterator_to_array($type->properties()))
     );
   }
