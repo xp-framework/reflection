@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Backport PR #41, `lang.reflection.Type::declaredName()` - @thekid
+
 ## 2.14.1 / 2023-09-30
 
 * Fixed `FromAttributes::imports()` for classes created inside `eval`
