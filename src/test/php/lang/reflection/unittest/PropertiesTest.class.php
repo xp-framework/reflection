@@ -54,7 +54,7 @@ class PropertiesTest {
   public function get_modifiers_erases_static() {
     Assert::equals(
       new Modifiers('public'),
-      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('get')
+      $this->declare('{ public static $fixture; }')->property('fixture')->modifiers('get')
     );
   }
 
@@ -62,7 +62,7 @@ class PropertiesTest {
   public function set_modifiers_erases_static() {
     Assert::equals(
       new Modifiers('public'),
-      $this->declare('{ public static int $fixture; }')->property('fixture')->modifiers('set')
+      $this->declare('{ public static $fixture; }')->property('fixture')->modifiers('set')
     );
   }
 
