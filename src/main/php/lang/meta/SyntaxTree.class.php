@@ -2,7 +2,7 @@
 
 use ReflectionClass;
 use lang\IllegalAccessException;
-use lang\ast\nodes\{Literal, Variable};
+use lang\ast\nodes\{Literal, Variable, InvokeExpression};
 use lang\ast\{Visitor, Type};
 
 class SyntaxTree extends Visitor {
@@ -102,8 +102,14 @@ class SyntaxTree extends Visitor {
         ? substr($c, 1)
         : (new ReflectionClass($c))->getConstant($self->member->expression)
       ;
+    } else if ($self->member instanceof InvokeExpression) {
+      $arguments= [];
+      foreach ($self->member->arguments as $key => $node) {
+        $arguments[$key]= $node->visit($this);
+      }
+      return (new ReflectionClass($c))->getMethod($self->member->expression)->invokeArgs(null, $arguments);
     } else {
-      throw new IllegalAccessException('Cannot resolve '.$type->name.'::'.$self->member->kind);
+      throw new IllegalAccessException('Cannot resolve '.$c.'::'.$self->member->kind);
     }
   }
 

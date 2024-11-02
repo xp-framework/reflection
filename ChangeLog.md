@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.3.0 / ????-??-??
+
+* Added support for static method calls in constant expressions in PHP 7.
+  This allows using first-class callables as annotation arguments.
+  (@thekid)
+
 ## 3.2.0 / 2024-08-26
 
 * Merged PR #43: Add support for asymmetric visibility for properties, see
