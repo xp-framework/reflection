@@ -272,11 +272,29 @@ class PropertiesTest {
     }
   }
 
-  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public protected(set)', 'public private(set)', 'protected private(set)'])]
-  public function asymmetric_visibility($modifiers) {
-    $t= $this->declare('{ '.$modifiers.' int $fixture; }');
+  #[Test, Condition(assert: 'self::$ASYMMETRIC')]
+  public function asymmetric_visibility() {
+    $t= $this->declare('{ public protected(set) int $fixture; }');
+    Assert::equals(
+      'public protected(set) int $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public', 'protected'])]
+  public function asymmetric_visibility_with_same_get_set_folded($modifiers) {
+    $t= $this->declare('{ '.$modifiers.' '.$modifiers.'(set) int $fixture; }');
     Assert::equals(
       $modifiers.' int $fixture',
+      $t->property('fixture')->toString()
+    );
+  }
+
+  #[Test, Condition(assert: 'self::$ASYMMETRIC'), Values(['public', 'protected'])]
+  public function asymmetric_visibility_with_private_become_final($modifiers) {
+    $t= $this->declare('{ '.$modifiers.' private(set) int $fixture; }');
+    Assert::equals(
+      $modifiers.' final private(set) int $fixture',
       $t->property('fixture')->toString()
     );
   }
