@@ -3,7 +3,7 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 3.3.0 / ????-??-??
+## 3.3.0 / 2024-11-02
 
 * Added support for static method calls in constant expressions in PHP 7.
   This allows using first-class callables as annotation arguments.
