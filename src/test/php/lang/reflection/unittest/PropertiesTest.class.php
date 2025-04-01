@@ -34,6 +34,22 @@ class PropertiesTest {
     );
   }
 
+  #[Test]
+  public function modifiers_tagged_final() {
+    Assert::equals(
+      new Modifiers(['public', 'final']),
+      $this->declare('{ /** @final */ public $fixture; }')->property('fixture')->modifiers()
+    );
+  }
+
+  #[Test, Runtime(php: '>=8.4')]
+  public function modifiers_declared_final() {
+    Assert::equals(
+      new Modifiers(['public', 'final']),
+      $this->declare('{ public final $fixture; }')->property('fixture')->modifiers()
+    );
+  }
+
   #[Test, Values(['public', 'protected', 'private'])]
   public function get_modifiers($modifier) {
     Assert::equals(

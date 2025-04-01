@@ -193,6 +193,23 @@ class MetaInformation {
   }
 
   /**
+   * Returns (non-literal) modifiers for a given property
+   *
+   * @param  \ReflectionProperty $reflect
+   * @return int
+   */
+  public function propertyModifiers($reflect) {
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
+    if ($meta= \xp::$meta[$c][0][$reflect->getName()][DETAIL_ARGUMENTS] ?? null) {
+      return (int)$meta[0];
+    } else {
+      $tags= $this->tags($reflect);
+      return $reflect->getModifiers() | (isset($tags['final']) ? MODIFIER_FINAL : 0);
+    }
+  }
+
+  /**
    * Returns annotation map (type => arguments) for a given method
    *
    * @param  \ReflectionMethod $reflect

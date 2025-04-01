@@ -56,6 +56,11 @@ class Property extends Member {
     $bits= $this->reflect->getModifiers();
     $bits & Modifiers::IS_READONLY && $bits|= Modifiers::IS_PROTECTED_SET;
 
+    // Final properties cannot be declared in PHP < 8.4, fetch from meta information
+    if (PHP_VERSION_ID <= 80400) {
+      $bits|= Reflection::meta()->propertyModifiers($this->reflect);
+    }
+
     switch ($hook) {
       case null: return new Modifiers($bits);
       case 'get': return new Modifiers(($bits & ~Modifiers::SET_MASK) & Modifiers::GET_MASK);
