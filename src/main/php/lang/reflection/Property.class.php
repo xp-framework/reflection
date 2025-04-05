@@ -53,7 +53,7 @@ class Property extends Member {
     ];
 
     // Readonly implies protected(set)
-    $bits= $this->reflect->getModifiers();
+    $bits= Reflection::meta()->propertyModifiers($this->reflect);
     $bits & Modifiers::IS_READONLY && $bits|= Modifiers::IS_PROTECTED_SET;
 
     switch ($hook) {
