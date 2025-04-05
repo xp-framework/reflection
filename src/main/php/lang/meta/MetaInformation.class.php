@@ -193,7 +193,7 @@ class MetaInformation {
   }
 
   /**
-   * Returns (non-literal) modifiers for a given property
+   * Returns modifiers for a given property, including non-declared
    *
    * @param  \ReflectionProperty $reflect
    * @return int
@@ -202,10 +202,10 @@ class MetaInformation {
     $name= $reflect->getDeclaringClass()->name;
     $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][0][$reflect->getName()][DETAIL_ARGUMENTS] ?? null) {
-      return (int)$meta[0];
+      return $reflect->getModifiers() | (int)$meta[0];
     } else {
       $tags= $this->tags($reflect);
-      return isset($tags['final']) ? MODIFIER_FINAL : 0;
+      return $reflect->getModifiers() | isset($tags['final']) ? MODIFIER_FINAL : 0;
     }
   }
 
