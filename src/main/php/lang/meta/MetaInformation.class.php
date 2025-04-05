@@ -205,7 +205,7 @@ class MetaInformation {
       return (int)$meta[0];
     } else {
       $tags= $this->tags($reflect);
-      return $reflect->getModifiers() | (isset($tags['final']) ? MODIFIER_FINAL : 0);
+      return isset($tags['final']) ? MODIFIER_FINAL : 0;
     }
   }
 
