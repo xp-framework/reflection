@@ -3,6 +3,11 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.4.0 / 2025-04-05
+
+* Merged PR #44: Implement support for final properties added in PHP 8.4
+  (@thekid)
+
 ## 3.3.0 / 2024-11-02
 
 * Added support for static method calls in constant expressions in PHP 7.
