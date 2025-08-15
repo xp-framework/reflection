@@ -170,7 +170,11 @@ class Type implements Annotated, Value {
     } else if ($this->reflect->hasMethod($function)) {
       $reflect= $this->reflect->getMethod($function);
       return new Initializer($this->reflect, $reflect, function($instance, $args) use($reflect) {
-        $reflect->setAccessible(true);
+
+        // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
+        // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
+        PHP_VERSION_ID < 80100 && $reflect->setAccessible(true);
+
         return $reflect->invokeArgs($instance, $args);
       });
     }

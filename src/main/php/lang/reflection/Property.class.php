@@ -77,7 +77,7 @@ class Property extends Member {
 
       // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
       // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
-      $this->reflect->setAccessible(true);
+      PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
       return $this->reflect->getValue($instance);
     } catch (ReflectionException $e) {
       throw new CannotAccess($this, $e);
@@ -100,7 +100,7 @@ class Property extends Member {
 
       // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
       // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
-      $this->reflect->setAccessible(true);
+      PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
       $this->reflect->setValue($instance, $value);
       return $value;
     } catch (ReflectionException $e) {
