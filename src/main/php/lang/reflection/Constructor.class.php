@@ -42,7 +42,11 @@ class Constructor extends Routine implements Instantiation {
       // invoke after creating an instance without invoking the constructor.
       if (!$this->reflect->isPublic()) {
         $instance= $this->class->newInstanceWithoutConstructor();
-        $this->reflect->setAccessible(true);
+
+        // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
+        // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
+        PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
+
         $this->reflect->invokeArgs($instance, $pass);
         return $instance;
       } else {
