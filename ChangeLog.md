@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.4.1 / 2025-08-15
+
+* Fixed PHP 8.5 compatibility, see xp-framework/test#24 - @thekid
+
 ## 3.4.0 / 2025-04-05
 
 * Merged PR #44: Implement support for final properties added in PHP 8.4
