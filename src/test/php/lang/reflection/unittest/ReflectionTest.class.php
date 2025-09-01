@@ -34,6 +34,11 @@ class ReflectionTest {
     Assert::instance(Package::class, Reflection::of('lang.reflection.unittest'));
   }
 
+  #[Test]
+  public function package() {
+    Assert::instance(Package::class, Reflection::package('lang.reflection.unittest'));
+  }
+
   #[Test, Values([70000, 70100, 70200, 70300, 70400])]
   public function parser_for_php7($versionId) {
     Assert::instance(FromSyntaxTree::class, Reflection::annotations($versionId));

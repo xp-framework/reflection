@@ -2,7 +2,7 @@
 
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\{Type, Package};
-use lang\{ClassLoader, ClassNotFoundException};
+use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
 
 /**
  * Factory for reflection instances.
@@ -54,6 +54,22 @@ abstract class Reflection {
         throw new ClassNotFoundException($arg, [ClassLoader::getDefault()]);
       }
     }
+  }
+
+  /**
+   * Returns a reflection package for a given argument.
+   *
+   * @param  string
+   * @return lang.reflection.Type
+   * @throws lang.IllegalArgumentException
+   */
+  public static function package($arg) {
+    $cl= ClassLoader::getDefault();
+    $name= strtr($arg, '\\', '.');
+    if ($cl->providesPackage($name)) {
+      return new Package($name);
+    }
+    throw new IllegalArgumentException('No package named '.$name);
   }
 
   /**
