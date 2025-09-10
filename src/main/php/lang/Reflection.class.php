@@ -59,17 +59,28 @@ abstract class Reflection {
   /**
    * Returns a reflection package for a given argument.
    *
-   * @param  string
+   * @param  string|object|lang.XPClass|lang.reflection.Type|ReflectionClass $arg
    * @return lang.reflection.Type
    * @throws lang.IllegalArgumentException
    */
   public static function package($arg) {
-    $cl= ClassLoader::getDefault();
-    $name= strtr($arg, '\\', '.');
-    if ($cl->providesPackage($name)) {
-      return new Package($name);
+    if ($arg instanceof XPClass) {
+      return new Package($arg->getPackage()->getName());
+    } else if ($arg instanceof \ReflectionClass) {
+      return new Package($arg->getNamespaceName());
+    } else if ($arg instanceof Type) {
+      return $arg->package();
+    } else if (is_object($arg)) {
+      $class= get_class($arg);
+      return new Package(substr($class, 0, strrpos($class, '\\')));
+    } else {
+      $cl= ClassLoader::getDefault();
+      $name= strtr($arg, '\\', '.');
+      if ($cl->providesPackage($name)) {
+        return new Package($name);
+      }
+      throw new IllegalArgumentException('No package named '.$name);
     }
-    throw new IllegalArgumentException('No package named '.$name);
   }
 
   /**
