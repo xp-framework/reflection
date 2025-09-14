@@ -122,6 +122,21 @@ class Package implements Value {
     throw new IllegalArgumentException('Given type '.$type.' is not in package '.$this->name);
   }
 
+  /**
+   * Returns an implementation for a given type
+   *
+   * @param  string|lang.reflection.Type $type
+   * @param  string $name
+   * @return lang.reflection.Type
+   * @throws lang.IllegalArgumentException
+   */
+  public function implementation($type, $name) {
+    $impl= $this->type($name);
+    if ($impl->is($type)) return $impl;
+
+    throw new IllegalArgumentException('Given type '.$impl->name().' is not an implementation of '.$type);
+  }
+
   /** @return string */
   public function hashCode() { return md5($this->name); }
 
