@@ -5,6 +5,7 @@ XP Reflection ChangeLog
 
 ## 3.5.0 / 2025-09-14
 
+* Merged PR #47: Implement `Package::implementation()` (see #15) - @thekid
 * Merged PR #45: Add `Reflection::package()` utility method - @thekid
 * Merged PR #46: Add `Package::child()` to return child packages - @thekid
 
