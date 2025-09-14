@@ -1,10 +1,19 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\IllegalArgumentException;
 use lang\reflection\Package;
+use lang\reflection\unittest\fixture\{Instruction, CreateInstruction};
+use lang\{Reflection, IllegalArgumentException};
 use test\{Assert, Expect, Test, Values};
 
 class PackageTest {
+  const FIXTURES= 'lang.reflection.unittest.fixture';
+
+  /** @return iterable */
+  private function instructions() {
+    yield [Instruction::class, 'class literal'];
+    yield ['lang.reflection.unittest.fixture.Instruction', 'class name'];
+    yield [Reflection::type(Instruction::class), 'type'];
+  }
 
   #[Test, Values(['lang.reflection', 'lang\reflection', 'lang.reflection.'])]
   public function name($arg) {
@@ -101,5 +110,31 @@ class PackageTest {
   #[Test, Expect(class: IllegalArgumentException::class, message: 'Given type util.Date is not in package lang')]
   public function type_with_namespace() {
     (new Package('lang'))->type('util.Date');
+  }
+
+  #[Test, Values(from: 'instructions')]
+  public function implementation_by_name($type) {
+    Assert::equals(
+      Reflection::type(CreateInstruction::class),
+      (new Package(self::FIXTURES))->implementation($type, 'CreateInstruction')
+    );
+  }
+
+  #[Test, Values(from: 'instructions')]
+  public function implementation_by_class($type) {
+    Assert::equals(
+      Reflection::type(CreateInstruction::class),
+      (new Package(self::FIXTURES))->implementation($type, CreateInstruction::class)
+    );
+  }
+
+  #[Test, Expect(class: IllegalArgumentException::class, message: '/Given type util.Date is not in package .+/')]
+  public function implementation_not_in_package() {
+    (new Package(self::FIXTURES))->implementation(Instruction::class, 'util.Date');
+  }
+
+  #[Test, Expect(class: IllegalArgumentException::class, message: '/Given type .+ is not an implementation of lang.Runnable/')]
+  public function not_an_implementation() {
+    (new Package(self::FIXTURES))->implementation('lang.Runnable', 'CreateInstruction');
   }
 }
