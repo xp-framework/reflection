@@ -3,8 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
-## 3.5.0 / ????-??-??
+## 3.5.0 / 2025-09-14
 
+* Merged PR #45: Add `Reflection::package()` utility method - @thekid
 * Merged PR #46: Add `Package::child()` to return child packages - @thekid
 
 ## 3.4.1 / 2025-08-15
