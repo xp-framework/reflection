@@ -98,6 +98,7 @@ abstract class Routine extends Member {
     foreach ($reflect->getParameters() as $i => $param) {
       if ($param->isVariadic()) {
         while ($args) $pass[]= array_shift($args);
+        break;
       } else if (isset($args[$param->name])) {
         $pass[]= $args[$param->name];
         unset($args[$param->name]);
