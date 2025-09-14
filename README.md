@@ -187,6 +187,7 @@ $package->literal();       // 'org\example'
 $package->type('Fixture'); // Type instance
 $package->types();         // iterable with Type instances
 $package->parent()         // Package or NULL
+$package->child('impl')    // Child package "org.example.impl" or NULL
 $package->children();      // iterable with Package instances
 $package->classLoaders();  // iterable with lang.ClassLoader instances
 ```

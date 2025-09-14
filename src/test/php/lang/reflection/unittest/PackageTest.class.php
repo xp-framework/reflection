@@ -52,6 +52,27 @@ class PackageTest {
   }
 
   #[Test]
+  public function non_existant_child() {
+    Assert::null((new Package())->child('lang.non_existant_package'));
+  }
+
+  #[Test, Values(['reflection.unittest', 'reflection\\unittest'])]
+  public function resolve_child($reference) {
+    Assert::equals(
+      new Package('lang.reflection.unittest'),
+      (new Package('lang'))->child($reference)
+    );
+  }
+
+  #[Test, Values(['lang.reflection.unittest', 'lang\\reflection\\unittest'])]
+  public function toplevel_child($reference) {
+    Assert::equals(
+      new Package('lang.reflection.unittest'),
+      (new Package())->child($reference)
+    );
+  }
+
+  #[Test]
   public function children() {
     Assert::equals(
       [new Package('lang.reflection.unittest')],

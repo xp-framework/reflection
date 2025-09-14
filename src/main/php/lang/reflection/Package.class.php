@@ -55,6 +55,21 @@ class Package implements Value {
   }
 
   /**
+   * Returns a child package with a given name. Returns NULL if the child package
+   * does not exist.
+   *
+   * @return ?self
+   */
+  public function child(string $name) {
+    $child= ($this->name ? $this->name.'.' : '').strtr($name, '\\', '.');
+    if (ClassLoader::getDefault()->providesPackage($child)) {
+      return new self($child);
+    } else {
+      return null;
+    }
+  }
+
+  /**
    * Returns this package's child packages
    *
    * @return iterable
