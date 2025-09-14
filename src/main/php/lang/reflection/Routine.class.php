@@ -3,7 +3,11 @@
 use Error, ReflectionException, ReflectionUnionType, ReflectionIntersectionType;
 use lang\{Reflection, Type, TypeUnion};
 
-/** Base class for methods and constructors */
+/**
+ * Base class for methods and constructors
+ *
+ * @test  lang.reflection.unittest.ArgumentPassingTest
+ */
 abstract class Routine extends Member {
 
   /** @return [:var] */
@@ -90,23 +94,29 @@ abstract class Routine extends Member {
 
   /** Support named arguments for PHP 7.X */
   public static function pass($reflect, $args) {
-    if (is_string(key($args))) {
-      $pass= [];
-      foreach ($reflect->getParameters() as $param) {
-        if (isset($args[$param->name])) {
-          $pass[]= $args[$param->name];
-        } else if ($param->isOptional()) {
-          $pass[]= $param->getDefaultValue();
-        } else {
-          throw new ReflectionException('Missing parameter $'.$param->name);
-        }
+    $pass= [];
+    foreach ($reflect->getParameters() as $i => $param) {
+      if ($param->isVariadic()) {
+        while ($args) $pass[]= array_shift($args);
+        break;
+      } else if (array_key_exists($param->name, $args)) {
+        $pass[]= $args[$param->name];
         unset($args[$param->name]);
+      } else if (array_key_exists($i, $args)) {
+        $pass[]= $args[$i];
+        unset($args[$i]);
+      } else if ($param->isOptional()) {
+        $pass[]= $param->getDefaultValue();
+      } else {
+        throw new ReflectionException('Missing parameter $'.$param->name);
       }
-      if ($args) {
-        throw new Error('Unknown named parameter $'.key($args));
-      }
-      return $pass;
     }
-    return $args;
+
+    // Check for excess named parameters
+    if ($args && is_string($excess= key($args))) {
+      throw new Error('Unknown named parameter $'.$excess);
+    }
+
+    return $pass;
   }
 }
