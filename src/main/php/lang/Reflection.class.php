@@ -78,6 +78,8 @@ abstract class Reflection {
       $name= strtr($arg, '\\', '.');
       if ($cl->providesPackage($name)) {
         return new Package($name);
+      } else if ($cl->providesClass($name)) {
+        return new Package(substr($name, 0, strrpos($name, '.')));
       }
       throw new IllegalArgumentException('No package named '.$name);
     }

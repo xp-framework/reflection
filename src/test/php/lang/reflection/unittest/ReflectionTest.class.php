@@ -23,6 +23,8 @@ class ReflectionTest {
   private function packages() {
     yield [__NAMESPACE__, 'namespace literal'];
     yield ['lang.reflection.unittest', 'namespace name'];
+    yield [self::class, 'class literal'];
+    yield [nameof($this), 'class name'];
     yield [$this, 'instance'];
     yield [Type::forName(self::class), 'type'];
     yield [Reflection::of(self::class), 'reflection'];
