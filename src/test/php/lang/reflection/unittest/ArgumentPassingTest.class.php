@@ -49,6 +49,12 @@ class ArgumentPassingTest {
     Assert::equals([1, 2], Routine::pass($f, ['b' => 2, 'a' => 1]));
   }
 
+  #[Test]
+  public function omit_optional() {
+    $f= new ReflectionFunction(fn($a, $b= 0, $c= 0) => null);
+    Assert::equals([1, 0, 2], Routine::pass($f, ['a' => 1, 'c' => 2]));
+  }
+
   #[Test, Expect(class: Error::class, message: 'Missing parameter $b')]
   public function missing_named() {
     $f= new ReflectionFunction(fn($a, $b) => null);
