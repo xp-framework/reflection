@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.5.0 / ????-??-??
+
+* Merged PR #46: Add `Package::child()` to return child packages - @thekid
+
 ## 3.4.1 / 2025-08-15
 
 * Fixed PHP 8.5 compatibility, see xp-framework/test#24 - @thekid
