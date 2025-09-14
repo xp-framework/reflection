@@ -19,6 +19,19 @@ class ReflectionTest {
     yield [new ReflectionObject($this), 'reflection object'];
   }
 
+  /** @return iterable */
+  private function packages() {
+    yield [__NAMESPACE__, 'namespace literal'];
+    yield ['lang.reflection.unittest', 'namespace name'];
+    yield [self::class, 'class literal'];
+    yield [nameof($this), 'class name'];
+    yield [$this, 'instance'];
+    yield [Type::forName(self::class), 'type'];
+    yield [Reflection::of(self::class), 'reflection'];
+    yield [new ReflectionClass($this), 'reflection class'];
+    yield [new ReflectionObject($this), 'reflection object'];
+  }
+
   #[Test, Values(from: 'arguments')]
   public function of($argument) {
     Assert::equals(nameof($this), Reflection::of($argument)->name());
@@ -27,6 +40,11 @@ class ReflectionTest {
   #[Test, Values(from: 'arguments')]
   public function type($argument) {
     Assert::equals(nameof($this), Reflection::type($argument)->name());
+  }
+
+  #[Test, Values(from: 'packages')]
+  public function package($argument) {
+    Assert::equals(new Package('lang.reflection.unittest'), Reflection::package($argument));
   }
 
   #[Test]
