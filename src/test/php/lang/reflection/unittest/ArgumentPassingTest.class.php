@@ -13,6 +13,12 @@ class ArgumentPassingTest {
     Assert::equals([1, 2], Routine::pass($f, [1, 2]));
   }
 
+  #[Test]
+  public function pass_ordered_null() {
+    $f= new ReflectionFunction(fn($a, $b) => null);
+    Assert::equals([null, 2], Routine::pass($f, [null, 2]));
+  }
+
   #[Test, Expect(class: Error::class, message: 'Missing parameter $a')]
   public function missing() {
     $f= new ReflectionFunction(fn($a, $b) => null);
@@ -29,6 +35,12 @@ class ArgumentPassingTest {
   public function pass_named() {
     $f= new ReflectionFunction(fn($a, $b) => null);
     Assert::equals([1, 2], Routine::pass($f, ['a' => 1, 'b' => 2]));
+  }
+
+  #[Test]
+  public function pass_named_null() {
+    $f= new ReflectionFunction(fn($a, $b) => null);
+    Assert::equals([null, 2], Routine::pass($f, ['a' => null, 'b' => 2]));
   }
 
   #[Test]

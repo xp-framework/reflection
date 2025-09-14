@@ -99,10 +99,10 @@ abstract class Routine extends Member {
       if ($param->isVariadic()) {
         while ($args) $pass[]= array_shift($args);
         break;
-      } else if (isset($args[$param->name])) {
+      } else if (array_key_exists($param->name, $args)) {
         $pass[]= $args[$param->name];
         unset($args[$param->name]);
-      } else if (isset($args[$i])) {
+      } else if (array_key_exists($i, $args)) {
         $pass[]= $args[$i];
         unset($args[$i]);
       } else if ($param->isOptional()) {
