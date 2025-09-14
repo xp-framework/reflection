@@ -164,14 +164,14 @@ if ($parameters->accept($args)) {
 }
 
 foreach ($parameters as $name => $parameter) {
-  $parameter->position();                 // 0
-  $parameter->name();                     // 'arg'
-  $parameter->variadic();                 // false
-  $parameter->optional();                 // true
-  $parameter->default();                  // (parameter default value)
-  $parameter->constraint();               // Constraint
-  $parameter->annotations();              // Annotations
-  $parameter->annotation(Inject::class)   // Annotation or NULL
+  $parameter->position();                  // 0
+  $parameter->name();                      // 'arg'
+  $parameter->variadic();                  // false
+  $parameter->optional();                  // true
+  $parameter->default();                   // (parameter default value)
+  $parameter->constraint();                // Constraint
+  $parameter->annotations();               // Annotations
+  $parameter->annotation(Inject::class)    // Annotation or NULL
 }
 ```
 
@@ -182,12 +182,13 @@ use lang\Reflection;
 
 $package= Reflection::of('org.example');
 
-$package->name();          // org.example
-$package->literal();       // 'org\example'
-$package->type('Fixture'); // Type instance
-$package->types();         // iterable with Type instances
-$package->parent()         // Package or NULL
-$package->child('impl')    // Child package "org.example.impl" or NULL
-$package->children();      // iterable with Package instances
-$package->classLoaders();  // iterable with lang.ClassLoader instances
+$package->name();                          // org.example
+$package->literal();                       // 'org\example'
+$package->type('Fixture');                 // Type instance
+$package->implementation($t, 'Fixture');   // Type instance (subclass of $t)
+$package->types();                         // iterable with Type instances
+$package->parent()                         // Package or NULL
+$package->child('impl')                    // Child package "org.example.impl" or NULL
+$package->children();                      // iterable with Package instances
+$package->classLoaders();                  // iterable with lang.ClassLoader instances
 ```
