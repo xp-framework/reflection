@@ -99,12 +99,12 @@ class PackageTest {
 
   #[Test]
   public function type_via_short_name() {
-    Assert::equals(self::class, (new Package(__NAMESPACE__))->type('PackageTest')->literal());
+    Assert::equals(Reflection::type(self::class), (new Package(__NAMESPACE__))->type('PackageTest'));
   }
 
   #[Test]
   public function type_via_full_name() {
-    Assert::equals(self::class, (new Package(__NAMESPACE__))->type(self::class)->literal());
+    Assert::equals(Reflection::type(self::class), (new Package(__NAMESPACE__))->type(self::class));
   }
 
   #[Test, Expect(class: IllegalArgumentException::class, message: 'Given type util.Date is not in package lang')]
