@@ -72,4 +72,16 @@ class ArgumentPassingTest {
     $f= new ReflectionFunction(fn($a, $b= 0) => null);
     Assert::equals([1, 0], Routine::pass($f, [1]));
   }
+
+  #[Test]
+  public function pass_variadic() {
+    $f= new ReflectionFunction(fn(... $a) => null);
+    Assert::equals([1, 2], Routine::pass($f, [1, 2]));
+  }
+
+  #[Test]
+  public function pass_variadic_after() {
+    $f= new ReflectionFunction(fn($a, ... $b) => null);
+    Assert::equals([1, 2, 3], Routine::pass($f, [1, 2, 3]));
+  }
 }

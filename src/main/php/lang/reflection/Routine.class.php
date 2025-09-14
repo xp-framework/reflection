@@ -96,7 +96,9 @@ abstract class Routine extends Member {
   public static function pass($reflect, $args) {
     $pass= [];
     foreach ($reflect->getParameters() as $i => $param) {
-      if (isset($args[$param->name])) {
+      if ($param->isVariadic()) {
+        while ($args) $pass[]= array_shift($args);
+      } else if (isset($args[$param->name])) {
         $pass[]= $args[$param->name];
         unset($args[$param->name]);
       } else if (isset($args[$i])) {
