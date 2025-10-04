@@ -1,9 +1,10 @@
 <?php namespace lang\reflection\unittest;
 
 use ReflectionFunction;
+use lang\reflection\unittest\fixture\Schemas;
 use lang\reflection\{Annotation, CannotInstantiate, InvocationFailed};
 use lang\{IllegalStateException, Reflection, XPClass};
-use test\{Assert, Expect, Test, Values};
+use test\{Assert, Before, Expect, Test, Values};
 
 class AnnotationTest {
   use TypeDefinition;
@@ -417,5 +418,20 @@ class AnnotationTest {
       [Annotated::class => [], Parameterized::class => [1, 2]],
       $t->annotations()->all($type)
     );
+  }
+
+  #[Test]
+  public function used_from_trait() {
+    $t= Reflection::type(Schemas::class);
+
+    foreach ($t->methods() as $name => $method) {
+      $annotations= [];
+      foreach ($method->annotations() as $type => $annotation) {
+        $annotations[$type]= $annotation->arguments();
+      }
+      $actual[$name]= $annotations;
+    }
+
+    Assert::equals(['fixture' => [Before::class => []], 'dialect' => [Before::class => []]], $actual);
   }
 }
