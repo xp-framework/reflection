@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ArgumentCountError, TypeError, ReflectionClass, ReflectionException, ReflectionFunction, Throwable;
+use ArgumentCountError, TypeError, UnitEnum, ReflectionClass, ReflectionException, ReflectionFunction, Throwable;
 use lang\{Reflection, Enum, XPClass, Value, VirtualProperty, IllegalArgumentException};
 
 /**
@@ -54,7 +54,7 @@ class Type implements Annotated, Value {
       return Kind::$INTERFACE;
     } else if ($this->reflect->isTrait()) {
       return Kind::$TRAIT;
-    } else if ($this->reflect->isSubclassOf(Enum::class) || $this->reflect->isSubclassOf(\UnitEnum::class)) {
+    } else if ($this->reflect->isSubclassOf(Enum::class) || $this->reflect->isSubclassOf(UnitEnum::class)) {
       return Kind::$ENUM;
     } else {
       return Kind::$CLASS;
