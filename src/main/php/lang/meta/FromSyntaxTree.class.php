@@ -37,7 +37,7 @@ class FromSyntaxTree {
   }
 
   /** Returns the syntax tree for a given type using a cache */
-  private function treeOf($reflect, $class, $file) {
+  private function treeOf($class, $file) {
     if (null === ($tree= $this->cache[$file] ?? null)) {
       $this->cache[$file]= $tree= self::$lang->parse(new Tokens(file_get_contents($file), $file))->tree();
       if (sizeof($this->cache) > self::CACHE_SIZE) unset($this->cache[key($this->cache)]);
@@ -147,7 +147,7 @@ class FromSyntaxTree {
   }
 
   public function evaluate($arg, $code) {
-    $tree= $arg instanceof SyntaxTree ? $arg : $this->treeOf($arg, $arg, $arg->getFileName());
+    $tree= $arg instanceof SyntaxTree ? $arg : $this->treeOf($arg, $arg->getFileName());
     $parsed= self::parse($code, $tree->resolver())->tree()->children();
     if (1 === sizeof($parsed)) {
       return $parsed[0]->visit($tree);
@@ -190,7 +190,7 @@ class FromSyntaxTree {
   }
 
   public function imports($reflect) {
-    $resolver= $this->treeOf($reflect, $reflect, $reflect->getFileName())->resolver();
+    $resolver= $this->treeOf($reflect, $reflect->getFileName())->resolver();
     $imports= [];
     foreach ($resolver->imports as $alias => $type) {
       $imports[$alias]= ltrim($type, '\\');
@@ -200,34 +200,34 @@ class FromSyntaxTree {
 
   /** @return iterable */
   public function ofType($reflect) {
-    $tree= $this->treeOf($reflect, $reflect, $reflect->getFileName());
+    $tree= $this->treeOf($reflect, $reflect->getFileName());
     return $this->annotations($tree, $tree->type());      
   }
 
   /** @return iterable */
   public function ofConstant($reflect) {
     $class= $reflect->getDeclaringClass();
-    $tree= $this->treeOf($reflect, $class, $class->getFileName());
+    $tree= $this->treeOf($class, $class->getFileName());
     return $this->annotations($tree, $tree->type()->constant($reflect->name));
   }
 
   /** @return iterable */
   public function ofProperty($reflect) {
     $class= $reflect->getDeclaringClass();
-    $tree= $this->treeOf($reflect, $class, $class->getFileName());
+    $tree= $this->treeOf($class, $class->getFileName());
     return $this->annotations($tree, $tree->type()->property($reflect->name));
   }
 
   /** @return iterable */
   public function ofMethod($reflect) {
-    $tree= $this->treeOf($reflect, $reflect->getDeclaringClass(), $reflect->getFileName());
+    $tree= $this->treeOf($reflect->getDeclaringClass(), $reflect->getFileName());
     return $this->annotations($tree, $tree->type()->method($reflect->name));
   }
 
   /** @return iterable */
   public function ofParameter($method, $reflect) {
     $class= $reflect->getDeclaringClass();
-    $tree= $this->treeOf($reflect, $reflect->getDeclaringClass(), $class->getMethod($method->name)->getFileName());
+    $tree= $this->treeOf($class, $class->getMethod($method->name)->getFileName());
     return $this->annotations($tree, $tree->type()
       ->method($method->name)
       ->signature
