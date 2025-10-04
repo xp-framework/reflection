@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.5.1 / 2025-10-04
+
+* Merged PR #49: (PHP 7.4 only) Fix annotation in trait methods not being
+  picked up correctly
+  (@thekid)
+
 ## 3.5.0 / 2025-09-14
 
 * Merged PR #48: Fix mixing named and unnamed parameters in PHP 7 - @thekid
