@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use lang\Reflection;
+use lang\{Reflection, Runnable};
 use test\{Assert, Test};
 
 class AnonymousClassTest {
@@ -20,5 +20,26 @@ class AnonymousClassTest {
     });
 
     Assert::equals(Test::class, $type->method('fixture')->annotation(Test::class)->type());
+  }
+
+  #[Test]
+  public function newinstance_string() {
+    $type= Reflection::type(newinstance(Runnable::class, [], '{
+
+      #[\test\Test]
+      public function run() { }
+    }'));
+
+    Assert::equals(Test::class, $type->method('run')->annotation(Test::class)->type());
+  }
+
+  #[Test]
+  public function newinstance_map() {
+    $type= Reflection::type(newinstance(Runnable::class, [], [
+
+      '#[\test\Test] run' => function() { }
+    ]));
+
+    Assert::equals(Test::class, $type->method('run')->annotation(Test::class)->type());
   }
 }
