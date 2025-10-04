@@ -12,18 +12,18 @@ class AnonymousClassTest {
 
   /** @see https://github.com/xp-framework/reflection/issues/33 */
   #[Test]
-  public function annotation() {
-    $type= Reflection::type(new class() {
+  public function annotation_on_new_class() {
+    $type= Reflection::type(new class() implements Runnable {
 
       #[Test]
-      public function fixture() { }
+      public function run() { }
     });
 
-    Assert::equals(Test::class, $type->method('fixture')->annotation(Test::class)->type());
+    Assert::equals(Test::class, $type->method('run')->annotation(Test::class)->type());
   }
 
   #[Test]
-  public function newinstance_string() {
+  public function annotation_on_newinstance_string() {
     $type= Reflection::type(newinstance(Runnable::class, [], '{
 
       #[\test\Test]
@@ -34,7 +34,7 @@ class AnonymousClassTest {
   }
 
   #[Test]
-  public function newinstance_map() {
+  public function annotation_on_newinstance_map() {
     $type= Reflection::type(newinstance(Runnable::class, [], [
 
       '#[\test\Test] run' => function() { }
