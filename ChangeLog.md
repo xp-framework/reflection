@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Made compatible with `xp-framework/ast` version 12.0.0 - adding support
+  for parsing partial function application syntax.
+  (@thekid)
 * Added PHP 8.6 to the test matrix and no longer allow PHP 8.5 to fail
   (@thekid)
 
