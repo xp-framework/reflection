@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.6.0 / 2026-02-14
+
 * Made compatible with `xp-framework/ast` version 12.0.0 - adding support
   for parsing partial function application syntax.
   (@thekid)
