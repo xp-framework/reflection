@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Added PHP 8.6 to the test matrix and no longer allow PHP 8.5 to fail
+  (@thekid)
+
 ## 3.5.1 / 2025-10-04
 
 * Merged PR #49: (PHP 7.4 only) Fix annotation in trait methods not being
