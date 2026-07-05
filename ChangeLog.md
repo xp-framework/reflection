@@ -3,6 +3,12 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.7.0 / 2026-07-05
+
+* Made compatible with `xp-framework/ast` version 13.0.0 - adding support
+  for promoted parameters with property hooks, see xp-framework/ast#64
+  (@thekid)
+
 ## 3.6.0 / 2026-02-14
 
 * Made compatible with `xp-framework/ast` version 12.0.0 - adding support
