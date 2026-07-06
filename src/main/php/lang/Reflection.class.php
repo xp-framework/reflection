@@ -1,6 +1,6 @@
 <?php namespace lang;
 
-use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
+use lang\meta\{MetaInformation, FromAttributes};
 use lang\reflection\{Type, Package};
 use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
 
@@ -22,13 +22,9 @@ use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
 abstract class Reflection {
   private static $meta= null;
 
-  public static function annotations($version) {
-    return $version >= 80000 ? new FromAttributes() : new FromSyntaxTree();
-  }
-
   /** Lazy-loads meta information extraction */
   public static function meta(): MetaInformation {
-    return self::$meta ?? self::$meta= new MetaInformation(self::annotations(PHP_VERSION_ID));
+    return self::$meta ?? self::$meta= new MetaInformation(new FromAttributes());
   }
 
   /**
