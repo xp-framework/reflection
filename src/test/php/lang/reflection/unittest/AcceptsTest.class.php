@@ -161,37 +161,33 @@ class AcceptsTest {
     yield [$t, ['test', 1], null, false];
     yield [$t, ['test', 'works'], null, true];
 
-    if (PHP_VERSION_ID >= 70100) {
-      $t= $this->type('<T>(?string $arg)');
-      yield [$t, [], null, false];
-      yield [$t, [null], null, true];
-      yield [$t, ['test'], null, true];
-      yield [$t, [$this], null, false];
-    }
+    $t= $this->type('<T>(?string $arg)');
+    yield [$t, [], null, false];
+    yield [$t, [null], null, true];
+    yield [$t, ['test'], null, true];
+    yield [$t, [$this], null, false];
 
-    if (PHP_VERSION_ID >= 80000) {
-      $t= $this->type('<T>(string|int $arg)');
-      yield [$t, [1], null, true];
-      yield [$t, ['test'], null, true];
-      yield [$t, [$this], null, false];
+    $t= $this->type('<T>(string|int $arg)');
+    yield [$t, [1], null, true];
+    yield [$t, ['test'], null, true];
+    yield [$t, [$this], null, false];
 
-      $t= $this->type('<T>(string|int|null $arg)');
-      yield [$t, [1], null, true];
-      yield [$t, ['test'], null, true];
-      yield [$t, [null], null, true];
-      yield [$t, [$this], null, false];
+    $t= $this->type('<T>(string|int|null $arg)');
+    yield [$t, [1], null, true];
+    yield [$t, ['test'], null, true];
+    yield [$t, [null], null, true];
+    yield [$t, [$this], null, false];
 
-      $t= $this->type('<T>(string|int... $arg)');
-      yield [$t, ['test'], null, true];
-      yield [$t, ['test', 1], null, true];
-      yield [$t, ['test', $this], null, false];
+    $t= $this->type('<T>(string|int... $arg)');
+    yield [$t, ['test'], null, true];
+    yield [$t, ['test', 1], null, true];
+    yield [$t, ['test', $this], null, false];
 
-      $t= $this->type('<T>(string|int|null... $arg)');
-      yield [$t, ['test'], null, true];
-      yield [$t, [null], null, true];
-      yield [$t, ['test', 1], null, true];
-      yield [$t, ['test', $this], null, false];
-    }
+    $t= $this->type('<T>(string|int|null... $arg)');
+    yield [$t, ['test'], null, true];
+    yield [$t, [null], null, true];
+    yield [$t, ['test', 1], null, true];
+    yield [$t, ['test', $this], null, false];
   }
 
   #[Test, Values(from: 'fixtures')]
