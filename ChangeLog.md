@@ -3,6 +3,13 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 4.0.0 / ????-??-??
+
+* Merged PR #70: Drop PHP 7 support. This implements the last phase of
+  xp-framework/rfc#343. The ninimum required PHP version goes from
+  7.4.0 to 8.0.0!
+  (@thekid)
+
 ## 3.7.0 / 2026-07-05
 
 * Made compatible with `xp-framework/ast` version 13.0.0 - adding support
