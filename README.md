@@ -4,8 +4,7 @@ XP Reflection
 [![Build status on GitHub](https://github.com/xp-framework/reflection/workflows/Tests/badge.svg)](https://github.com/xp-framework/reflection/actions)
 [![XP Framework Module](https://raw.githubusercontent.com/xp-framework/web/master/static/xp-framework-badge.png)](https://github.com/xp-framework/core)
 [![BSD Licence](https://raw.githubusercontent.com/xp-framework/web/master/static/licence-bsd.png)](https://github.com/xp-framework/core/blob/master/LICENCE.md)
-[![Requires PHP 7.4+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-7_4plus.svg)](http://php.net/)
-[![Supports PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
+[![Requires PHP 8.0+](https://raw.githubusercontent.com/xp-framework/web/master/static/php-8_0plus.svg)](http://php.net/)
 [![Latest Stable Version](https://poser.pugx.org/xp-framework/reflection/version.svg)](https://packagist.org/packages/xp-framework/reflection)
 
 This library provides a replacement for the XP Framework's reflection API.
@@ -13,8 +12,6 @@ This library provides a replacement for the XP Framework's reflection API.
 Features
 --------
 **Concise**: This library aims at reducing code noise of the form `if (hasX(...)) { getX() }` by simply returning NULL from its accessor methods. Null handling has improved with the introduction of the null-coalesce operator `??` in PHP 7 and the null-safe invocation operator `?->` in PHP 8 (and in [XP Compiler](https://github.com/xp-framework/compiler)).
-
-**PHP 7 & 8**: This library handles PHP 8 attributes in both PHP 7 (*using the compiler's AST library*) and PHP 8 (*using its native reflection API*).
 
 **Subcommand**: This library provides an [RFC #0303 integration](https://github.com/xp-framework/rfc/issues/303) and offers a "reflect" subcommand for the new XP runners. See `xp help reflect` on how to use it.
 
