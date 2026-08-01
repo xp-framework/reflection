@@ -65,7 +65,7 @@ abstract class Reflection {
    */
   public static function package($arg) {
     if ($arg instanceof XPClass) {
-      return new Package($arg->getPackage()->getName());
+      return new Package($arg->reflect()->getNamespaceName());
     } else if ($arg instanceof \ReflectionClass) {
       return new Package($arg->getNamespaceName());
     } else if ($arg instanceof Type) {
