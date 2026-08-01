@@ -36,7 +36,6 @@ class Constructor extends Routine implements Instantiation {
    */
   public function newInstance(array $args= []) {
     try {
-      $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
 
       // Workaround for non-public constructors: Set accessible, then manually
       // invoke after creating an instance without invoking the constructor.
@@ -47,10 +46,10 @@ class Constructor extends Routine implements Instantiation {
         // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
         PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
 
-        $this->reflect->invokeArgs($instance, $pass);
+        $this->reflect->invokeArgs($instance, $args);
         return $instance;
       } else {
-        return $this->class->newInstanceArgs($pass);
+        return $this->class->newInstanceArgs($args);
       }
     } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInstantiate($this->class, $e);

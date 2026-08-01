@@ -204,8 +204,7 @@ class Type implements Annotated, Value {
     $constructor= $this->reflect->hasMethod('__construct');
     try {
       if ($constructor) {
-        $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect->getMethod('__construct'), $args) : $args;
-        return $this->reflect->newInstanceArgs($pass);
+        return $this->reflect->newInstanceArgs($args);
       } else {
         return $this->reflect->newInstance();
       }

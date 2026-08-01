@@ -47,11 +47,7 @@ class Annotation implements Value {
    */
   public function newInstance() {
     try {
-      $pass= PHP_VERSION_ID < 80000 && $this->arguments
-        ? Routine::pass(new ReflectionMethod($this->type, '__construct'), $this->arguments)
-        : $this->arguments
-      ;
-      return new $this->type(...$pass);
+      return new $this->type(...$this->arguments);
     } catch (ArgumentCountError $e) {
       throw new CannotInstantiate($this->type, $e);
     } catch (TypeError $e) {

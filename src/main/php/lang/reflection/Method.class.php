@@ -50,12 +50,11 @@ class Method extends Routine {
    */
   public function invoke(?object $instance, $args= []) {
     try {
-      $pass= PHP_VERSION_ID < 80000 && $args ? self::pass($this->reflect, $args) : $args;
 
       // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
       // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
       PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
-      return $this->reflect->invokeArgs($instance, $pass);
+      return $this->reflect->invokeArgs($instance, $args);
     } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInvoke($this, $e);
     } catch (Throwable $e) {

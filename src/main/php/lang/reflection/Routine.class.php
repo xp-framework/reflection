@@ -91,32 +91,4 @@ abstract class Routine extends Member {
   public function parameters(): Parameters {
     return new Parameters($this->reflect);
   }
-
-  /** Support named arguments for PHP 7.X */
-  public static function pass($reflect, $args) {
-    $pass= [];
-    foreach ($reflect->getParameters() as $i => $param) {
-      if ($param->isVariadic()) {
-        while ($args) $pass[]= array_shift($args);
-        break;
-      } else if (array_key_exists($param->name, $args)) {
-        $pass[]= $args[$param->name];
-        unset($args[$param->name]);
-      } else if (array_key_exists($i, $args)) {
-        $pass[]= $args[$i];
-        unset($args[$i]);
-      } else if ($param->isOptional()) {
-        $pass[]= $param->getDefaultValue();
-      } else {
-        throw new ReflectionException('Missing parameter $'.$param->name);
-      }
-    }
-
-    // Check for excess named parameters
-    if ($args && is_string($excess= key($args))) {
-      throw new Error('Unknown named parameter $'.$excess);
-    }
-
-    return $pass;
-  }
 }

@@ -202,7 +202,7 @@ class AnnotationTest {
     $f= $t->annotation(Annotated::class)->argument(0);
 
     $type= (new ReflectionFunction($f))->getParameters()[0]->getType();
-    Assert::equals('int', PHP_VERSION_ID >= 70100 ? $type->getName() : (string)$type);
+    Assert::equals('int', $type->getName());
   }
 
   #[Test, Values(['function(): int { return 6100; }', 'fn(): int => 6100'])]
@@ -211,7 +211,7 @@ class AnnotationTest {
     $f= $t->annotation(Annotated::class)->argument(0);
 
     $type= (new ReflectionFunction($f))->getReturnType();
-    Assert::equals('int', PHP_VERSION_ID >= 70100 ? $type->getName() : (string)$type);
+    Assert::equals('int', $type->getName());
   }
 
   #[Test]
