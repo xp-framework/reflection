@@ -1,7 +1,16 @@
 <?php namespace lang\reflection;
 
 use ArgumentCountError, ReflectionException, ReflectionUnionType, ReflectionIntersectionType, Throwable, TypeError, Error;
-use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
+use lang\{
+  Generic,
+  IllegalArgumentException,
+  IllegalStateException,
+  Reflection,
+  Type,
+  TypeUnion,
+  TypeParameter,
+  XPClass
+};
 
 /**
  * Reflection for a single method
@@ -10,6 +19,49 @@ use lang\{Reflection, TypeUnion, Type, XPClass, IllegalArgumentException};
  * @test lang.reflection.unittest.InvocationTest
  */
 class Method extends Routine {
+
+  /**
+   * Returns generic type parameters if this method is parameterized, NULL otherwise
+   *
+   * @return ?string[]
+   */
+  public function parameterized() {
+    $generic= Reflection::meta()->methodAnnotations($this->reflect)[Generic::class]['self'] ?? null;
+    return $generic ? [...XPClass::split($generic)] : null;
+  }
+
+  /**
+   * Parameterizes this method with type arguments
+   *
+   * @param  lang.Type[] $arguments
+   * @return lang.reflection.GenericMethod
+   * @throws lang.IllegalStateException if this type is not generic
+   * @throws lang.IllegalArgumentException for incorrect numbers of type parameters
+   */
+  public function parameterize(array $arguments): GenericMethod {
+    $generic= $this->parameterized();
+
+    if (null === $generic) {
+      throw new IllegalStateException('Method '.$this->name().' is not generic');
+    } else if (sizeof($arguments) !== sizeof($generic)) {
+      throw new IllegalArgumentException('Expected '.sizeof($generic).' argument(s), have '.sizeof($arguments));
+    }
+
+    return new GenericMethod($this->reflect, $arguments);
+  }
+
+  /**
+   * Returns context for `Type::resolve()`
+   *
+   * @return [:function(?string): Type]
+   */
+  public function resolve() {
+    $resolve= parent::resolve();
+    foreach ($this->parameterized() ?? [] as $param) {
+      $resolve[$param]= fn() => new TypeParameter($param);
+    }
+    return $resolve;
+  }
 
   /**
    * Returns a closure
@@ -79,19 +131,24 @@ class Method extends Routine {
       return Reflection::meta()->methodReturns($this->reflect);
     };
 
-    $t= Type::resolve($this->reflect->getReturnType(), Member::resolve($this->reflect), $api);
+    $t= Type::resolve($this->reflect->getReturnType(), $this->resolve(), $api);
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
   /** @return string */
   public function toString() {
     $meta= Reflection::meta();
+    if ($generic= $meta->methodAnnotations($this->reflect)[Generic::class] ?? []) {
+      $params= [...Type::split($generic['params'] ?? '')];
+    } else {
+      $params= [];
+    }
 
     // Put together return type
     $t= $this->reflect->getReturnType();
     $nullable= '';
     if (null === $t) {
-      $returns= $meta->methodReturns($this->reflect) ?? 'var';
+      $returns= $meta->methodReturns($this->reflect) ?? $generic['return'] ?? 'var';
     } else if ($t instanceof ReflectionUnionType) {
       $name= '';
       foreach ($t->getTypes() as $component) {
@@ -113,9 +170,10 @@ class Method extends Routine {
       $t->allowsNull() && $nullable= '?';
     }
 
+    $parameterized= isset($generic['self']) ? '<'.$generic['self'].'>' : '';
     return 
       Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
-      ' function '.$this->reflect->name.'('.$this->signature($meta).'): '.
+      ' function '.$this->reflect->name.$parameterized.'('.$this->signature($meta, $params).'): '.
       $nullable.$returns
     ;
   }

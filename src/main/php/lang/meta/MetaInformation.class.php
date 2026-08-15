@@ -25,7 +25,7 @@ class MetaInformation {
    */
   private function annotations($meta) {
     $r= [];
-    foreach ($meta[DETAIL_ANNOTATIONS] as $name => $value) {
+    foreach ($meta[DETAIL_ANNOTATIONS] ?? [] as $name => $value) {
       $qname= $meta[DETAIL_TARGET_ANNO][$name] ?? $name;
       $r[$qname]= isset($meta[DETAIL_TARGET_ANNO][$qname]) ? [$value] : (array)$value;
     }
@@ -70,6 +70,16 @@ class MetaInformation {
     } else {
       return $this->annotations->ofType($reflect);
     }
+  }
+
+  /**
+   * Returns type generics for a given type, if any
+   *
+   * @param  \ReflectionClass $reflect
+   * @return ?var[]
+   */
+  public function typeGenerics($reflect) {
+    return \xp::$meta[\xp::$cn[$reflect->name] ?? strtr($reflect->name, '\\', '.')]['class'][DETAIL_GENERIC] ?? null;
   }
 
   /**

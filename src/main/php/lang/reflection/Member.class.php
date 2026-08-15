@@ -18,23 +18,38 @@ abstract class Member implements Annotated, Value {
     $this->annotations= $annotations;
   }
 
+  /** Returns definition for a given generic class */
+  protected function definitionOf($class) {
+    return substr($class, 0, strpos($class, "\xb7\xb7"));
+  }
+
   /**
    * Returns context for `Type::resolve()`
    *
-   * @param  ReflectionMethod|ReflectionProperty|ReflectionClassConstant $reflect
    * @return [:function(?string): Type]
    */
-  public static function resolve($reflect) {
-    return [
-      'static' => fn() => new XPClass($reflect->class),
-      'self'   => fn() => new XPClass($reflect->getDeclaringClass()),
-      'parent' => fn() => new XPClass($reflect->getDeclaringClass()->getParentClass()),
-      '*'      => function($type) use($reflect) {
-        $declared= $reflect->getDeclaringClass();
-        $imports= Reflection::meta()->scopeImports($declared);
-        return XPClass::forName($imports[$type] ?? $declared->getNamespaceName().'\\'.$type);
-      },
-    ];
+  public function resolve() {
+    $declared= $this->reflect->getDeclaringClass();
+
+    // Inside `Type<string>`, `self` should resolve to the base type
+    if (strpos($this->reflect->class, "\xb7\xb7")) {
+      $resolve= [
+        'static' => fn() => new XPClass($this->definitionOf($this->reflect->class)),
+        'self'   => fn() => new XPClass($this->definitionOf($declared->name)),
+        'parent' => fn() => new XPClass(get_parent_class($this->definitionOf($declared->name))),
+      ];
+    } else {
+      $resolve= [
+        'static' => fn() => new XPClass($this->reflect->class),
+        'self'   => fn() => new XPClass($declared),
+        'parent' => fn() => new XPClass($declared->getParentClass()),
+      ];
+    }
+
+    return $resolve + ['*' => function($type) use($declared) {
+      $imports= Reflection::meta()->scopeImports($declared);
+      return XPClass::forName($imports[$type] ?? $declared->getNamespaceName().'\\'.$type);
+    }];
   }
 
   /** @return [:var] */

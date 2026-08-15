@@ -34,7 +34,7 @@ class Constant extends Member {
 
     $t= Type::resolve(
       PHP_VERSION_ID >= 80300 ? $this->reflect->getType() : null,
-      Member::resolve($this->reflect),
+      $this->resolve(),
       $api
     );
     return new Constraint($t ?? Type::$VAR, $present);

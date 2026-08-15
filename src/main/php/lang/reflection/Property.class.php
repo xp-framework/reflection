@@ -34,7 +34,7 @@ class Property extends Member {
       return Reflection::meta()->propertyType($this->reflect);
     };
 
-    $t= Type::resolve($this->reflect->getType(), Member::resolve($this->reflect), $api);
+    $t= Type::resolve($this->reflect->getType(), $this->resolve(), $api);
     return new Constraint($t ?? Type::$VAR, $present);
   }
 

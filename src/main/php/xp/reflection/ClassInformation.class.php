@@ -5,9 +5,10 @@ class ClassInformation extends TypeInformation {
   public function display($out) {
     $this->documentation($out, $this->type);
     $out->format(
-      '%s class %s%s%s {',
+      '%s class %s%s%s%s {',
       $this->type->modifiers(),
       $this->type->name(),
+      $this->parameterized($this->type),
       $this->extends($this->type),
       $this->implements($this->type)
     );
