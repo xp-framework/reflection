@@ -20,6 +20,9 @@ use lang\{
  */
 class Method extends Routine {
 
+  /** Returns whether this method is generic */
+  public function generic() { return false; }
+
   /**
    * Returns generic type parameters if this method is parameterized, NULL otherwise
    *

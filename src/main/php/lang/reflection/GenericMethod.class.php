@@ -11,7 +11,7 @@ class GenericMethod extends Method {
     $this->arguments= $arguments;
   }
 
-  /** Returns whether this type is generic */
+  /** Returns whether this method is generic */
   public function generic() { return true; }
 
   /** @return lang.reflection.Method */
