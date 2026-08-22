@@ -27,7 +27,7 @@ class MetaInformation {
     $r= [];
     foreach ($meta[DETAIL_ANNOTATIONS] ?? [] as $name => $value) {
       $qname= $meta[DETAIL_TARGET_ANNO][$name] ?? $name;
-      $r[$qname]= isset($meta[DETAIL_TARGET_ANNO][$qname]) ? [$value] : (array)$value;
+      $r[strtr($qname, '.', '\\')]= isset($meta[DETAIL_TARGET_ANNO][$qname]) ? [$value] : (array)$value;
     }
     return $r;
   }
@@ -226,7 +226,8 @@ class MetaInformation {
    * @return [:var[]]
    */
   public function methodAnnotations($reflect) {
-    $c= strtr($reflect->getDeclaringClass()->name, '\\', '.');
+    $name= $reflect->getDeclaringClass()->name;
+    $c= \xp::$cn[$name] ?? strtr($name, '\\', '.');
     if ($meta= \xp::$meta[$c][1][$reflect->name] ?? null) {
       return $this->annotations($meta);
     } else {
