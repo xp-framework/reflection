@@ -9,11 +9,17 @@ use lang\{Reflection, Type};
  * @test lang.reflection.unittest.MethodsTest
  */
 class Parameters implements \IteratorAggregate {
-  private $method;
+  private $reflect, $resolve;
 
-  /** @param ReflectionMethod $method */
-  public function __construct($method) {
-    $this->method= $method;
+  /**
+   * Creates a new instance
+   *
+   * @param  ReflectionMethod $reflect
+   * @param  [:function(?string): Type] $resolve
+   */
+  public function __construct($reflect, $resolve) {
+    $this->reflect= $reflect;
+    $this->resolve= $resolve;
   }
 
   /**
@@ -23,7 +29,7 @@ class Parameters implements \IteratorAggregate {
    * @return int
    */
   public function size($required= false) {
-    return $required ? $this->method->getNumberOfRequiredParameters() : $this->method->getNumberOfParameters();
+    return $required ? $this->reflect->getNumberOfRequiredParameters() : $this->reflect->getNumberOfParameters();
   }
 
   /**
@@ -33,8 +39,8 @@ class Parameters implements \IteratorAggregate {
    * @return ?lang.reflection.Parameter
    */
   public function at(int $position) {
-    $list= $this->method->getParameters();
-    return isset($list[$position]) ? new Parameter($list[$position], $this->method) : null;
+    $list= $this->reflect->getParameters();
+    return isset($list[$position]) ? new Parameter($list[$position], $this->resolve, $this->reflect) : null;
   }
 
   /**
@@ -44,22 +50,22 @@ class Parameters implements \IteratorAggregate {
    * @return ?lang.reflection.Parameter
    */
   public function named(string $name) {
-    foreach ($this->method->getParameters() as $param) {
-      if ($name === $param->name) return new Parameter($param, $this->method);
+    foreach ($this->reflect->getParameters() as $param) {
+      if ($name === $param->name) return new Parameter($param, $this->resolve, $this->reflect);
     }
     return null;
   }
 
   /** @return ?lang.reflection.Parameter */
   public function first() {
-    $list= $this->method->getParameters();
-    return $list ? new Parameter($list[0], $this->method) : null;
+    $list= $this->reflect->getParameters();
+    return $list ? new Parameter($list[0], $this->resolve, $this->reflect) : null;
   }
 
   /** @return iterable */
   public function getIterator(): Traversable {
-    foreach ($this->method->getParameters() as $parameter) {
-      yield $parameter->name => new Parameter($parameter, $this->method);
+    foreach ($this->reflect->getParameters() as $parameter) {
+      yield $parameter->name => new Parameter($parameter, $this->resolve, $this->reflect);
     }
   }
 
@@ -73,23 +79,22 @@ class Parameters implements \IteratorAggregate {
    * @return bool
    */
   public function accept(array $arguments, $count= null): bool {
-    $parameters= $this->method->getParameters();
+    $parameters= $this->reflect->getParameters();
     if (null !== $count && $count !== sizeof($parameters)) return false;
 
     // Only fetch api doc types if necessary
     $api= function() use(&$i, &$types) {
-      $types ?? $types= Reflection::meta()->methodParameterTypes($this->method);
+      $types ?? $types= Reflection::meta()->methodParameterTypes($this->reflect);
       return $types[$i] ?? null;
     };
 
-    $context= Member::resolve($this->method);
     foreach ($parameters as $i => $parameter) {
 
       // If a given value is missing check whether parameter is optional
       if (!array_key_exists($i, $arguments)) return $parameter->isOptional();
 
       // A value is present for this parameter, now check type
-      if (null === ($type= Type::resolve($parameter->getType(), $context, $api))) continue;
+      if (null === ($type= Type::resolve($parameter->getType(), $this->resolve, $api))) continue;
 
       // For variadic parameters, verify rest of arguments
       if ($parameter->isVariadic()) {

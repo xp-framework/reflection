@@ -17,16 +17,17 @@ abstract class Routine extends Member {
    * Compiles signature
    *
    * @param  lang.meta.MetaInformation $meta
+   * @param  string[] $params
    * @return string
    */
-  protected function signature($meta) {
+  protected function signature($meta, $params= []) {
     $types= $meta->methodParameterTypes($this->reflect);
     $r= '';
     foreach ($this->reflect->getParameters() as $i => $parameter) {
       $t= $parameter->getType();
       $nullable= '';
       if (null === $t) {
-        $type= $types[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
+        $type= $types[$i] ?? $params[$i] ?? ($parameter->isVariadic() ? 'var...' : 'var');
       } else if ($t instanceof ReflectionUnionType) {
         $name= '';
         foreach ($t->getTypes() as $component) {
@@ -80,7 +81,7 @@ abstract class Routine extends Member {
         break;
       }
     }
-    return null === $p ? null : new Parameter($p, $this->reflect);
+    return null === $p ? null : new Parameter($p, $this->resolve(), $this->reflect);
   }
 
   /**
@@ -89,7 +90,7 @@ abstract class Routine extends Member {
    * @return lang.reflection.Parameters
    */
   public function parameters(): Parameters {
-    return new Parameters($this->reflect);
+    return new Parameters($this->reflect, $this->resolve());
   }
 
   /** Support named arguments for PHP 7.X */

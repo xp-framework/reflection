@@ -1,7 +1,7 @@
 <?php namespace lang;
 
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
-use lang\reflection\{Type, Package};
+use lang\reflection\{Type, GenericType, Package};
 use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
 
 /**
@@ -9,12 +9,12 @@ use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
  *
  * ```php
  * // Types can be instantiated by names, instances or via lang.XPClass
- * $type= Reflection::of(Runnable::class);
- * $type= Reflection::of($instance);
- * $type= Reflection::of(XPClass::forName('lang.Value'));
+ * $type= Reflection::type(Runnable::class);
+ * $type= Reflection::type($instance);
+ * $type= Reflection::type(XPClass::forName('lang.Value'));
  *
  * // Packages can be instantiated via their name
- * $package= Reflection::of('lang.reflection');
+ * $package= Reflection::package('lang.reflection');
  * ```
  *
  * @test lang.reflection.unittest.ReflectionTest
@@ -40,20 +40,22 @@ abstract class Reflection {
    */
   public static function type($arg) {
     if ($arg instanceof XPClass) {
-      return new Type($arg->reflect());
+      $reflect= $arg->reflect();
     } else if ($arg instanceof \ReflectionClass) {
-      return new Type($arg);
+      $reflect= $arg;
     } else if ($arg instanceof Type) {
       return $arg;
     } else if (is_object($arg)) {
-      return new Type(new \ReflectionObject($arg));
+      $reflect= new \ReflectionObject($arg);
     } else {
       try {
-        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
+        $reflect= new \ReflectionClass(strtr($arg, '.', '\\'));
       } catch (\ReflectionException $e) {
         throw new ClassNotFoundException($arg, [ClassLoader::getDefault()]);
       }
     }
+
+    return strpos($reflect->name, "\xb7\xb7") ? new GenericType($reflect) : new Type($reflect);
   }
 
   /**
@@ -94,28 +96,30 @@ abstract class Reflection {
    * @throws lang.ClassNotFoundException
    */
   public static function of($arg) {
-    if ($arg instanceof XPClass) {
-      return new Type($arg->reflect());
-    } else if ($arg instanceof \ReflectionClass) {
-      return new Type($arg);
-    } else if ($arg instanceof Type) {
+    if ($arg instanceof Type) {
       return $arg;
+    } else if ($arg instanceof XPClass) {
+      $reflect= $arg->reflect();
+    } else if ($arg instanceof \ReflectionClass) {
+      $reflect= $arg;
     } else if (is_object($arg)) {
-      return new Type(new \ReflectionObject($arg));
+      $reflect= new \ReflectionObject($arg);
     } else {
       $cl= ClassLoader::getDefault();
       $name= strtr($arg, '\\', '.');
       if ($cl->providesClass($name)) {
-        return new Type(new \ReflectionClass($cl->loadClass0($name)));
+        $reflect= new \ReflectionClass($cl->loadClass0($name));
       } else if ($cl->providesPackage($name)) {
         return new Package($name);
-      }
-
-      try {
-        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
-      } catch (\ReflectionException $e) {
-        throw new ClassNotFoundException($name, [$cl]);
+      } else {
+        try {
+          $reflect= new \ReflectionClass(strtr($arg, '.', '\\'));
+        } catch (\ReflectionException $e) {
+          throw new ClassNotFoundException($name, [$cl]);
+        }
       }
     }
+
+    return strpos($reflect->name, "\xb7\xb7") ? new GenericType($reflect) : new Type($reflect);
   }
 }

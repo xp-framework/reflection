@@ -1,15 +1,26 @@
 <?php namespace lang\reflection;
 
 use ArgumentCountError, TypeError, UnitEnum, ReflectionClass, ReflectionException, ReflectionFunction, Throwable;
-use lang\{Reflection, Enum, XPClass, Value, VirtualProperty, IllegalArgumentException};
+use lang\{
+  Enum,
+  Generic,
+  GenericTypes,
+  IllegalArgumentException,
+  IllegalStateException,
+  Reflection,
+  Value,
+  VirtualProperty,
+  XPClass
+};
 
 /**
  * Reflection for a value type: classes, interfaces, traits and enums
  *
  * @test lang.reflection.unittest.TypeTest
+ * @test lang.reflection.unittest.GenericsTest
  */
 class Type implements Annotated, Value {
-  private $reflect;
+  protected $reflect;
   private $annotations= null;
 
   /** @param ReflectionClass $reflect */
@@ -128,6 +139,44 @@ class Type implements Annotated, Value {
     }
     return $r;
   }
+
+  /**
+   * Returns generic type parameters if this type is parameterized, NULL otherwise
+   *
+   * @return ?string[]
+   */
+  public function parameterized() {
+    $this->annotations ?? $this->annotations= Reflection::meta()->typeAnnotations($this->reflect);
+    if ($generic= $this->annotations[Generic::class]['self'] ?? null) {
+      return [...XPClass::split($generic)];
+    }
+    return null;
+  }
+
+  /**
+   * Parameterizes this type with type arguments
+   *
+   * @param  lang.Type[] $arguments
+   * @return lang.reflection.GenericType
+   * @throws lang.IllegalStateException if this type is not generic
+   * @throws lang.IllegalArgumentException for incorrect numbers of type parameters
+   */
+  public function parameterize(array $arguments): GenericType {
+    static $types= null;
+
+    $generic= $this->parameterized();
+    if (null === $generic) {
+      throw new IllegalStateException('Type '.$this->name().' is not generic');
+    } else if (sizeof($arguments) !== sizeof($generic)) {
+      throw new IllegalArgumentException('Expected '.sizeof($generic).' argument(s), have '.sizeof($arguments));
+    }
+
+    $types??= new GenericTypes();
+    return new GenericType(new ReflectionClass($types->newType0(new XPClass($this->reflect), $arguments)));
+  }
+
+  /** Returns whether this type is generic */
+  public function generic() { return false; }
 
   /** @return ?lang.IClassLoader */
   public function classLoader() {

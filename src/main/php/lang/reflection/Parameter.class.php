@@ -1,24 +1,26 @@
 <?php namespace lang\reflection;
 
-use lang\{Reflection, Type, IllegalStateException};
+use lang\{Reflection, Type, IllegalStateException, Value};
 
 /**
  * Reflection for a method's or constructor's parameter
  *
  * @test lang.reflection.unittest.MethodsTest
  */
-class Parameter implements Annotated {
-  private $reflect, $method;
+class Parameter implements Annotated, Value {
+  private $reflect, $resolve, $method;
   private $annotations= null;
 
   /**
    * Creates a new parameter
    *
    * @param  ReflectionParameter $reflect
+   * @param  [:function(?string): Type] $resolve
    * @param  ReflectionMethod $method
    */
-  public function __construct($reflect, $method= null) {
+  public function __construct($reflect, $resolve, $method= null) {
     $this->reflect= $reflect;
+    $this->resolve= $resolve;
     $this->method= $method ?? $reflect->getDeclaringFunction();
   }
 
@@ -80,8 +82,28 @@ class Parameter implements Annotated {
     };
 
     return new Constraint(
-      Type::resolve($this->reflect->getType(), Member::resolve($this->reflect), $api) ?? Type::$VAR,
+      Type::resolve($this->reflect->getType(), $this->resolve, $api) ?? Type::$VAR,
       $present
     );
+  }
+
+  /** @return string */
+  public function toString() {
+    return nameof($this).'<'.$this->reflect->name.'>';
+  }
+
+  /** @return string */
+  public function hashCode() {
+    return 'P'.Objects::hashOf([$this->method->name, $this->reflect->name]);
+  }
+
+  /**
+   * Comparison
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self ? $this->reflect <=> $value->reflect : 1;
   }
 }

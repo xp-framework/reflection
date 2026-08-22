@@ -1,7 +1,7 @@
 <?php namespace lang\reflection;
 
 use ArgumentCountError, ReflectionMethod, ReflectionClass, ReflectionException, TypeError, Error, Throwable;
-use lang\Reflection;
+use lang\{Reflection, Generic, Type};
 
 /**
  * Reflection for a type's constructor
@@ -20,9 +20,16 @@ class Constructor extends Routine implements Instantiation {
 
   /** @return string */
   public function toString() {
+    $meta= Reflection::meta();
+    if ($generic= $meta->methodAnnotations($this->reflect)[Generic::class] ?? []) {
+      $params= [...Type::split($generic['params'] ?? '')];
+    } else {
+      $params= [];
+    }
+
     return
       Modifiers::namesOf($this->reflect->getModifiers() & ~0x1fb7f008).
-      ' function __construct('.$this->signature(Reflection::meta()).')'
+      ' function __construct('.$this->signature($meta, $params).')'
     ;
   }
 

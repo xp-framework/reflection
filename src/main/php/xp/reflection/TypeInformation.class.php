@@ -61,6 +61,11 @@ abstract class TypeInformation {
     return $i ? ' extends '.implode(', ', array_map(fn($t) => $t->name(), $i)) : '';
   }
 
+  protected function parameterized($type) {
+    $c= $type->parameterized();
+    return $c ? '<'.implode(', ', $c).'>' : '';
+  }
+
   protected function partition($members) {
     $r= ['class' => [], 'instance' => []];
     foreach ($members as $member) {
