@@ -11,7 +11,7 @@ use lang\{Reflection, Type};
 class Parameters implements \IteratorAggregate {
   private $method;
 
-  /** @param ReflectionMethod $method */
+  /** @param ReflectionFunctionAbstract $method */
   public function __construct($method) {
     $this->method= $method;
   }

@@ -15,7 +15,7 @@ class Parameter implements Annotated {
    * Creates a new parameter
    *
    * @param  ReflectionParameter $reflect
-   * @param  ReflectionMethod $method
+   * @param  ReflectionFuntionAbstract $method
    */
   public function __construct($reflect, $method= null) {
     $this->reflect= $reflect;
