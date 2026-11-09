@@ -9,15 +9,20 @@ class InvocableTest {
 
   /** @return iterable */
   private function callables() {
-    yield ['strtoupper'];
-    yield [fn() => true];
-    yield [function() { return true; }];
-    yield [new ReflectionFunction('strtoupper')];
+    yield ['strtoupper', 'strtoupper'];
+    yield [fn() => true, null];
+    yield [function() { return true; }, null];
+    yield [new ReflectionFunction('strtoupper'), 'strtoupper'];
   }
 
   #[Test, Values(from: 'callables')]
   public function can_create($callable) {
     new Invocable($callable);
+  }
+
+  #[Test, Values(from: 'callables')]
+  public function name($callable, $expected) {
+    Assert::equals($expected, (new Invocable($callable))->name());
   }
 
   #[Test]

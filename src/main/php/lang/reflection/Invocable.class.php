@@ -15,6 +15,15 @@ class Invocable implements Target {
     }
   }
 
+  /** Returns the name, null for anonymous functions */
+  public function name(): ?string {
+    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
+      return null;
+    } else {
+      return $this->reflect->name;
+    }
+  }
+
   /** Returns a compound name consisting of `[NAME]()` */
   public function compoundName(): string { return $this->reflect->name.'()'; }
 
