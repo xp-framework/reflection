@@ -1,5 +1,6 @@
 <?php namespace lang;
 
+use ReflectionClass, ReflectionObject, ReflectionException;
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\{Type, Package};
 use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
@@ -46,11 +47,11 @@ abstract class Reflection {
     } else if ($arg instanceof Type) {
       return $arg;
     } else if (is_object($arg)) {
-      return new Type(new \ReflectionObject($arg));
+      return new Type(new ReflectionObject($arg));
     } else {
       try {
-        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
-      } catch (\ReflectionException $e) {
+        return new Type(new ReflectionClass(strtr($arg, '.', '\\')));
+      } catch (ReflectionException $e) {
         throw new ClassNotFoundException($arg, [ClassLoader::getDefault()]);
       }
     }
@@ -101,19 +102,19 @@ abstract class Reflection {
     } else if ($arg instanceof Type) {
       return $arg;
     } else if (is_object($arg)) {
-      return new Type(new \ReflectionObject($arg));
+      return new Type(new ReflectionObject($arg));
     } else {
       $cl= ClassLoader::getDefault();
       $name= strtr($arg, '\\', '.');
       if ($cl->providesClass($name)) {
-        return new Type(new \ReflectionClass($cl->loadClass0($name)));
+        return new Type(new ReflectionClass($cl->loadClass0($name)));
       } else if ($cl->providesPackage($name)) {
         return new Package($name);
       }
 
       try {
-        return new Type(new \ReflectionClass(strtr($arg, '.', '\\')));
-      } catch (\ReflectionException $e) {
+        return new Type(new ReflectionClass(strtr($arg, '.', '\\')));
+      } catch (ReflectionException $e) {
         throw new ClassNotFoundException($name, [$cl]);
       }
     }
