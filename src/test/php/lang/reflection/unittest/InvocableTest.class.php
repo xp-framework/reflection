@@ -39,6 +39,28 @@ class InvocableTest {
   }
 
   #[Test]
+  public function no_annotations() {
+    Assert::equals([], iterator_to_array((new Invocable(fn() => true))->annotations()));
+  }
+
+  #[Test]
+  public function with_annotation() {
+    Assert::equals(
+      'test',
+      (new Invocable(#[Test] fn() => true))->annotation(Test::class)->name()
+    );
+  }
+
+  #[Test]
+  public function with_annotations() {
+    $annotations= [];
+    foreach ((new Invocable(#[Test, Values] fn() => true))->annotations() as $annotation) {
+      $annotations[]= $annotation->name();
+    }
+    Assert::equals(['test', 'values'], $annotations);
+  }
+
+  #[Test]
   public function empty_parameters() {
     $parameters= (new Invocable(fn() => true))->parameters();
     Assert::equals(0, $parameters->size());
