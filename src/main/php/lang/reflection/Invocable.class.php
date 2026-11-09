@@ -44,13 +44,13 @@ class Invocable implements Target {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::meta()->annotations->ofType($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->annotations->ofInvocable($this->reflect);
     return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::meta()->annotations->ofType($this->reflect);
+    $this->annotations ?? $this->annotations= Reflection::meta()->annotations->ofInvocable($this->reflect);
 
     $t= strtr($type, '.', '\\');
     return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;

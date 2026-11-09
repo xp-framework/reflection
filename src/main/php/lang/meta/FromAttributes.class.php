@@ -31,6 +31,11 @@ class FromAttributes {
   }
 
   /** @return iterable */
+  public function ofInvocable($reflect) {
+    return $this->annotations($reflect, $reflect);
+  }
+
+  /** @return iterable */
   public function ofType($reflect) {
     return $this->annotations($reflect, $reflect);
   }

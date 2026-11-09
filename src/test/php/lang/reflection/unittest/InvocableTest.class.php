@@ -3,6 +3,7 @@
 use Closure, ReflectionFunction;
 use lang\reflection\{Invocable, CannotInvoke};
 use lang\{Type, Primitive};
+use test\verify\Runtime;
 use test\{Assert, Expect, Test, Values};
 
 class InvocableTest {
@@ -38,12 +39,12 @@ class InvocableTest {
     Assert::equals('Test', (new Invocable(/** Test */ fn() => true))->comment());
   }
 
-  #[Test]
+  #[Test, Runtime(php: '>=8.0')]
   public function no_annotations() {
     Assert::equals([], iterator_to_array((new Invocable(fn() => true))->annotations()));
   }
 
-  #[Test]
+  #[Test, Runtime(php: '>=8.0')]
   public function with_annotation() {
     Assert::equals(
       'test',
@@ -51,7 +52,7 @@ class InvocableTest {
     );
   }
 
-  #[Test]
+  #[Test, Runtime(php: '>=8.0')]
   public function with_annotations() {
     $annotations= [];
     foreach ((new Invocable(#[Test, Values] fn() => true))->annotations() as $annotation) {
