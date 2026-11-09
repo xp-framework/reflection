@@ -46,19 +46,13 @@ class InvocableTest {
 
   #[Test, Runtime(php: '>=8.0')]
   public function with_annotation() {
-    $closure=
-      #[Test]
-      fn() => true
-    ;
+    $closure= eval('return #[Test] fn() => true;');
     Assert::equals('test', (new Invocable($closure))->annotation(Test::class)->name());
   }
 
   #[Test, Runtime(php: '>=8.0')]
   public function with_annotations() {
-    $closure=
-      #[Test, Values]
-      fn() => true
-    ;
+    $closure= eval('return #[Test, Values] fn() => true;');
 
     $annotations= [];
     foreach ((new Invocable($closure))->annotations() as $annotation) {
