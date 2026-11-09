@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use ReflectionFunction;
+use Closure, ReflectionFunction;
 use lang\reflection\{Invocable, CannotInvoke};
 use lang\{Type, Primitive};
 use test\{Assert, Expect, Test, Values};
@@ -12,6 +12,9 @@ class InvocableTest {
     yield ['strtoupper', 'strtoupper'];
     yield [fn() => true, null];
     yield [function() { return true; }, null];
+    yield [[$this, 'name'], 'name'];
+    yield [[Closure::class, 'fromCallable'], 'fromCallable'];
+    yield [Closure::fromCallable('strtoupper'), 'strtoupper'];
     yield [new ReflectionFunction('strtoupper'), 'strtoupper'];
   }
 

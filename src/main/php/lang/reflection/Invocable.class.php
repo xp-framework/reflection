@@ -1,15 +1,17 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionFunction, ArgumentCountError, TypeError, Throwable;
+use ReflectionException, ReflectionFunction, ArgumentCountError, Closure, TypeError, Throwable;
 use lang\{Reflection, Type};
 
 class Invocable implements Target {
   private $reflect;
 
-  /** @param string|Closure|ReflectionFunction $arg */
+  /** @param callable|ReflectionFunction $arg */
   public function __construct($arg) {
     if ($arg instanceof ReflectionFunction) {
       $this->reflect= $arg;
+    } else if (is_array($arg)) {
+      $this->reflect= new ReflectionFunction(Closure::fromCallable($arg));
     } else {
       $this->reflect= new ReflectionFunction($arg);
     }
