@@ -3,7 +3,7 @@
 use ReflectionException, ReflectionFunction, ArgumentCountError, TypeError, Throwable;
 use lang\{Reflection, Type};
 
-class Closure implements Target {
+class Invocable implements Target {
   private $reflect;
 
   /** @param string|Closure|ReflectionFunction $arg */
