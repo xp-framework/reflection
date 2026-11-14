@@ -31,6 +31,15 @@ class Invocable implements Target {
   public function compoundName(): string { return $this->reflect->name.'()'; }
 
   /**
+   * Returns this type's package
+   *
+   * @return lang.reflection.Package
+   */
+  public function package() {
+    return new Package($this->reflect->getNamespaceName());
+  }
+
+  /**
    * Returns this functions's doc comment, or NULL if there is none.
    *
    * @return ?string

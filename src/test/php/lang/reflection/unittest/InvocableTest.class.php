@@ -1,7 +1,7 @@
 <?php namespace lang\reflection\unittest;
 
 use Closure, ReflectionFunction;
-use lang\reflection\{Invocable, CannotInvoke};
+use lang\reflection\{Invocable, CannotInvoke, Package};
 use lang\{Type, Primitive};
 use test\verify\Runtime;
 use test\{Assert, Expect, Test, Values};
@@ -27,6 +27,16 @@ class InvocableTest {
   #[Test, Values(from: 'callables')]
   public function name($callable, $expected) {
     Assert::equals($expected, (new Invocable($callable))->name());
+  }
+
+  #[Test]
+  public function global_function() {
+    Assert::equals(new Package(''), (new Invocable('strlen'))->package());
+  }
+
+  #[Test]
+  public function namespaced_function() {
+    Assert::equals(new Package(__NAMESPACE__), (new Invocable(fn() => true))->package());
   }
 
   #[Test]
