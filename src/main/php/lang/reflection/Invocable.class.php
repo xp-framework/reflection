@@ -19,7 +19,7 @@ class Invocable implements Target, Annotated, Value {
       $this->receiver= $receiver;
     } else if (is_array($arg)) {
       $this->reflect= new ReflectionMethod(...$arg);
-      $this->receiver= $arg[0];
+      $this->receiver= $this->reflect->isStatic() ? null : $arg[0];
     } else {
       $this->reflect= new ReflectionFunction($arg);
       $this->receiver= $receiver;
