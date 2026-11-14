@@ -1,6 +1,6 @@
 <?php namespace lang\reflection\unittest;
 
-use ReflectionClass, ReflectionObject;
+use ReflectionClass, ReflectionObject, ReflectionFunction;
 use lang\meta\{FromAttributes, FromSyntaxTree};
 use lang\reflection\{Invocable, Package};
 use lang\{ClassNotFoundException, Reflection, Type};
@@ -57,6 +57,16 @@ class ReflectionTest {
   #[Test, Values(from: 'packages')]
   public function package($argument) {
     Assert::equals(new Package('lang.reflection.unittest'), Reflection::package($argument));
+  }
+
+  #[Test]
+  public function of_closure() {
+    Assert::instance(Invocable::class, Reflection::of(fn() => true));
+  }
+
+  #[Test]
+  public function of_function() {
+    Assert::instance(Invocable::class, Reflection::of(new ReflectionFunction('strlen')));
   }
 
   #[Test]

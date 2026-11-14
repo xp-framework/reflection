@@ -1,6 +1,6 @@
 <?php namespace lang;
 
-use ReflectionClass, ReflectionObject, ReflectionException;
+use Closure, ReflectionClass, ReflectionObject, ReflectionFunction, ReflectionException;
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
 use lang\reflection\{Invocable, Type, Package};
 use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
@@ -77,7 +77,7 @@ abstract class Reflection {
   public static function package($arg) {
     if ($arg instanceof XPClass) {
       return new Package($arg->reflect()->getNamespaceName());
-    } else if ($arg instanceof \ReflectionClass) {
+    } else if ($arg instanceof ReflectionClass) {
       return new Package($arg->getNamespaceName());
     } else if ($arg instanceof Type) {
       return $arg->package();
@@ -100,17 +100,19 @@ abstract class Reflection {
    * Creates a new reflection instance, which may either refer to a type
    * or to a package.
    *
-   * @param  string|object|lang.XPClass|lang.reflection.Type|ReflectionClass $arg
+   * @param  string|Closure|lang.XPClass|lang.reflection.Type|ReflectionClass|ReflectionFunction $arg
    * @return lang.reflection.Type|lang.reflection.Package
    * @throws lang.ClassNotFoundException
    */
   public static function of($arg) {
     if ($arg instanceof XPClass) {
       return new Type($arg->reflect());
-    } else if ($arg instanceof \ReflectionClass) {
+    } else if ($arg instanceof ReflectionClass) {
       return new Type($arg);
     } else if ($arg instanceof Type) {
       return $arg;
+    } else if ($arg instanceof Closure || $arg instanceof ReflectionFunction) {
+      return new Invocable($arg);
     } else if (is_object($arg)) {
       return new Type(new ReflectionObject($arg));
     } else {
