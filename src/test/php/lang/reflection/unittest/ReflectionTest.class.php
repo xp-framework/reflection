@@ -2,14 +2,21 @@
 
 use ReflectionClass, ReflectionObject;
 use lang\meta\{FromAttributes, FromSyntaxTree};
-use lang\reflection\Package;
+use lang\reflection\{Invocable, Package};
 use lang\{ClassNotFoundException, Reflection, Type};
 use test\{Assert, Expect, Test, Values};
 
 class ReflectionTest {
 
   /** @return iterable */
-  private function arguments() {
+  private function invocables() {
+    yield ['strlen', 'global function'];
+    yield [fn() => true, 'short closure'];
+    yield [function() { }, 'closure'];
+  }
+
+  /** @return iterable */
+  private function types() {
     yield [self::class, 'class literal'];
     yield [nameof($this), 'class name'];
     yield [$this, 'instance'];
@@ -32,12 +39,17 @@ class ReflectionTest {
     yield [new ReflectionObject($this), 'reflection object'];
   }
 
-  #[Test, Values(from: 'arguments')]
+  #[Test, Values(from: 'types')]
   public function of($argument) {
     Assert::equals(nameof($this), Reflection::of($argument)->name());
   }
 
-  #[Test, Values(from: 'arguments')]
+  #[Test, Values(from: 'invocables')]
+  public function invocable($argument) {
+    Assert::instance(Invocable::class, Reflection::invocable($argument));
+  }
+
+  #[Test, Values(from: 'types')]
   public function type($argument) {
     Assert::equals(nameof($this), Reflection::type($argument)->name());
   }

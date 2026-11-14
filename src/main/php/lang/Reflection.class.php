@@ -2,7 +2,7 @@
 
 use ReflectionClass, ReflectionObject, ReflectionException;
 use lang\meta\{MetaInformation, FromSyntaxTree, FromAttributes};
-use lang\reflection\{Type, Package};
+use lang\reflection\{Invocable, Type, Package};
 use lang\{ClassLoader, ClassNotFoundException, IllegalArgumentException};
 
 /**
@@ -30,6 +30,16 @@ abstract class Reflection {
   /** Lazy-loads meta information extraction */
   public static function meta(): MetaInformation {
     return self::$meta ?? self::$meta= new MetaInformation(self::annotations(PHP_VERSION_ID));
+  }
+
+  /**
+   * Returns a reflection type for a given argument.
+   *
+   * @param  string|callable|lang.reflection.Invocable $arg
+   * @return lang.reflection.Invocable
+   */
+  public static function invocable($arg) {
+    return $arg instanceof Invocable ? $arg : new Invocable($arg);
   }
 
   /**
