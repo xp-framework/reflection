@@ -27,6 +27,24 @@ class Invocable implements Target, Annotated, Value {
     }
   }
 
+  /** Returns type literal (in namespaced form) */
+  public function literal(): ?string {
+    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
+      return null;
+    } else {
+      return $this->reflect->name;
+    }
+  }
+
+  /** Returns declared name (without namespace) */
+  public function declaredName(): ?string {
+    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
+      return null;
+    } else {
+      return $this->reflect->getShortName();
+    }
+  }
+
   /** Returns a compound name consisting of `[NAME]()` */
   public function compoundName(): string { return $this->name().'()'; }
 

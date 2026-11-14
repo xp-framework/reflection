@@ -39,6 +39,8 @@ class InvocableTest {
     $strlen= new Invocable('strlen');
 
     Assert::equals('strlen', $strlen->name());
+    Assert::equals('strlen', $strlen->literal());
+    Assert::equals('strlen', $strlen->declaredName());
     Assert::equals(new Package(''), $strlen->package());
   }
 
@@ -47,6 +49,8 @@ class InvocableTest {
     $anonymous= new Invocable(fn() => true);
 
     Assert::null($anonymous->name());
+    Assert::null($anonymous->literal());
+    Assert::null($anonymous->declaredName());
     Assert::equals(new Package(''), $anonymous->package());
   }
 
@@ -56,6 +60,8 @@ class InvocableTest {
     $namespaced= new Invocable('test\\fixture');
 
     Assert::equals('test.fixture', $namespaced->name());
+    Assert::equals('test\\fixture', $namespaced->literal());
+    Assert::equals('fixture', $namespaced->declaredName());
     Assert::equals(new Package('test'), $namespaced->package());
   }
 
