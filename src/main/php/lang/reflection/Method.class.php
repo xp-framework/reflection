@@ -47,6 +47,12 @@ class Method extends Routine {
    * @throws lang.IllegalArgumentException for incorrect or missing instances
    */
   public function invocable(?object $instance= null) {
+    if ($instance && !($instance instanceof $this->reflect->class)) {
+      throw new IllegalArgumentException('Instance is not an instance of the class method was declared in');
+    } else if (null === $instance && !$this->reflect->isStatic()) {
+      throw new IllegalArgumentException('Instance cannot be null for non-static methods');
+    }
+
     return new Invocable($this->reflect, $instance);
   }
 

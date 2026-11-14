@@ -248,6 +248,16 @@ class MethodsTest {
     Assert::equals('@test', $invocable->invoke(['Test']));
   }
 
+  #[Test, Expect(IllegalArgumentException::class)]
+  public function invocable_with_missing_instance() {
+    $this->declare('{ public function fixture() { } }')->method('fixture')->invocable(null);
+  }
+
+  #[Test, Expect(IllegalArgumentException::class)]
+  public function invocable_with_incorrect_instance() {
+    $this->declare('{ public function fixture() { } }')->method('fixture')->invocable($this);
+  }
+
   #[Test]
   public function hash_code() {
     $t= $this->declare('{ public function fixture() { } }');
