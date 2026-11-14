@@ -1,6 +1,6 @@
 <?php namespace lang\meta;
 
-use PhpToken;
+use PhpToken, ReflectionMethod;
 use lang\reflection\Annotation;
 
 /**
@@ -57,7 +57,7 @@ class FromAttributes {
 
   /** @return iterable */
   public function ofParameter($method, $reflect) {
-    return $this->annotations($reflect, $method->getDeclaringClass());
+    return $this->annotations($reflect, $method instanceof ReflectionMethod ? $method->getDeclaringClass() : $method);
   }
 
   /**
