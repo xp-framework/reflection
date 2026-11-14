@@ -39,11 +39,6 @@ class ReflectionTest {
     yield [new ReflectionObject($this), 'reflection object'];
   }
 
-  #[Test, Values(from: 'types')]
-  public function of($argument) {
-    Assert::equals(nameof($this), Reflection::of($argument)->name());
-  }
-
   #[Test, Values(from: 'invocables')]
   public function invocable($argument) {
     Assert::instance(Invocable::class, Reflection::invocable($argument));
@@ -57,6 +52,26 @@ class ReflectionTest {
   #[Test, Values(from: 'packages')]
   public function package($argument) {
     Assert::equals(new Package('lang.reflection.unittest'), Reflection::package($argument));
+  }
+
+  #[Test]
+  public function package_of_closure() {
+    Assert::equals(new Package(''), Reflection::package(fn() => true));
+  }
+
+  #[Test]
+  public function package_of_invocable() {
+    Assert::equals(new Package(''), Reflection::package(Reflection::invocable('strlen')));
+  }
+
+  #[Test]
+  public function package_of_function() {
+    Assert::equals(new Package(''), Reflection::package(new ReflectionFunction('strlen')));
+  }
+
+  #[Test, Values(from: 'types')]
+  public function of($argument) {
+    Assert::equals(nameof($this), Reflection::of($argument)->name());
   }
 
   #[Test]
