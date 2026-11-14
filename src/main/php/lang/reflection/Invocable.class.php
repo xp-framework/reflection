@@ -1,6 +1,6 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionFunctionAbstract, ReflectionFunction, ArgumentCountError, Closure, TypeError, Throwable;
+use ReflectionException, ReflectionFunctionAbstract, ReflectionFunction, ReflectionMethod, ArgumentCountError, TypeError, Throwable;
 use lang\{Reflection, Type, Value};
 
 class Invocable implements Target, Annotated, Value {
@@ -17,7 +17,8 @@ class Invocable implements Target, Annotated, Value {
     if ($arg instanceof ReflectionFunctionAbstract) {
       $this->reflect= $arg;
     } else if (is_array($arg)) {
-      $this->reflect= new ReflectionFunction(Closure::fromCallable($arg));
+      $this->reflect= new ReflectionMethod(...$arg);
+      $receiver ?? $receiver= $arg[0];
     } else {
       $this->reflect= new ReflectionFunction($arg);
     }
@@ -52,7 +53,15 @@ class Invocable implements Target, Annotated, Value {
   }
 
   /** Returns a compound name consisting of `[NAME]()` */
-  public function compoundName(): string { return $this->name().'()'; }
+  public function compoundName(): string {
+    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
+      return '{closure}()';
+    } else if ($this->reflect instanceof ReflectionFunction) {
+      return strtr($this->reflect->name, '\\', '.').'()';
+    } else {
+      return strtr($this->reflect->class.'::'.$this->reflect->name, '\\', '.').'()';
+    }
+  }
 
   /**
    * Returns this invocable's package. Anonymous functions are always in the
@@ -140,10 +149,16 @@ class Invocable implements Target, Annotated, Value {
   public function invoke(array $args= []) {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect, $args) : $args;
-      return $this->reflect instanceof ReflectionFunction
-        ? $this->reflect->invokeArgs($pass)
-        : $this->reflect->invokeArgs($this->receiver, $pass)
-      ;
+
+      if ($this->reflect instanceof ReflectionFunction) {
+        return $this->reflect->invokeArgs($pass);
+      } else {
+
+        // TODO: Remove superfluous call to setAccessible() if on PHP8.1+
+        // see https://wiki.php.net/rfc/make-reflection-setaccessible-no-op
+        PHP_VERSION_ID < 80100 && $this->reflect->setAccessible(true);
+        return $this->reflect->invokeArgs($this->receiver, $pass);
+      }
     } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInvoke($this, $e);
     } catch (Throwable $e) {
@@ -158,7 +173,7 @@ class Invocable implements Target, Annotated, Value {
   }
 
   /** @return string */
-  public function hashCode() { return md5($this->reflect->name); }
+  public function hashCode() { return 'I'.md5($this->reflect->name); }
 
   /** @return string */
   public function toString() { return nameof($this).'<'.$this->name().'>'; }

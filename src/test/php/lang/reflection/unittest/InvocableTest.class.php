@@ -8,12 +8,19 @@ use test\{Assert, Expect, Test, Values};
 
 class InvocableTest {
 
+  /** Fixture */
+  private function instance($name) { return '@'.strtolower($name); }
+
+  /** Fixture */
+  private static function class($name) { return '@'.strtolower($name); }
+
   /** @return iterable */
   private function callables() {
     yield ['strtoupper', 'strtoupper'];
     yield [fn() => true, null];
     yield [function() { return true; }, null];
-    yield [[$this, 'name'], 'name'];
+    yield [[$this, 'instance'], 'instance'];
+    yield [[self::class, 'class'], 'class'];
     yield [[Closure::class, 'fromCallable'], 'fromCallable'];
     yield [Closure::fromCallable('strtoupper'), 'strtoupper'];
     yield [new ReflectionFunction('strtoupper'), 'strtoupper'];
@@ -30,8 +37,24 @@ class InvocableTest {
   }
 
   #[Test]
-  public function compound_name() {
+  public function compound_name_of_function() {
     Assert::equals('strlen()', (new Invocable('strlen'))->compoundName());
+  }
+
+  #[Test]
+  public function compound_name_of_instance_method() {
+    Assert::equals(
+      'lang.reflection.unittest.InvocableTest::instance()',
+      (new Invocable([$this, 'instance']))->compoundName()
+    );
+  }
+
+  #[Test]
+  public function compound_name_of_class_method() {
+    Assert::equals(
+      'lang.reflection.unittest.InvocableTest::class()',
+      (new Invocable([self::class, 'class']))->compoundName()
+    );
   }
 
   #[Test]
@@ -139,19 +162,31 @@ class InvocableTest {
 
   #[Test]
   public function invoke() {
-    $Invocable= (new Invocable(fn($name) => strtoupper($name)));
-    Assert::equals('TEST', $Invocable->invoke(['test']));
+    $invocable= (new Invocable(fn($name) => strtoupper($name)));
+    Assert::equals('TEST', $invocable->invoke(['test']));
   }
 
   #[Test]
   public function invoke_named() {
-    $Invocable= (new Invocable(fn($name) => strtoupper($name)));
-    Assert::equals('TEST', $Invocable->invoke(['name' => 'test']));
+    $invocable= (new Invocable(fn($name) => strtoupper($name)));
+    Assert::equals('TEST', $invocable->invoke(['name' => 'test']));
   }
 
   #[Test, Expect(CannotInvoke::class)]
   public function invoke_missing_argument() {
-    $Invocable= (new Invocable(fn($name) => strtoupper($name)));
-    $Invocable->invoke([]);
+    $invocable= (new Invocable(fn($name) => strtoupper($name)));
+    $invocable->invoke([]);
+  }
+
+  #[Test]
+  public function invoke_instance_method() {
+    $invocable= new Invocable([$this, 'instance']);
+    Assert::equals('@test', $invocable->invoke(['Test']));
+  }
+
+  #[Test]
+  public function invoke_class_method() {
+    $invocable= new Invocable([$this, 'class']);
+    Assert::equals('@test', $invocable->invoke(['Test']));
   }
 }
