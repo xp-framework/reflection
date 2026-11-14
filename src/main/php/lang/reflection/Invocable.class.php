@@ -173,10 +173,10 @@ class Invocable implements Target, Annotated, Value {
   }
 
   /** @return string */
-  public function hashCode() { return 'I'.md5($this->reflect->name); }
+  public function hashCode() { return 'I'.md5($this->compoundName()); }
 
   /** @return string */
-  public function toString() { return nameof($this).'<'.$this->name().'>'; }
+  public function toString() { return nameof($this).'<'.$this->compoundName().'>'; }
 
   /**
    * Compares this member to another value
@@ -186,7 +186,7 @@ class Invocable implements Target, Annotated, Value {
    */
   public function compareTo($value) {
     return $value instanceof self
-      ? $this->reflect->name <=> $value->reflect->name
+      ? $this->compoundName() <=> $value->compoundName()
       : 1
     ;
   }
