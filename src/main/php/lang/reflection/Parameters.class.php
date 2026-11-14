@@ -9,11 +9,11 @@ use lang\{Reflection, Type};
  * @test lang.reflection.unittest.MethodsTest
  */
 class Parameters implements \IteratorAggregate {
-  private $method;
+  private $holder;
 
-  /** @param ReflectionMethod $method */
-  public function __construct($method) {
-    $this->method= $method;
+  /** @param ReflectionFunctionAbstract $holder */
+  public function __construct($holder) {
+    $this->holder= $holder;
   }
 
   /**
@@ -23,7 +23,7 @@ class Parameters implements \IteratorAggregate {
    * @return int
    */
   public function size($required= false) {
-    return $required ? $this->method->getNumberOfRequiredParameters() : $this->method->getNumberOfParameters();
+    return $required ? $this->holder->getNumberOfRequiredParameters() : $this->holder->getNumberOfParameters();
   }
 
   /**
@@ -33,8 +33,8 @@ class Parameters implements \IteratorAggregate {
    * @return ?lang.reflection.Parameter
    */
   public function at(int $position) {
-    $list= $this->method->getParameters();
-    return isset($list[$position]) ? new Parameter($list[$position], $this->method) : null;
+    $list= $this->holder->getParameters();
+    return isset($list[$position]) ? new Parameter($list[$position], $this->holder) : null;
   }
 
   /**
@@ -44,22 +44,22 @@ class Parameters implements \IteratorAggregate {
    * @return ?lang.reflection.Parameter
    */
   public function named(string $name) {
-    foreach ($this->method->getParameters() as $param) {
-      if ($name === $param->name) return new Parameter($param, $this->method);
+    foreach ($this->holder->getParameters() as $param) {
+      if ($name === $param->name) return new Parameter($param, $this->holder);
     }
     return null;
   }
 
   /** @return ?lang.reflection.Parameter */
   public function first() {
-    $list= $this->method->getParameters();
-    return $list ? new Parameter($list[0], $this->method) : null;
+    $list= $this->holder->getParameters();
+    return $list ? new Parameter($list[0], $this->holder) : null;
   }
 
   /** @return iterable */
   public function getIterator(): Traversable {
-    foreach ($this->method->getParameters() as $parameter) {
-      yield $parameter->name => new Parameter($parameter, $this->method);
+    foreach ($this->holder->getParameters() as $parameter) {
+      yield $parameter->name => new Parameter($parameter, $this->holder);
     }
   }
 
@@ -73,16 +73,16 @@ class Parameters implements \IteratorAggregate {
    * @return bool
    */
   public function accept(array $arguments, $count= null): bool {
-    $parameters= $this->method->getParameters();
+    $parameters= $this->holder->getParameters();
     if (null !== $count && $count !== sizeof($parameters)) return false;
 
     // Only fetch api doc types if necessary
     $api= function() use(&$i, &$types) {
-      $types ?? $types= Reflection::meta()->methodParameterTypes($this->method);
+      $types ?? $types= Reflection::meta()->methodParameterTypes($this->holder);
       return $types[$i] ?? null;
     };
 
-    $context= Member::resolve($this->method);
+    $context= Member::resolve($this->holder);
     foreach ($parameters as $i => $parameter) {
 
       // If a given value is missing check whether parameter is optional
