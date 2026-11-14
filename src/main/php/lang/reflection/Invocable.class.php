@@ -1,21 +1,27 @@
 <?php namespace lang\reflection;
 
-use ReflectionException, ReflectionFunction, ArgumentCountError, Closure, TypeError, Throwable;
+use ReflectionException, ReflectionFunctionAbstract, ReflectionFunction, ArgumentCountError, Closure, TypeError, Throwable;
 use lang\{Reflection, Type, Value};
 
 class Invocable implements Target, Annotated, Value {
-  private $reflect;
+  private $reflect, $receiver;
   private $annotations= null;
 
-  /** @param callable|ReflectionFunction $arg */
-  public function __construct($arg) {
-    if ($arg instanceof ReflectionFunction) {
+  /**
+   * Creates a new instance
+   *
+   * @param  callable|ReflectionFunction $arg
+   * @param  ?object $receiver
+   */
+  public function __construct($arg, $receiver= null) {
+    if ($arg instanceof ReflectionFunctionAbstract) {
       $this->reflect= $arg;
     } else if (is_array($arg)) {
       $this->reflect= new ReflectionFunction(Closure::fromCallable($arg));
     } else {
       $this->reflect= new ReflectionFunction($arg);
     }
+    $this->receiver= $receiver;
   }
 
   /** Returns the name, null for anonymous functions */
@@ -134,7 +140,10 @@ class Invocable implements Target, Annotated, Value {
   public function invoke(array $args= []) {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect, $args) : $args;
-      return $this->reflect->invokeArgs($pass);
+      return $this->reflect instanceof ReflectionFunction
+        ? $this->reflect->invokeArgs($pass)
+        : $this->reflect->invokeArgs($this->receiver, $pass)
+      ;
     } catch (ReflectionException|ArgumentCountError|TypeError $e) {
       throw new CannotInvoke($this, $e);
     } catch (Throwable $e) {

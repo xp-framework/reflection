@@ -47,7 +47,7 @@ class Method extends Routine {
    * @throws lang.IllegalArgumentException for incorrect or missing instances
    */
   public function invocable(?object $instance= null) {
-    return new Invocable($this->closure($instance));
+    return new Invocable($this->reflect, $instance);
   }
 
   /**

@@ -235,7 +235,7 @@ class MethodsTest {
   #[Test]
   public function invocable() {
     $t= $this->declare('{ public function fixture($name) { return "@".strtolower($name); } }');
-    $invocable= $t->method('fixture')->invocable($t->newinstance());
+    $invocable= $t->method('fixture')->invocable($t->newInstance());
 
     Assert::equals('@test', $invocable->invoke(['Test']));
   }
