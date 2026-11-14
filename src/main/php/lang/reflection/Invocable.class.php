@@ -1,9 +1,9 @@
 <?php namespace lang\reflection;
 
 use ReflectionException, ReflectionFunction, ArgumentCountError, Closure, TypeError, Throwable;
-use lang\{Reflection, Type};
+use lang\{Reflection, Type, Value};
 
-class Invocable implements Target {
+class Invocable implements Target, Annotated, Value {
   private $reflect;
   private $annotations= null;
 
@@ -128,5 +128,24 @@ class Invocable implements Target {
 
       throw new InvocationFailed($this, $e);
     }
+  }
+
+  /** @return string */
+  public function hashCode() { return md5($this->reflect->name); }
+
+  /** @return string */
+  public function toString() { return nameof($this).'<'.$this->name().'>'; }
+
+  /**
+   * Compares this member to another value
+   *
+   * @param  var $value
+   * @return int
+   */
+  public function compareTo($value) {
+    return $value instanceof self
+      ? $this->reflect->name <=> $value->reflect->name
+      : 1
+    ;
   }
 }
