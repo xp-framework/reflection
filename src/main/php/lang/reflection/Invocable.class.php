@@ -76,21 +76,15 @@ class Invocable implements Target {
     return null === $p ? null : new Parameter($p, $this->reflect);
   }
 
-  /**
-   * Returns all parameters
-   *
-   * @return lang.reflection.Parameters
-   */
-  public function parameters(): Parameters {
-    return new Parameters($this->reflect);
-  }
+  /** Returns all parameters */
+  public function parameters(): Parameters { return new Parameters($this->reflect); }
 
   /** @return lang.reflection.Constraint */
   public function returns() {
     $present= true;
-    $absent= function($set) use(&$present) { $present= false; };
-
-    $t= Type::resolve($this->reflect->getReturnType(), [], $absent);
+    $t= Type::resolve($this->reflect->getReturnType(), [], function($set) use(&$present) {
+      $present= false;
+    });
     return new Constraint($t ?? Type::$VAR, $present);
   }
 
@@ -102,7 +96,7 @@ class Invocable implements Target {
    * @throws lang.reflection.CannotInvoke if prerequisites to the invocation fail
    * @throws lang.reflection.InvocationFailed if invocation raises an exception
    */
-  public function invoke($args= []) {
+  public function invoke(array $args= []) {
     try {
       $pass= PHP_VERSION_ID < 80000 && $args ? Routine::pass($this->reflect, $args) : $args;
       return $this->reflect->invokeArgs($pass);

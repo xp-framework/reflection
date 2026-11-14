@@ -206,6 +206,22 @@ class MethodsTest {
     Assert::equals("Returns the fixture\nor NULL.", $t->method('fixture')->comment());
   }
 
+  #[Test]
+  public function closure() {
+    $t= $this->declare('{ public function fixture($name) { return "@".strtolower($name); } }');
+    $closure= $t->method('fixture')->closure($t->newinstance());
+
+    Assert::equals('@test', $closure('Test'));
+  }
+
+  #[Test]
+  public function static_closure() {
+    $t= $this->declare('{ public static function fixture($name) { return "@".strtolower($name); } }');
+    $closure= $t->method('fixture')->closure(null);
+
+    Assert::equals('@test', $closure('Test'));
+  }
+
   #[Test, Expect(IllegalArgumentException::class)]
   public function closure_with_missing_instance() {
     $this->declare('{ public function fixture() { } }')->method('fixture')->closure(null);
@@ -214,6 +230,22 @@ class MethodsTest {
   #[Test, Expect(IllegalArgumentException::class)]
   public function closure_with_incorrect_instance() {
     $this->declare('{ public function fixture() { } }')->method('fixture')->closure($this);
+  }
+
+  #[Test]
+  public function invocable() {
+    $t= $this->declare('{ public function fixture($name) { return "@".strtolower($name); } }');
+    $invocable= $t->method('fixture')->invocable($t->newinstance());
+
+    Assert::equals('@test', $invocable->invoke(['Test']));
+  }
+
+  #[Test]
+  public function static_invocable() {
+    $t= $this->declare('{ public static function fixture($name) { return "@".strtolower($name); } }');
+    $invocable= $t->method('fixture')->invocable(null);
+
+    Assert::equals('@test', $invocable->invoke(['Test']));
   }
 
   #[Test]

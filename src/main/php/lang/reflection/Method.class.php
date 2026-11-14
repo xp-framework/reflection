@@ -21,7 +21,7 @@ class Method extends Routine {
   public function closure(?object $instance= null) {
     try {
       $closure= $this->reflect->getClosure($instance);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new IllegalArgumentException($e->getMessage());
     }
 
@@ -37,6 +37,17 @@ class Method extends Routine {
     // @codeCoverageIgnoreEnd
 
     return $closure;
+  }
+
+  /**
+   * Returns an invocable
+   *
+   * @param  ?object $instance
+   * @return lang.reflection.Invocable
+   * @throws lang.IllegalArgumentException for incorrect or missing instances
+   */
+  public function invocable(?object $instance= null) {
+    return new Invocable($this->closure($instance));
   }
 
   /**
