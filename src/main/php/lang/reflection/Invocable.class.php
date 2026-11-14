@@ -14,14 +14,11 @@ class Invocable implements Target, Annotated, Value {
    * @param  ?object $receiver
    */
   public function __construct($arg, $receiver= null) {
-    if ($arg instanceof ReflectionFunctionAbstract) {
-      $this->reflect= $arg;
-      $this->receiver= $receiver;
-    } else if (is_array($arg)) {
+    if (is_array($arg)) {
       $this->reflect= new ReflectionMethod(...$arg);
       $this->receiver= $this->reflect->isStatic() ? null : $receiver ?? $arg[0];
     } else {
-      $this->reflect= new ReflectionFunction($arg);
+      $this->reflect= $arg instanceof ReflectionFunctionAbstract ? $arg : new ReflectionFunction($arg);
       $this->receiver= $receiver;
     }
   }
