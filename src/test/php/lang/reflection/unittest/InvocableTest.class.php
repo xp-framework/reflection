@@ -30,13 +30,33 @@ class InvocableTest {
   }
 
   #[Test]
+  public function compound_name() {
+    Assert::equals('strlen()', (new Invocable('strlen'))->compoundName());
+  }
+
+  #[Test]
   public function global_function() {
-    Assert::equals(new Package(''), (new Invocable('strlen'))->package());
+    $strlen= new Invocable('strlen');
+
+    Assert::equals('strlen', $strlen->name());
+    Assert::equals(new Package(''), $strlen->package());
+  }
+
+  #[Test]
+  public function anonymous_function() {
+    $anonymous= new Invocable(fn() => true);
+
+    Assert::null($anonymous->name());
+    Assert::equals(new Package(''), $anonymous->package());
   }
 
   #[Test]
   public function namespaced_function() {
-    Assert::equals(new Package(__NAMESPACE__), (new Invocable(fn() => true))->package());
+    eval('namespace test; function fixture() { }');
+    $namespaced= new Invocable('test\\fixture');
+
+    Assert::equals('test.fixture', $namespaced->name());
+    Assert::equals(new Package('test'), $namespaced->package());
   }
 
   #[Test]

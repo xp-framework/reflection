@@ -23,20 +23,28 @@ class Invocable implements Target {
     if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
       return null;
     } else {
-      return $this->reflect->name;
+      return strtr($this->reflect->name, '\\', '.');
     }
   }
 
   /** Returns a compound name consisting of `[NAME]()` */
-  public function compoundName(): string { return $this->reflect->name.'()'; }
+  public function compoundName(): string { return $this->name().'()'; }
 
   /**
-   * Returns this type's package
+   * Returns this invocable's package. Anonymous functions are always in the
+   * top-level package
    *
    * @return lang.reflection.Package
    */
   public function package() {
-    return new Package($this->reflect->getNamespaceName());
+    if (PHP_VERSION_ID < 80200) {
+      $ns= false === strpos($this->reflect->name, '{closure}') ? $this->reflect->getNamespaceName() : '';
+    } else if (PHP_VERSION_ID < 80400) {
+      $ns= $this->reflect->isAnonymous() ? '' : $this->reflect->getNamespaceName();
+    } else {
+      $ns= $this->reflect->getNamespaceName();
+    }
+    return new Package($ns);
   }
 
   /**
