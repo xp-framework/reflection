@@ -6,6 +6,11 @@ use test\{Assert, Test};
 class AnonymousClassTest {
 
   #[Test]
+  public function anonymous() {
+    Assert::true(Reflection::type(new class() { })->anonymous());
+  }
+
+  #[Test]
   public function name() {
     Assert::null(Reflection::type(new class() { })->name());
   }

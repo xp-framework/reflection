@@ -17,6 +17,9 @@ class Type implements Annotated, Value {
     $this->reflect= $reflect;
   }
 
+  /** Returns whether this is an anonymous function */
+  public function anonymous(): bool { return $this->reflect->isAnonymous(); }
+
   /** Returns type name (in dotted form) */
   public function name(): ?string {
     return $this->reflect->isAnonymous() ? null : strtr($this->reflect->name, '\\', '.');

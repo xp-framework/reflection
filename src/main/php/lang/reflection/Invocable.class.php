@@ -16,50 +16,39 @@ class Invocable implements Target, Annotated, Value {
   public function __construct($arg, $receiver= null) {
     if ($arg instanceof ReflectionFunctionAbstract) {
       $this->reflect= $arg;
+      $this->receiver= $receiver;
     } else if (is_array($arg)) {
       $this->reflect= new ReflectionMethod(...$arg);
-      $receiver ?? $receiver= $arg[0];
+      $this->receiver= $arg[0];
     } else {
       $this->reflect= new ReflectionFunction($arg);
+      $this->receiver= $receiver;
     }
-    $this->receiver= $receiver;
+  }
+
+  /** Returns whether this is an anonymous function */
+  public function anonymous(): bool {
+    return
+      $this->reflect instanceof ReflectionFunction &&
+      (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous())
+    ;
   }
 
   /** Returns the name, null for anonymous functions */
-  public function name(): ?string {
-    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
-      return null;
-    } else {
-      return strtr($this->reflect->name, '\\', '.');
-    }
-  }
+  public function name(): ?string { return $this->anonymous() ? null : strtr($this->reflect->name, '\\', '.'); }
 
   /** Returns type literal (in namespaced form) */
-  public function literal(): ?string {
-    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
-      return null;
-    } else {
-      return $this->reflect->name;
-    }
-  }
+  public function literal(): ?string { return $this->anonymous() ? null :  $this->reflect->name; }
 
   /** Returns declared name (without namespace) */
-  public function declaredName(): ?string {
-    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
-      return null;
-    } else {
-      return $this->reflect->getShortName();
-    }
-  }
+  public function declaredName(): ?string {  return $this->anonymous() ? null : $this->reflect->getShortName(); }
 
   /** Returns a compound name consisting of `[NAME]()` */
   public function compoundName(): string {
-    if (PHP_VERSION_ID < 80200 ? strpos($this->reflect->name, '{closure}') : $this->reflect->isAnonymous()) {
-      return '{closure}()';
-    } else if ($this->reflect instanceof ReflectionFunction) {
-      return strtr($this->reflect->name, '\\', '.').'()';
-    } else {
+    if ($this->reflect instanceof ReflectionMethod) {
       return strtr($this->reflect->class.'::'.$this->reflect->name, '\\', '.').'()';
+    } else {
+      return $this->anonymous() ? '{closure}()' : strtr($this->reflect->name, '\\', '.').'()';
     }
   }
 
