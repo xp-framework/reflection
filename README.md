@@ -28,6 +28,7 @@ use org\example\{Base, Inject, Fixture};
 
 $type= Reflection::type(Fixture::class);
 
+$type->anonymous();           // FALSE
 $type->name();                // org.example.Fixture
 $type->declaredName();        // Fixture
 $type->literal();             // Fixture::class
@@ -144,6 +145,7 @@ foreach ($type->methods() as $name => $method) {
   $method->parameters();                   // Parameters
   $method->parameter(0);                   // Parameter or NULL
   $method->closure($instance);             // Closure instance
+  $method->invocable($instance);           // Invocable
   $method->invoke($instance, []);          // (method return value)
 }
 ```
@@ -189,12 +191,33 @@ foreach ($parameters as $name => $parameter) {
 }
 ```
 
-Packages can be reflected upon by passing namespace names to `Reflection::of()`.
+Closure can be reflected upon via the *Invocable* class:
 
 ```php
 use lang\Reflection;
 
-$package= Reflection::of('org.example');
+$invocable= Reflection::invocable('strlen');
+
+$invocable->anonymous();               // FALSE
+$invocable->name();                    // strlen
+$invocable->declaredName();            // strlen
+$invocable->literal();                 // strlen
+$invocable->comment();                 // (api doc comment)
+$invocable->package();                 // Package or NULL
+$invocable->annotations();             // Annotations
+$invocable->annotation(Inject::class); // Annotation or NULL
+$invocable->returns();                 // Constraint
+$invocable->parameters();              // Parameters
+$invocable->parameter(0);              // Parameter or NULL
+$invocable->invoke(['Test']);          // strlen("Test") = 4
+```
+
+Packages can be reflected upon by passing namespace names to `Reflection::package()`.
+
+```php
+use lang\Reflection;
+
+$package= Reflection::package('org.example');
 
 $package->name();                          // org.example
 $package->literal();                       // 'org\example'

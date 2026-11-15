@@ -199,6 +199,11 @@ class FromSyntaxTree {
   }
 
   /** @return iterable */
+  public function ofInvocable($reflect) {
+    throw new IllegalStateException('Invocables cannot have annotations in PHP 7');
+  }
+
+  /** @return iterable */
   public function ofType($reflect) {
     $tree= $this->tree($reflect, $reflect->getFileName());
     return $this->annotations($tree, $tree->type());      

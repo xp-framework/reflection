@@ -7,7 +7,7 @@ Use lang\reflection\Modifiers;
  * it to another source otherwise.
  */
 class MetaInformation {
-  private $annotations;
+  public $annotations;
 
   public function __construct($annotations) {
     $this->annotations= $annotations;

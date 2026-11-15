@@ -1,15 +1,22 @@
 <?php namespace lang\reflection\unittest;
 
-use ReflectionClass, ReflectionObject;
+use ReflectionClass, ReflectionObject, ReflectionFunction;
 use lang\meta\{FromAttributes, FromSyntaxTree};
-use lang\reflection\Package;
+use lang\reflection\{Invocable, Package};
 use lang\{ClassNotFoundException, Reflection, Type};
 use test\{Assert, Expect, Test, Values};
 
 class ReflectionTest {
 
   /** @return iterable */
-  private function arguments() {
+  private function invocables() {
+    yield ['strlen', 'global function'];
+    yield [fn() => true, 'short closure'];
+    yield [function() { }, 'closure'];
+  }
+
+  /** @return iterable */
+  private function types() {
     yield [self::class, 'class literal'];
     yield [nameof($this), 'class name'];
     yield [$this, 'instance'];
@@ -32,12 +39,12 @@ class ReflectionTest {
     yield [new ReflectionObject($this), 'reflection object'];
   }
 
-  #[Test, Values(from: 'arguments')]
-  public function of($argument) {
-    Assert::equals(nameof($this), Reflection::of($argument)->name());
+  #[Test, Values(from: 'invocables')]
+  public function invocable($argument) {
+    Assert::instance(Invocable::class, Reflection::invocable($argument));
   }
 
-  #[Test, Values(from: 'arguments')]
+  #[Test, Values(from: 'types')]
   public function type($argument) {
     Assert::equals(nameof($this), Reflection::type($argument)->name());
   }
@@ -45,6 +52,36 @@ class ReflectionTest {
   #[Test, Values(from: 'packages')]
   public function package($argument) {
     Assert::equals(new Package('lang.reflection.unittest'), Reflection::package($argument));
+  }
+
+  #[Test]
+  public function package_of_closure() {
+    Assert::equals(new Package(''), Reflection::package(fn() => true));
+  }
+
+  #[Test]
+  public function package_of_invocable() {
+    Assert::equals(new Package(''), Reflection::package(Reflection::invocable('strlen')));
+  }
+
+  #[Test]
+  public function package_of_function() {
+    Assert::equals(new Package(''), Reflection::package(new ReflectionFunction('strlen')));
+  }
+
+  #[Test, Values(from: 'types')]
+  public function of($argument) {
+    Assert::equals(nameof($this), Reflection::of($argument)->name());
+  }
+
+  #[Test]
+  public function of_closure() {
+    Assert::instance(Invocable::class, Reflection::of(fn() => true));
+  }
+
+  #[Test]
+  public function of_function() {
+    Assert::instance(Invocable::class, Reflection::of(new ReflectionFunction('strlen')));
   }
 
   #[Test]

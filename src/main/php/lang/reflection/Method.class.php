@@ -21,7 +21,7 @@ class Method extends Routine {
   public function closure(?object $instance= null) {
     try {
       $closure= $this->reflect->getClosure($instance);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
       throw new IllegalArgumentException($e->getMessage());
     }
 
@@ -37,6 +37,23 @@ class Method extends Routine {
     // @codeCoverageIgnoreEnd
 
     return $closure;
+  }
+
+  /**
+   * Returns an invocable
+   *
+   * @param  ?object $instance
+   * @return lang.reflection.Invocable
+   * @throws lang.IllegalArgumentException for incorrect or missing instances
+   */
+  public function invocable(?object $instance= null) {
+    if ($instance && !($instance instanceof $this->reflect->class)) {
+      throw new IllegalArgumentException('Instance is not an instance of the class method was declared in');
+    } else if (null === $instance && !$this->reflect->isStatic()) {
+      throw new IllegalArgumentException('Instance cannot be null for non-static methods');
+    }
+
+    return new Invocable($this->reflect, $instance);
   }
 
   /**

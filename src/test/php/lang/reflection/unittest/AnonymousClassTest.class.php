@@ -6,8 +6,23 @@ use test\{Assert, Test};
 class AnonymousClassTest {
 
   #[Test]
+  public function anonymous() {
+    Assert::true(Reflection::type(new class() { })->anonymous());
+  }
+
+  #[Test]
   public function name() {
-    Assert::equals('class@anonymous', strstr(Reflection::type(new class() { })->name(), "\0", true));
+    Assert::null(Reflection::type(new class() { })->name());
+  }
+
+  #[Test]
+  public function literal() {
+    Assert::null(Reflection::type(new class() { })->literal());
+  }
+
+  #[Test]
+  public function declared_name() {
+    Assert::null(Reflection::type(new class() { })->declaredName());
   }
 
   /** @see https://github.com/xp-framework/reflection/issues/33 */

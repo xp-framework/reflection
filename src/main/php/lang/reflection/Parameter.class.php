@@ -1,5 +1,6 @@
 <?php namespace lang\reflection;
 
+use ReflectionMethod;
 use lang\{Reflection, Type, IllegalStateException};
 
 /**
@@ -8,18 +9,18 @@ use lang\{Reflection, Type, IllegalStateException};
  * @test lang.reflection.unittest.MethodsTest
  */
 class Parameter implements Annotated {
-  private $reflect, $method;
+  private $reflect, $holder;
   private $annotations= null;
 
   /**
    * Creates a new parameter
    *
    * @param  ReflectionParameter $reflect
-   * @param  ReflectionMethod $method
+   * @param  ReflectionFunctionAbstract $holder
    */
-  public function __construct($reflect, $method= null) {
+  public function __construct($reflect, $holder= null) {
     $this->reflect= $reflect;
-    $this->method= $method ?? $reflect->getDeclaringFunction();
+    $this->holder= $holder ?? $reflect->getDeclaringFunction();
   }
 
   /** Returns parameter name */
@@ -45,7 +46,10 @@ class Parameter implements Annotated {
     if ($this->reflect->isDefaultValueAvailable()) {
       $value= $this->reflect->getDefaultValue();
       if (null === $value) {
-        $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
+        $this->annotations ?? $this->annotations= $this->holder instanceof ReflectionMethod
+          ? Reflection::meta()->parameterAnnotations($this->holder, $this->reflect)
+          : Reflection::meta()->annotations->ofParameter($this->holder, $this->reflect)
+        ;
         return $this->annotations['Default'][0] ?? null;
       }
       return $value;
@@ -56,13 +60,19 @@ class Parameter implements Annotated {
 
   /** @return lang.reflection.Annotations */
   public function annotations() {
-    $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
+    $this->annotations ?? $this->annotations= $this->holder instanceof ReflectionMethod
+      ? Reflection::meta()->parameterAnnotations($this->holder, $this->reflect)
+      : Reflection::meta()->annotations->ofParameter($this->holder, $this->reflect)
+    ;
     return new Annotations($this->annotations);
   }
 
   /** @return ?lang.reflection.Annotation */
   public function annotation(string $type) {
-    $this->annotations ?? $this->annotations= Reflection::meta()->parameterAnnotations($this->method, $this->reflect);
+    $this->annotations ?? $this->annotations= $this->holder instanceof ReflectionMethod
+      ? Reflection::meta()->parameterAnnotations($this->holder, $this->reflect)
+      : Reflection::meta()->annotations->ofParameter($this->holder, $this->reflect)
+    ;
 
     $t= strtr($type, '.', '\\');
     return isset($this->annotations[$t]) ? new Annotation($t, $this->annotations[$t]) : null;
@@ -73,14 +83,20 @@ class Parameter implements Annotated {
     $present= true;
 
     // Only use meta information if necessary
-    $api= function($set) use(&$present, &$names) {
-      $present= $set;
-      $names= Reflection::meta()->methodParameterTypes($this->method);
-      return $names[$this->reflect->getPosition()] ?? null;
-    };
+    if ($this->holder instanceof ReflectionMethod) {
+      $resolve= Member::resolve($this->reflect);
+      $api= function($set) use(&$present) {
+        $present= $set;
+        $names= Reflection::meta()->methodParameterTypes($this->holder);
+        return $names[$this->reflect->getPosition()] ?? null;
+      };
+    } else {
+      $resolve= [];
+      $api= function($set) use(&$present) { $present= $set; return null; };
+    }
 
     return new Constraint(
-      Type::resolve($this->reflect->getType(), Member::resolve($this->reflect), $api) ?? Type::$VAR,
+      Type::resolve($this->reflect->getType(), $resolve, $api) ?? Type::$VAR,
       $present
     );
   }
