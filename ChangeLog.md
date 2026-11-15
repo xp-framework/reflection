@@ -3,6 +3,9 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #52: Add `lang.reflection.Invocable` to reflect callable
+  closures and functions.
+  (@thekid)
 * Merged PR #53: Add `Methods::class()` and `Methods::instance()` to
   enumerate methods (optionally with modifier mask)
   (@thekid)
