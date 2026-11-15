@@ -3,6 +3,10 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+* Merged PR #53: Add `Methods::class()` and `Methods::instance()` to
+  enumerate methods (optionally with modifier mask)
+  (@thekid)
+
 ## 3.7.0 / 2026-07-05
 
 * Made compatible with `xp-framework/ast` version 13.0.0 - adding support
