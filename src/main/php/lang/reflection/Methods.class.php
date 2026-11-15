@@ -22,6 +22,32 @@ class Methods extends Members {
   }
 
   /**
+   * Return class methods
+   *
+   * @param  int $mask
+   * @return iterable
+   */
+  public function class($mask= MODIFIER_PUBLIC | MODIFIER_PROTECTED | MODIFIER_PRIVATE) {
+    foreach ($this->reflect->getMethods($mask) as $method) {
+      if (!$method->isStatic() || 0 === strncmp($method->name, '__', 2)) continue;
+      yield $method->name => new Method($method);
+    }
+  }
+
+  /**
+   * Return instance methods
+   *
+   * @param  int $mask
+   * @return iterable
+   */
+  public function instance($mask= MODIFIER_PUBLIC | MODIFIER_PROTECTED | MODIFIER_PRIVATE) {
+    foreach ($this->reflect->getMethods($mask) as $method) {
+      if ($method->isStatic() || 0 === strncmp($method->name, '__', 2)) continue;
+      yield $method->name => new Method($method);
+    }
+  }
+
+  /**
    * Return methods annotated with a given annotation
    *
    * @param  string $annotation

@@ -61,6 +61,46 @@ class MethodsTest {
   }
 
   #[Test]
+  public function instance() {
+    $type= $this->declare('{
+      public static function create() { }
+
+      private function concat() { }
+
+      public function name() { }
+    }');
+
+    Assert::equals(
+      ['concat' => $type->method('concat'), 'name' => $type->method('name')],
+      iterator_to_array($type->methods()->instance())
+    );
+    Assert::equals(
+      ['name' => $type->method('name')],
+      iterator_to_array($type->methods()->instance(MODIFIER_PUBLIC))
+    );
+  }
+
+  #[Test]
+  public function class() {
+    $type= $this->declare('{
+      public static function create() { }
+
+      private static function newInstance() { }
+
+      public function name() { }
+    }');
+
+    Assert::equals(
+      ['create' => $type->method('create'), 'newInstance' => $type->method('newInstance')],
+      iterator_to_array($type->methods()->class())
+    );
+    Assert::equals(
+      ['newInstance' => $type->method('newInstance')],
+      iterator_to_array($type->methods()->class(MODIFIER_PRIVATE))
+    );
+  }
+
+  #[Test]
   public function non_existant() {
     $type= $this->declare('{ }');
     Assert::null($type->methods()->named('fixture'));
