@@ -3,6 +3,8 @@ XP Reflection ChangeLog
 
 ## ?.?.? / ????-??-??
 
+## 3.8.0 / 2026-11-15
+
 * Merged PR #52: Add `lang.reflection.Invocable` to reflect callable
   closures and functions.
   (@thekid)
