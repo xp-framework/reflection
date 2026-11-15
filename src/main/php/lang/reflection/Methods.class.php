@@ -17,7 +17,8 @@ class Methods extends Members {
    */
   public function getIterator(): Traversable {
     foreach ($this->reflect->getMethods() as $method) {
-      if (0 !== strncmp($method->name, '__', 2)) yield $method->name => new Method($method);
+      if (0 === strncmp($method->name, '__', 2)) continue;
+      yield $method->name => new Method($method);
     }
   }
 
@@ -56,10 +57,9 @@ class Methods extends Members {
   public function annotated($annotation) {
     $t= strtr($annotation, '.', '\\');
     foreach ($this->reflect->getMethods() as $method) {
-      if (0 !== strncmp($method->name, '__', 2)) {
-        $annotations= Reflection::meta()->methodAnnotations($method);
-        if (isset($annotations[$t])) yield $method->name => new Method($method, $annotations);
-      }
+      if (0 === strncmp($method->name, '__', 2)) continue;
+      $annotations= Reflection::meta()->methodAnnotations($method);
+      if (isset($annotations[$t])) yield $method->name => new Method($method, $annotations);
     }
   }
 
