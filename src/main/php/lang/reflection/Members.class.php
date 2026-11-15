@@ -6,7 +6,7 @@ use IteratorAggregate;
 abstract class Members implements IteratorAggregate {
   protected $reflect;
 
-  /** @param ReflectionClassConstant|ReflectionProperty|ReflectionMethod $reflect */
+  /** @param ReflectionClass $reflect */
   public function __construct($reflect) {
     $this->reflect= $reflect;
   }
