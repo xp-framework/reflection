@@ -148,6 +148,20 @@ foreach ($type->methods() as $name => $method) {
 }
 ```
 
+To select class and instance methods:
+
+```php
+$select= $type->methods()->instance();
+$select= $type->methods()->instance(MODIFIER_PUBLIC);
+
+$select= $type->methods()->class();
+$select= $type->methods()->class(MODIFIER_PRIVATE | MODIFIER_PROTECTED);
+
+foreach ($select as $name => $method) {
+  // ...
+}
+```
+
 Method and constructor parameters can be retrieved by iterating via `parameters()`, by offset `parameter($position)` or by name `parameter($name)`.
 
 ```php
